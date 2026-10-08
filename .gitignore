@@ -1,0 +1,23 @@
+# Secretos y entorno
+.env
+.env.*
+!.env.example
+!.env.test.example
+
+# Dependencias y compilados
+node_modules/
+dist/
+build/
+coverage/
+
+# Registros
+*.log
+npm-debug.log*
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/

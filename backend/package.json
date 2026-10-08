@@ -1,0 +1,23 @@
+{
+  "name": "gymaccess-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API REST de GymAccess (Sprint 1: autenticación, usuarios y clientes)",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node --env-file=.env --watch src/server.js",
+    "start": "node --env-file=.env src/server.js",
+    "test": "node --env-file=.env.test --test \"tests/**/*.test.js\""
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.24.5",
+    "zod": "^4.6.5"
+  }
+}

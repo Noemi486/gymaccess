@@ -1,0 +1,474 @@
+openapi: 3.0.3
+info:
+  title: GymAccess API - Sprint 1
+  version: 1.0.0
+  description: >
+    API REST del Sprint 1 (autenticación, usuarios y clientes). Todas las respuestas son JSON.
+    Los permisos se validan en el backend en cada petición.
+servers:
+  - url: http://localhost:3000/api
+
+tags:
+  - name: Auth
+  - name: Usuarios
+  - name: Clientes
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Iniciar sesión (FR-001..FR-004, FR-003a)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: Sesión iniciada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResponse' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401':
+          description: Credenciales inválidas, cuenta desactivada o cliente dado de baja (mismo mensaje genérico)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '423':
+          description: Cuenta bloqueada temporalmente (5 intentos fallidos, 15 minutos)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Datos de la sesión actual
+      responses:
+        '200':
+          description: Usuario autenticado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UsuarioPublico' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /usuarios:
+    get:
+      tags: [Usuarios]
+      summary: Listar usuarios (solo administrador, FR-008)
+      parameters:
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/Limit' }
+        - in: query
+          name: rol
+          schema: { $ref: '#/components/schemas/Rol' }
+        - in: query
+          name: estado
+          schema: { $ref: '#/components/schemas/Estado' }
+      responses:
+        '200':
+          description: Página de usuarios (sin contraseñas)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, page, limit, total]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/UsuarioPublico' }
+                  page: { type: integer }
+                  limit: { type: integer }
+                  total: { type: integer }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Usuarios]
+      summary: Registrar usuario (solo administrador, FR-008, FR-010, FR-011, FR-007a)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UsuarioCrear' }
+      responses:
+        '201':
+          description: Usuario creado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UsuarioPublico' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Correo ya en uso, cliente ya con cuenta o cliente sin correo
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /usuarios/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/IdPath' }
+    get:
+      tags: [Usuarios]
+      summary: Consultar un usuario (solo administrador)
+      responses:
+        '200':
+          description: Usuario
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UsuarioPublico' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Usuarios]
+      summary: Modificar usuario, cambiar rol o estado (solo administrador, FR-008, FR-012)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UsuarioActualizar' }
+      responses:
+        '200':
+          description: Usuario actualizado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UsuarioPublico' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Correo duplicado, cambio de rol hacia/desde cliente, o la operación dejaría al sistema sin administradores activos
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /clientes:
+    get:
+      tags: [Clientes]
+      summary: Listar clientes (administrador, recepcionista, entrenador; FR-019)
+      description: El entrenador recibe solo id_cliente, nombre, apellido, estado y fecha_registro.
+      parameters:
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/Limit' }
+        - in: query
+          name: q
+          description: Búsqueda por nombre, apellido o correo
+          schema: { type: string, maxLength: 150 }
+        - in: query
+          name: estado
+          schema: { $ref: '#/components/schemas/Estado' }
+        - in: query
+          name: para_cuenta
+          description: >
+            Solo administrador (403 para los demás roles). Devuelve únicamente clientes activos, con correo
+            y sin cuenta de acceso, para elegir a quién crear una cuenta.
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Página de clientes
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, page, limit, total]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/Cliente'
+                        - $ref: '#/components/schemas/ClienteBasico'
+                  page: { type: integer }
+                  limit: { type: integer }
+                  total: { type: integer }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Clientes]
+      summary: Registrar cliente (administrador o recepcionista; FR-015, FR-017, FR-018)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ClienteCrear' }
+      responses:
+        '201':
+          description: Cliente creado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cliente' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409':
+          description: Correo ya registrado en otro cliente
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /clientes/me:
+    get:
+      tags: [Clientes]
+      summary: Consultar la información propia (solo rol cliente, FR-020)
+      responses:
+        '200':
+          description: Datos del cliente vinculado a la sesión
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cliente' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /clientes/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/IdPath' }
+    get:
+      tags: [Clientes]
+      summary: Consultar un cliente (administrador, recepcionista, entrenador)
+      description: El entrenador recibe solo los campos básicos. El rol cliente recibe 403 (usa /clientes/me).
+      responses:
+        '200':
+          description: Cliente
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Cliente'
+                  - $ref: '#/components/schemas/ClienteBasico'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Clientes]
+      summary: Modificar cliente (administrador o recepcionista; FR-016)
+      description: No cambia el estado (usar /clientes/{id}/estado). Rechaza cambiar o quitar el correo si el cliente ya tiene cuenta.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ClienteActualizar' }
+      responses:
+        '200':
+          description: Cliente actualizado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cliente' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Correo duplicado o correo no modificable porque el cliente tiene cuenta
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /clientes/{id}/estado:
+    parameters:
+      - { $ref: '#/components/parameters/IdPath' }
+    patch:
+      tags: [Clientes]
+      summary: Dar de baja o reactivar un cliente (solo administrador, FR-021)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [estado]
+              additionalProperties: false
+              properties:
+                estado: { $ref: '#/components/schemas/Estado' }
+      responses:
+        '200':
+          description: Estado actualizado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cliente' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    IdPath:
+      in: path
+      name: id
+      required: true
+      schema: { type: integer, minimum: 1 }
+    Page:
+      in: query
+      name: page
+      schema: { type: integer, minimum: 1, default: 1 }
+    Limit:
+      in: query
+      name: limit
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+
+  responses:
+    ValidationError:
+      description: Datos inválidos; details indica cada campo a corregir
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unauthorized:
+      description: Falta la sesión, es inválida o venció
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: El rol no tiene permiso para esta operación
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Recurso inexistente
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+    Rol:
+      type: string
+      enum: [administrador, recepcionista, entrenador, cliente]
+    Estado:
+      type: string
+      enum: [activo, inactivo]
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              example: Revisa los datos enviados.
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field: { type: string, example: telefono }
+                  message: { type: string, example: El teléfono es obligatorio. }
+
+    LoginRequest:
+      type: object
+      required: [correo, password]
+      additionalProperties: false
+      properties:
+        correo: { type: string, format: email }
+        password: { type: string }
+
+    LoginResponse:
+      type: object
+      required: [token, usuario]
+      properties:
+        token: { type: string, description: JWT con vigencia de 8 horas }
+        usuario: { $ref: '#/components/schemas/UsuarioPublico' }
+
+    UsuarioPublico:
+      type: object
+      required: [id_usuario, nombre, correo, rol, estado, id_cliente, fecha_registro]
+      properties:
+        id_usuario: { type: integer }
+        nombre: { type: string }
+        correo: { type: string, format: email }
+        rol: { $ref: '#/components/schemas/Rol' }
+        estado: { $ref: '#/components/schemas/Estado' }
+        id_cliente: { type: integer, nullable: true }
+        fecha_registro: { type: string, format: date-time }
+
+    UsuarioCrear:
+      type: object
+      required: [nombre, correo, password, rol]
+      additionalProperties: false
+      properties:
+        nombre: { type: string, minLength: 1, maxLength: 120 }
+        correo: { type: string, format: email, maxLength: 150 }
+        password:
+          type: string
+          minLength: 8
+          maxLength: 72
+          description: Al menos una letra y un número
+        rol: { $ref: '#/components/schemas/Rol' }
+        id_cliente:
+          type: integer
+          description: Obligatorio si rol = cliente; prohibido en los demás roles. El correo debe coincidir con el del cliente.
+
+    UsuarioActualizar:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        nombre: { type: string, minLength: 1, maxLength: 120 }
+        correo: { type: string, format: email, maxLength: 150 }
+        password: { type: string, minLength: 8, maxLength: 72 }
+        rol: { $ref: '#/components/schemas/Rol' }
+        estado: { $ref: '#/components/schemas/Estado' }
+
+    Cliente:
+      type: object
+      required: [id_cliente, nombre, apellido, correo, telefono, direccion, fecha_registro, estado]
+      properties:
+        id_cliente: { type: integer }
+        nombre: { type: string }
+        apellido: { type: string }
+        correo: { type: string, format: email, nullable: true }
+        telefono: { type: string }
+        direccion: { type: string, nullable: true }
+        fecha_registro: { type: string, format: date-time }
+        estado: { $ref: '#/components/schemas/Estado' }
+
+    ClienteBasico:
+      type: object
+      description: Vista para el entrenador
+      required: [id_cliente, nombre, apellido, fecha_registro, estado]
+      properties:
+        id_cliente: { type: integer }
+        nombre: { type: string }
+        apellido: { type: string }
+        fecha_registro: { type: string, format: date-time }
+        estado: { $ref: '#/components/schemas/Estado' }
+
+    ClienteCrear:
+      type: object
+      required: [nombre, apellido, telefono]
+      additionalProperties: false
+      properties:
+        nombre: { type: string, minLength: 1, maxLength: 80 }
+        apellido: { type: string, minLength: 1, maxLength: 80 }
+        telefono: { type: string, minLength: 1, maxLength: 20 }
+        correo: { type: string, format: email, maxLength: 150, nullable: true }
+        direccion: { type: string, maxLength: 255, nullable: true }
+
+    ClienteActualizar:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        nombre: { type: string, minLength: 1, maxLength: 80 }
+        apellido: { type: string, minLength: 1, maxLength: 80 }
+        telefono: { type: string, minLength: 1, maxLength: 20 }
+        correo: { type: string, format: email, maxLength: 150, nullable: true }
+        direccion: { type: string, maxLength: 255, nullable: true }
