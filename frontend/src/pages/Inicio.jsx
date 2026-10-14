@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { indicadoresParaRol } from '../config/indicadores.js';
 import { tarjetasClienteVisibles } from '../config/tarjetasCliente.js';
 import BuscadorClientes from '../components/BuscadorClientes.jsx';
+import ClientesNuevos from '../components/ClientesNuevos.jsx';
 import Badge from '../components/ui/Badge.jsx';
 import Button from '../components/ui/Button.jsx';
 import Card from '../components/ui/Card.jsx';
@@ -149,7 +150,14 @@ function ResumenPersonal({ rol, resumen }) {
       </div>
 
       <div className="inicio-paneles">
-        {ultimos && (
+        {/* Entrenador: lista de clientes nuevos con la proyección básica (sin datos de contacto) */}
+        {ultimos && rol === 'entrenador' && (
+          <div className="inicio-panel-ancho">
+            <ClientesNuevos clientes={ultimos} />
+          </div>
+        )}
+
+        {ultimos && rol !== 'entrenador' && (
           <Card titulo="Últimos clientes registrados" className="inicio-panel-ancho">
             <Table
               etiquetaTabla="Últimos clientes registrados"

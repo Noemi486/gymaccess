@@ -24,6 +24,14 @@ export async function contarClientesRegistradosEsteMes() {
   return Number(filas[0].total);
 }
 
+// Clientes registrados en los últimos 7 días: hoy y los 6 días anteriores (7 días naturales).
+export async function contarClientesRegistradosUltimos7Dias() {
+  const [filas] = await pool.execute(
+    'SELECT COUNT(*) AS total FROM clientes WHERE fecha_registro >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)',
+  );
+  return Number(filas[0].total);
+}
+
 // Últimos clientes registrados, del más reciente al más antiguo (el id desempata).
 export async function ultimosClientes(limite) {
   // LIMIT como texto: mysql2 lo envía así en las sentencias preparadas.

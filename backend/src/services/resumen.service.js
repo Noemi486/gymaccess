@@ -25,6 +25,9 @@ export function crearResumenService({ modelo }) {
         if (rol === 'recepcionista') {
           clientes.registrados_hoy = await modelo.contarClientesRegistradosHoy();
         }
+        if (rol === 'entrenador') {
+          clientes.nuevos_7_dias = await modelo.contarClientesRegistradosUltimos7Dias();
+        }
         return clientes;
       },
     },
@@ -40,7 +43,9 @@ export function crearResumenService({ modelo }) {
     },
     {
       clave: 'ultimos_clientes',
-      roles: ['administrador', 'recepcionista'],
+      // El entrenador también los recibe, pero con la proyección básica de vistaCliente: solo id,
+      // nombre, apellido, estado y fecha de registro (nunca teléfono, correo ni dirección).
+      roles: ['administrador', 'recepcionista', 'entrenador'],
       async obtener(rol) {
         const filas = await modelo.ultimosClientes(CANTIDAD_ULTIMOS);
         return filas.map((fila) => vistaCliente(fila, rol));

@@ -15,6 +15,7 @@ import {
 // comparan con tolerancia (estabilidad entre dos lecturas) y no con valores fijos.
 
 const ROLES = ['administrador', 'recepcionista', 'entrenador', 'cliente'];
+const BASICOS = ['apellido', 'estado', 'fecha_registro', 'id_cliente', 'nombre'];
 const COMPLETOS = ['apellido', 'correo', 'direccion', 'estado', 'fecha_registro', 'id_cliente', 'nombre', 'telefono'];
 
 describe('API de resumen del inicio', () => {
@@ -177,15 +178,70 @@ describe('API de resumen del inicio', () => {
   });
 
   describe('entrenador', () => {
-    it('recibe solo el número de clientes activos: sin contacto ni cifras de usuarios', async () => {
+    it('recibe activos, nuevos de los últimos 7 días y los últimos 5 clientes con la proyección básica', async () => {
+      await crearCliente('Nuevo', { correo: correoUnico('test'), direccion: 'Calle Secreta 99' });
       const { status, cuerpo } = await api('GET', '/resumen', tokenEntrenador);
 
       assert.equal(status, 200);
-      assert.deepEqual(Object.keys(cuerpo), ['clientes']);
-      assert.deepEqual(Object.keys(cuerpo.clientes), ['activos']);
+      assert.deepEqual(Object.keys(cuerpo).sort(), ['clientes', 'ultimos_clientes']);
+      assert.deepEqual(Object.keys(cuerpo.clientes).sort(), ['activos', 'nuevos_7_dias']);
       assert.ok(Number.isInteger(cuerpo.clientes.activos) && cuerpo.clientes.activos >= 1);
+      assert.ok(Number.isInteger(cuerpo.clientes.nuevos_7_dias) && cuerpo.clientes.nuevos_7_dias >= 1);
+      assert.ok(cuerpo.ultimos_clientes.length >= 1 && cuerpo.ultimos_clientes.length <= 5);
+      for (const cliente of cuerpo.ultimos_clientes) {
+        assert.deepEqual(Object.keys(cliente).sort(), BASICOS);
+      }
+    });
+
+    it('nunca recibe teléfono, correo, dirección, cifras de usuarios ni información financiera', async () => {
+      const marcaSecreta = `Secreto${Date.now()}`;
+      await crearCliente('Privado', { correo: correoUnico('test'), direccion: marcaSecreta });
+      const { cuerpo } = await api('GET', '/resumen', tokenEntrenador);
+
       const texto = JSON.stringify(cuerpo);
-      assert.ok(!texto.includes('telefono') && !texto.includes('correo') && !texto.includes('usuarios'));
+      for (const prohibido of ['telefono', 'correo', 'direccion', 'usuarios', 'pago', 'monto', 'adeudo', 'ingreso']) {
+        assert.ok(!texto.includes(prohibido), `no debe incluir "${prohibido}"`);
+      }
+      assert.ok(!texto.includes(marcaSecreta));
+      assert.ok(!texto.includes('555-300-4000')); // el teléfono con el que se crean los clientes de prueba
+      assert.ok(!texto.includes('@example.com'));
+    });
+
+    it('los últimos clientes vienen del más reciente al más antiguo', async () => {
+      await crearCliente('Orden');
+      const { cuerpo } = await api('GET', '/resumen', tokenEntrenador);
+      const claves = cuerpo.ultimos_clientes.map((c) => [new Date(c.fecha_registro).getTime(), c.id_cliente]);
+      assert.deepEqual(claves, [...claves].sort((a, b) => b[0] - a[0] || b[1] - a[1]));
+    });
+
+    it('recibe los mismos clientes recientes que el administrador, pero sin datos de contacto', async () => {
+      const leer = async () => {
+        const [entrenador, admin] = await Promise.all([
+          api('GET', '/resumen', tokenEntrenador),
+          api('GET', '/resumen', tokenAdmin),
+        ]);
+        return {
+          entrenador: entrenador.cuerpo.ultimos_clientes.map((c) => c.id_cliente),
+          admin: admin.cuerpo.ultimos_clientes.map((c) => c.id_cliente),
+        };
+      };
+      // Otras pruebas crean clientes en paralelo: se repite hasta que ambas lecturas ven el mismo estado.
+      let ultima;
+      for (let intento = 0; intento < 10; intento += 1) {
+        ultima = await leer();
+        if (JSON.stringify(ultima.entrenador) === JSON.stringify(ultima.admin)) break;
+      }
+      const comunes = ultima.entrenador.filter((id) => ultima.admin.includes(id));
+      assert.ok(comunes.length >= 3, 'las dos listas deben coincidir salvo altas simultáneas de otras pruebas');
+      // Los comunes aparecen en el mismo orden (del más reciente al más antiguo).
+      assert.deepEqual(comunes, ultima.admin.filter((id) => comunes.includes(id)));
+    });
+
+    it('las cifras de nuevos y activos de los demás roles no se ven alteradas por la del entrenador', async () => {
+      const recepcion = (await api('GET', '/resumen', tokenRecepcion)).cuerpo;
+      const admin = (await api('GET', '/resumen', tokenAdmin)).cuerpo;
+      assert.equal('nuevos_7_dias' in recepcion.clientes, false);
+      assert.equal('nuevos_7_dias' in admin.clientes, false);
     });
   });
 

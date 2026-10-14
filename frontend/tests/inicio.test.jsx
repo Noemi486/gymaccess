@@ -22,6 +22,15 @@ const cliente = (id, nombre, estado = 'activo') => ({
   estado,
 });
 
+// Proyección del entrenador: solo id, nombre, apellido, estado y fecha de registro.
+const basico = (id, nombre, estado) => ({
+  id_cliente: id,
+  nombre,
+  apellido: 'Pérez',
+  estado,
+  fecha_registro: '2026-10-12T10:00:00.000Z',
+});
+
 const RESUMENES = {
   administrador: {
     clientes: { activos: 40, inactivos: 7, registrados_mes: 12 },
@@ -32,7 +41,14 @@ const RESUMENES = {
     clientes: { activos: 40, registrados_hoy: 2 },
     ultimos_clientes: [cliente(5, 'Elena'), cliente(4, 'Diego')],
   },
-  entrenador: { clientes: { activos: 40 } },
+  entrenador: {
+    clientes: { activos: 40, nuevos_7_dias: 6 },
+    ultimos_clientes: [
+      basico(5, 'Elena', 'activo'),
+      basico(4, 'Diego', 'inactivo'),
+      basico(3, 'Carla', 'activo'),
+    ],
+  },
 };
 
 const propio = { ...cliente(7, 'Ana'), correo: 'ana@example.com' };
@@ -176,16 +192,62 @@ describe('Inicio: panel de resumen', () => {
   });
 
   describe('entrenador', () => {
-    it('ve el buscador y los clientes activos, sin botón de registro ni listas', async () => {
-      abrir('entrenador');
+    it('ve el saludo con fecha, el buscador, dos indicadores y la lista de clientes nuevos', async () => {
+      const urls = abrir('entrenador');
       const contenido = within(principal());
 
       expect(await contenido.findByText('Clientes activos')).toBeInTheDocument();
       expect(contenido.getByRole('search', { name: /buscar clientes/i })).toBeInTheDocument();
+      expect(contenido.getByPlaceholderText('Nombre o apellido')).toBeInTheDocument();
       expect(contenido.getByText('Clientes activos').closest('.stat-card')).toHaveTextContent('40');
+      expect(contenido.getByText('Clientes nuevos (7 días)').closest('.stat-card')).toHaveTextContent('6');
+      expect(principal().querySelectorAll('.stat-card')).toHaveLength(2);
+      expect(contenido.getByText(fechaDeHoy())).toBeInTheDocument();
+
       expect(contenido.queryByRole('link', { name: /registrar cliente/i })).not.toBeInTheDocument();
       expect(contenido.queryByRole('table')).not.toBeInTheDocument();
       expect(contenido.queryByText('Registrados hoy')).not.toBeInTheDocument();
+      expect(contenido.queryByText('Usuarios del sistema')).not.toBeInTheDocument();
+      expect(urls).toContain('/api/resumen');
+    });
+
+    it('la lista "Clientes nuevos" muestra avatar, nombre completo, estado y fecha de registro', async () => {
+      abrir('entrenador');
+      const lista = (await screen.findByRole('heading', { name: 'Clientes nuevos' })).closest('.card');
+      const filas = within(lista).getAllByRole('listitem');
+      expect(filas).toHaveLength(3);
+
+      const primera = within(filas[0]);
+      expect(primera.getByText('EP')).toHaveClass('avatar');
+      expect(primera.getByRole('link', { name: 'Elena Pérez' })).toHaveAttribute('href', '/clientes/5');
+      expect(primera.getByText('Activo')).toBeInTheDocument();
+      expect(primera.getByText('12 oct 2026')).toBeInTheDocument();
+      expect(within(filas[1]).getByText('Inactivo')).toBeInTheDocument();
+    });
+
+    it('nunca muestra teléfono, correo, dirección ni información financiera', async () => {
+      abrir('entrenador');
+      await screen.findByRole('heading', { name: 'Clientes nuevos' });
+      const texto = principal().textContent.toLowerCase();
+
+      for (const dato of ['555-000', '@example.com', 'calle', 'teléfono', 'correo', 'dirección']) {
+        expect(texto).not.toContain(dato);
+      }
+      for (const financiero of ['pagos', 'adeudo', 'ingresos', 'monto', '$']) {
+        expect(texto).not.toContain(financiero);
+      }
+    });
+
+    it('el buscador lleva a /clientes con el texto buscado', async () => {
+      abrir('entrenador');
+      fireEvent.change(await screen.findByRole('searchbox', { name: /buscar clientes/i }), { target: { value: 'Pérez' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Buscar' }));
+      expect(await screen.findByTestId('ubicacion')).toHaveTextContent('/clientes?q=P%C3%A9rez');
+    });
+
+    it('sin clientes nuevos muestra un estado vacío', async () => {
+      abrir('entrenador', { resumen: { clientes: { activos: 0, nuevos_7_dias: 0 }, ultimos_clientes: [] } });
+      expect(await screen.findByText('Aún no hay clientes nuevos')).toBeInTheDocument();
     });
   });
 
@@ -244,7 +306,7 @@ describe('Configuración de indicadores', () => {
       'usuarios-sistema',
     ]);
     expect(indicadoresParaRol('recepcionista').map((i) => i.id)).toEqual(['clientes-activos', 'clientes-hoy']);
-    expect(indicadoresParaRol('entrenador').map((i) => i.id)).toEqual(['clientes-activos']);
+    expect(indicadoresParaRol('entrenador').map((i) => i.id)).toEqual(['clientes-activos', 'clientes-7-dias']);
     expect(indicadoresParaRol('cliente')).toEqual([]);
   });
 

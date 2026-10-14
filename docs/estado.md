@@ -30,6 +30,10 @@ El MVP queda completo al terminar la funcionalidad **003 (Sprint 2)**. Criterio 
 - [ ] Ratificar la constitución (fecha de ratificación).
 - [ ] Aprobar decisiones técnicas propuestas: `mysql2`, Context de React, sin librería de componentes, Vitest.
 - [ ] Activar GitHub Copilot para estudiantes (GitHub Education).
+- [ ] Revisar el Inicio del entrenador (funcionalidad 002, interfaz):
+  - Contar y mostrar como "nuevos" solo a los clientes activos (hoy el indicador "Clientes nuevos (7 días)" y la lista "Clientes nuevos" incluyen también a los inactivos).
+  - Hacer las `StatCard` más compactas.
+  - Completarlo con "clientes que entraron hoy" (Sprint 2) y "mis clientes asignados" y rutinas (Sprint 3). El espacio reservado está anotado en el anexo de `specs/002-interfaz-menu-lateral/spec.md`.
 
 ## Bitácora
 

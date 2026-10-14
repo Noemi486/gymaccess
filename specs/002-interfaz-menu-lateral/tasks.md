@@ -174,14 +174,27 @@
 
 ---
 
-## Phase 11: Polish & Cross-Cutting
+## Phase 11: Ajuste de US3 - Inicio del entrenador (Priority: P2)
 
-- [ ] T055 Preguntar al equipo y, con su confirmación, retirar los componentes sustituidos `frontend/src/components/Layout.jsx`, `Mensaje.jsx`, `Confirmacion.jsx` y `Paginacion.jsx` (tras comprobar con búsqueda que ninguna pantalla los importa); si no se confirma, dejarlos sin uso y anotarlo en `docs/estado.md`
-- [ ] T056 Comprobar FR-015/SC-005: buscar en `frontend/src` colores literales (`#`, `rgb(`, `hsl(`) fuera de `frontend/src/styles/tokens.css` y corregirlos
-- [ ] T057 Revisar contraste (≥ 4.5:1) del texto sobre el acento, textos secundarios e insignias, y que el foco de teclado sea visible
-- [ ] T058 Ejecutar `npm test` y `npm run build` en `frontend/` y `npm test` en `backend/`; todo debe pasar (SC-010)
-- [ ] T059 Recorrer `specs/002-interfaz-menu-lateral/quickstart.md` con los 4 roles y marcar los resultados
-- [ ] T060 Actualizar `docs/estado.md` con el avance del sprint de interfaz (fase terminada, pruebas, decisiones: verde lima, fuente del sistema, `lucide-react`)
+**Goal**: Inicio del entrenador con saludo y fecha, buscador grande por nombre o apellido, dos indicadores (clientes activos y clientes nuevos de los últimos 7 días) y la lista "Clientes nuevos" (últimos 5 registrados: avatar de iniciales, nombre completo, `Badge` de estado y fecha de registro), siempre con la proyección básica del entrenador (nunca teléfono, correo, dirección ni información financiera), validada en el backend.
+
+**Independent Test**: entrar como entrenador; se ven los dos indicadores, el buscador y la lista; la respuesta de `GET /api/resumen` para ese rol no contiene teléfono, correo, dirección, cifras de usuarios ni datos financieros; el buscador lleva a `/clientes?q=texto`.
+
+- [X] T055 [P] [US3] Ampliar `backend/tests/integration/resumen.test.js` (base `gymaccess_test`): el entrenador recibe `clientes.activos`, `clientes.nuevos_7_dias` y `ultimos_clientes` (máximo 5, del más reciente al más antiguo) con exactamente `id_cliente`, `nombre`, `apellido`, `estado` y `fecha_registro`; nunca `telefono`, `correo`, `direccion`, `usuarios` ni datos financieros (aunque el cliente creado tenga correo y dirección); recibe los mismos clientes recientes que el administrador pero con la proyección básica; `nuevos_7_dias` no aparece para administrador ni recepcionista
+- [X] T056 [US3] Backend: agregar `contarClientesRegistradosUltimos7Dias` (hoy y los 6 días anteriores, `SELECT` de solo lectura) en `backend/src/models/resumen.model.js` y, en `backend/src/services/resumen.service.js`, incluir `nuevos_7_dias` solo para el entrenador y `ultimos_clientes` también para el entrenador con la proyección de `vistaCliente` (básica); actualizar `specs/002-interfaz-menu-lateral/contracts/resumen-api.md`
+- [X] T057 [P] [US3] Actualizar `frontend/tests/inicio.test.jsx` para el entrenador: saludo con fecha, buscador con "Nombre o apellido", exactamente dos `StatCard` (clientes activos y clientes nuevos de 7 días), lista "Clientes nuevos" (avatar, nombre completo enlazado, `Badge` y fecha), sin botón "+ Registrar cliente", sin tablas ni datos de contacto ni financieros, buscador hacia `/clientes?q=…` y estado vacío
+- [X] T058 [US3] Frontend: crear `frontend/src/components/ClientesNuevos.jsx` (lista sin viñetas con avatar, nombre completo, `Badge` y fecha de registro; estado vacío), agregar el indicador "Clientes nuevos (7 días)" para el entrenador en `frontend/src/config/indicadores.js`, mostrar la lista en `frontend/src/pages/Inicio.jsx` y sus estilos en `frontend/src/styles/estilos.css`; anotar en `spec.md` el espacio para Sprint 2 ("clientes que entraron hoy") y Sprint 3 ("mis clientes asignados" y rutinas)
+
+---
+
+## Phase 12: Polish & Cross-Cutting
+
+- [ ] T059 Preguntar al equipo y, con su confirmación, retirar los componentes sustituidos `frontend/src/components/Layout.jsx`, `Mensaje.jsx`, `Confirmacion.jsx` y `Paginacion.jsx` (tras comprobar con búsqueda que ninguna pantalla los importa); si no se confirma, dejarlos sin uso y anotarlo en `docs/estado.md`
+- [ ] T060 Comprobar FR-015/SC-005: buscar en `frontend/src` colores literales (`#`, `rgb(`, `hsl(`) fuera de `frontend/src/styles/tokens.css` y corregirlos
+- [ ] T061 Revisar contraste (≥ 4.5:1) del texto sobre el acento, textos secundarios e insignias, y que el foco de teclado sea visible
+- [ ] T062 Ejecutar `npm test` y `npm run build` en `frontend/` y `npm test` en `backend/`; todo debe pasar (SC-010)
+- [ ] T063 Recorrer `specs/002-interfaz-menu-lateral/quickstart.md` con los 4 roles y marcar los resultados
+- [ ] T064 Actualizar `docs/estado.md` con el avance del sprint de interfaz (fase terminada, pruebas, decisiones: verde lima, fuente del sistema, `lucide-react`)
 
 ---
 
@@ -238,6 +251,6 @@ Después del MVP: US3 (inicio) → US4 (pantallas consistentes, la fase más gra
 
 ## Notes
 
-- Total: 60 tareas. Por fase: Setup 2, Foundational 11, US1 8, US2 3, US3 8 (T025–T026 son el endpoint de resumen aprobado), US4 7, US5 2, US6 3, US7 3, US8 7, Polish 6.
-- Solo T025–T026 y T048–T049 tocan `backend/` (el endpoint de resumen, de solo lectura, y el de cambio de contraseña, ambos aprobados el 2026-10-13); ninguna tarea modifica `database/`.
+- Total: 64 tareas. Por fase: Setup 2, Foundational 11, US1 8, US2 3, US3 8 (T025–T026 son el endpoint de resumen aprobado), US4 7, US5 2, US6 3, US7 3, US8 7, ajuste del Inicio del entrenador 4, Polish 6.
+- Solo T025–T026, T048–T049 y T055–T056 tocan `backend/` (el endpoint de resumen, de solo lectura, y el de cambio de contraseña, ambos aprobados el 2026-10-13); ninguna tarea modifica `database/`.
 - Hacer commits pequeños por tarea o grupo lógico, en la rama de la funcionalidad.

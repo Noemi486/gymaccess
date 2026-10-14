@@ -15,6 +15,13 @@ export const INDICADORES = [
     valor: (resumen) => resumen.clientes?.activos,
   },
   {
+    id: 'clientes-7-dias',
+    etiqueta: 'Clientes nuevos (7 días)',
+    icono: UserPlus,
+    roles: ['entrenador'],
+    valor: (resumen) => resumen.clientes?.nuevos_7_dias,
+  },
+  {
     id: 'clientes-inactivos',
     etiqueta: 'Clientes inactivos',
     icono: UserX,

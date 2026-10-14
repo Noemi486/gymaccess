@@ -8,7 +8,7 @@ Endpoint de **solo lectura** para el panel de resumen del Inicio. Aprobado por e
 |---|---|
 | Sin sesión | 401 |
 | `cliente` | 403 (consulta su información con `GET /api/clientes/me`) |
-| `administrador`, `recepcionista`, `entrenador` | 200, con **solo** lo que su rol puede ver |
+| `administrador`, `recepcionista`, `entrenador` | 200, con **solo** lo que su rol puede ver (el entrenador solo recibe la proyección básica del cliente) |
 
 El rol se valida en el backend (middlewares `autenticar` y `autorizar`), y el servicio vuelve a comprobarlo.
 
@@ -26,10 +26,14 @@ El rol se valida en el backend (middlewares `autenticar` y `autorizar`), y el se
   "clientes": { "activos": 40, "registrados_hoy": 2 },
   "ultimos_clientes": [ /* 5 como máximo, vista completa del cliente */ ]
 }
-// entrenador (sin contacto ni cifras de usuarios)
-{ "clientes": { "activos": 40 } }
+// entrenador (proyección básica: sin contacto, sin cifras de usuarios, sin información financiera)
+{
+  "clientes": { "activos": 40, "nuevos_7_dias": 6 },
+  "ultimos_clientes": [ /* 5 como máximo; solo id_cliente, nombre, apellido, estado y fecha_registro */ ]
+}
 ```
 
+- `nuevos_7_dias` (solo entrenador): clientes registrados hoy y en los 6 días anteriores.
 - `ultimos_clientes`: del más reciente al más antiguo (`fecha_registro` descendente; el id desempata).
 - `usuarios.total` y `por_rol` cuentan todas las cuentas, activas o no (coincide con `GET /api/usuarios`).
 - "Hoy" y "este mes" se calculan con el reloj de MySQL, el mismo que asigna `fecha_registro`.
