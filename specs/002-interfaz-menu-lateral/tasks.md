@@ -129,8 +129,8 @@
 
 **Independent Test**: abrir sin sesión; se ve el logotipo, el formulario estilizado y el error claro con credenciales incorrectas.
 
-- [ ] T040 [US5] Rediseñar `frontend/src/pages/Login.jsx` con tarjeta centrada, logotipo "GymAccess" con ícono, `FormField`/`Input`/`Button` con `cargando` y error accesible en español sin detalles técnicos; conservar etiquetas y textos que verifica `frontend/tests/login.test.jsx`
-- [ ] T041 [US5] Ajustar `frontend/tests/login.test.jsx` solo en lo estructural y comprobar que el mensaje de credenciales incorrectas sigue visible
+- [X] T040 [US5] Rediseñar `frontend/src/pages/Login.jsx` en dos paneles (izquierda: marca "GymAccess" con ícono y una frase; derecha: el formulario; en pantallas pequeñas el panel de marca pasa arriba reducido a la marca; el panel izquierdo lleva, centrados verticalmente, un ícono grande ScanFace en un círculo de acento suave, tres características con check verde y un degradado verde visible; el campo Contraseña usa `frontend/src/components/ui/PasswordInput.jsx` con botón de ojo accesible por teclado), `FormField`/`Input`/`Button` con `cargando` y error accesible en español sin detalles técnicos; conservar etiquetas y textos que verifica `frontend/tests/login.test.jsx`
+- [X] T041 [US5] Ajustar `frontend/tests/login.test.jsx` solo en lo estructural y comprobar que el mensaje de credenciales incorrectas sigue visible
 
 ---
 

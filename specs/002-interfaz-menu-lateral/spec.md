@@ -106,8 +106,10 @@ Como usuario, quiero una pantalla de inicio de sesión clara y con la identidad 
 
 **Acceptance Scenarios**:
 
-1. **Given** un visitante sin sesión, **When** abre el sistema, **Then** ve la pantalla de inicio de sesión con la identidad de GymAccess.
-2. **Given** credenciales incorrectas, **When** intenta iniciar sesión, **Then** ve un mensaje de error claro sin revelar información interna.
+1. **Given** un visitante sin sesión, **When** abre el sistema, **Then** ve la pantalla de inicio de sesión dividida en dos paneles: a la izquierda la marca GymAccess con una frase y a la derecha el formulario (en pantallas pequeñas, la marca arriba y el formulario debajo).
+2. **Given** la pantalla de inicio de sesión en pantallas anchas, **When** el visitante mira el panel izquierdo, **Then** ve, centrados verticalmente, un ícono grande de reconocimiento facial dentro de un círculo con el color de acento suave y una lista de tres características con su marca de verificación en verde: "Acceso con reconocimiento facial", "Membresías y pagos al día" y "Control de permisos por rol", sobre un degradado verde bien visible.
+3. **Given** el campo Contraseña, **When** el visitante usa el botón con ícono de ojo (con ratón o con teclado), **Then** la contraseña se muestra u oculta, el botón anuncia su estado y lo escrito se conserva.
+4. **Given** credenciales incorrectas, **When** intenta iniciar sesión, **Then** ve un mensaje de error claro sin revelar información interna.
 
 ---
 
