@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { ToastProvider } from '../src/components/ui/Toast.jsx';
 import Usuarios from '../src/pages/Usuarios.jsx';
 import UsuarioForm from '../src/pages/UsuarioForm.jsx';
 
@@ -34,9 +35,11 @@ describe('Usuarios (lista)', () => {
     vi.stubGlobal('fetch', fetchSimulado);
     return render(
       <MemoryRouter initialEntries={['/usuarios']}>
-        <Routes>
-          <Route path="/usuarios" element={<Usuarios />} />
-        </Routes>
+        <ToastProvider>
+          <Routes>
+            <Route path="/usuarios" element={<Usuarios />} />
+          </Routes>
+        </ToastProvider>
       </MemoryRouter>,
     );
   }

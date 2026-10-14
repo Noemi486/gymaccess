@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '../src/context/AuthContext.jsx';
+import { ToastProvider } from '../src/components/ui/Toast.jsx';
 import ClienteForm from '../src/pages/ClienteForm.jsx';
 
 function respuesta(status, cuerpo) {
@@ -24,12 +25,14 @@ function renderizar(fetchSimulado, ruta = '/clientes/nuevo') {
   vi.stubGlobal('fetch', fetchSimulado);
   return render(
     <MemoryRouter initialEntries={[ruta]}>
-      <AuthProvider>
-        <Routes>
-          <Route path="/clientes/nuevo" element={<ClienteForm />} />
-          <Route path="/clientes/:id/editar" element={<ClienteForm />} />
-        </Routes>
-      </AuthProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <Routes>
+            <Route path="/clientes/nuevo" element={<ClienteForm />} />
+            <Route path="/clientes/:id/editar" element={<ClienteForm />} />
+          </Routes>
+        </AuthProvider>
+      </ToastProvider>
     </MemoryRouter>,
   );
 }

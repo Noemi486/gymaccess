@@ -1149,3 +1149,46 @@ tbody tr:last-child td {
     padding-left: calc(36px + var(--espacio-3));
   }
 }
+
+/* Listas y formularios */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--espacio-3) var(--espacio-4);
+  margin-bottom: var(--espacio-4);
+}
+
+.filtros .campo {
+  margin-bottom: 0;
+  min-width: 180px;
+}
+
+.filtros-acciones {
+  display: flex;
+  gap: var(--espacio-2);
+}
+
+.acciones-fila {
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+}
+
+.acciones-izquierda {
+  justify-content: flex-start;
+  margin-top: var(--espacio-4);
+}
+
+.formulario-pagina {
+  max-width: 600px;
+}
+
+@media (max-width: 640px) {
+  .filtros .campo {
+    flex: 1 1 100%;
+  }
+
+  .acciones-fila {
+    flex-wrap: wrap;
+  }
+}

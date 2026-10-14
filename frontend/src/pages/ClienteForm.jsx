@@ -1,9 +1,15 @@
-import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { ErrorApi, solicitar } from '../api/cliente.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import Confirmacion from '../components/Confirmacion.jsx';
-import Mensaje from '../components/Mensaje.jsx';
+import Badge from '../components/ui/Badge.jsx';
+import Button from '../components/ui/Button.jsx';
+import ConfirmDialog from '../components/ui/ConfirmDialog.jsx';
+import FormField from '../components/ui/FormField.jsx';
+import Input from '../components/ui/Input.jsx';
+import PageHeader from '../components/ui/PageHeader.jsx';
+import Spinner from '../components/ui/Spinner.jsx';
+import { useToast } from '../components/ui/Toast.jsx';
 
 const CAMPOS_DEL_FORMULARIO = ['nombre', 'apellido', 'telefono', 'correo', 'direccion'];
 const VACIO = { nombre: '', apellido: '', telefono: '', correo: '', direccion: '' };
@@ -26,12 +32,12 @@ export default function ClienteForm() {
   const { id } = useParams();
   const editando = Boolean(id);
   const { rol } = useAuth();
+  const { mostrar } = useToast();
   const [valores, setValores] = useState(VACIO);
   const [original, setOriginal] = useState(null);
   const [cargando, setCargando] = useState(editando);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState(null);
-  const [exito, setExito] = useState(null);
   const [confirmandoBaja, setConfirmandoBaja] = useState(false);
 
   useEffect(() => {
@@ -55,7 +61,6 @@ export default function ClienteForm() {
   async function alEnviar(evento) {
     evento.preventDefault();
     setError(null);
-    setExito(null);
 
     let cuerpo;
     if (editando) {
@@ -84,10 +89,10 @@ export default function ClienteForm() {
       if (editando) {
         setOriginal(guardado);
         setValores(aValores(guardado));
-        setExito('Cliente actualizado.');
+        mostrar({ tipo: 'exito', texto: 'Cliente actualizado.' });
       } else {
         setValores(VACIO);
-        setExito('Cliente registrado.');
+        mostrar({ tipo: 'exito', texto: 'Cliente registrado.' });
       }
     } catch (e) {
       setError(e instanceof ErrorApi ? e : new ErrorApi(0, 'ERROR', 'Ocurrió un error inesperado. Inténtalo de nuevo.'));
@@ -99,15 +104,16 @@ export default function ClienteForm() {
   async function cambiarEstado(estado) {
     setConfirmandoBaja(false);
     setError(null);
-    setExito(null);
     try {
       const actualizado = await solicitar(`/clientes/${id}/estado`, { metodo: 'PATCH', cuerpo: { estado } });
       setOriginal(actualizado);
-      setExito(estado === 'inactivo' ? 'Cliente dado de baja.' : 'Cliente reactivado.');
+      mostrar({ tipo: 'exito', texto: estado === 'inactivo' ? 'Cliente dado de baja.' : 'Cliente reactivado.' });
     } catch (e) {
       setError(e instanceof ErrorApi ? e : new ErrorApi(0, 'ERROR', 'No se pudo cambiar el estado del cliente.'));
     }
   }
+
+  const cancelarBaja = useCallback(() => setConfirmandoBaja(false), []);
 
   // El mensaje general se muestra si no hay detalles o si algún detalle no corresponde a un campo visible.
   const detalles = error?.detalles ?? [];
@@ -115,96 +121,85 @@ export default function ClienteForm() {
   const mostrarGeneral = error && (detalles.length === 0 || hayDetallesSinCampo);
   const errorDe = (campo) => error?.mensajeDeCampo(campo);
 
-  if (cargando) return <p>Cargando…</p>;
+  if (cargando) return <Spinner etiqueta="Cargando cliente…" />;
   if (editando && !original) {
     return (
-      <section>
-        <Mensaje tipo="error" texto={error?.message ?? 'El cliente no existe.'} />
-        <Link to="/clientes">Volver a la lista</Link>
+      <section className="formulario-pagina">
+        <div className="mensaje mensaje-error" role="alert">
+          {error?.message ?? 'El cliente no existe.'}
+        </div>
+        <Button to="/clientes" variante="secundario">
+          Volver a la lista
+        </Button>
       </section>
     );
   }
 
   return (
-    <section style={{ maxWidth: 520 }}>
-      <h1>{editando ? 'Editar cliente' : 'Registrar cliente'}</h1>
+    <section className="formulario-pagina">
+      <PageHeader
+        titulo={editando ? 'Editar cliente' : 'Registrar cliente'}
+        descripcion={editando ? undefined : 'Nombre, apellido y teléfono son obligatorios.'}
+        acciones={editando ? <Badge estado={original.estado} /> : null}
+      />
 
-      <Mensaje tipo="exito" texto={exito} />
-      {mostrarGeneral && <Mensaje tipo="error" texto={error.message} />}
-
-      {editando && (
-        <p>
-          Estado:{' '}
-          <span className={`insignia insignia-${original.estado}`}>
-            {original.estado === 'activo' ? 'Activo' : 'Inactivo'}
-          </span>
-        </p>
+      {mostrarGeneral && (
+        <div className="mensaje mensaje-error" role="alert">
+          {error.message}
+        </div>
       )}
 
-      <form onSubmit={alEnviar} noValidate className="tarjeta">
-        <div className="campo">
-          <label htmlFor="nombre">Nombre</label>
-          <input id="nombre" value={valores.nombre} onChange={cambiar('nombre')} maxLength={80} required />
-          {errorDe('nombre') && <span className="error-campo">{errorDe('nombre')}</span>}
-        </div>
+      <form onSubmit={alEnviar} noValidate className="card">
+        <FormField id="nombre" etiqueta="Nombre" error={errorDe('nombre')}>
+          <Input value={valores.nombre} onChange={cambiar('nombre')} maxLength={80} required />
+        </FormField>
 
-        <div className="campo">
-          <label htmlFor="apellido">Apellido</label>
-          <input id="apellido" value={valores.apellido} onChange={cambiar('apellido')} maxLength={80} required />
-          {errorDe('apellido') && <span className="error-campo">{errorDe('apellido')}</span>}
-        </div>
+        <FormField id="apellido" etiqueta="Apellido" error={errorDe('apellido')}>
+          <Input value={valores.apellido} onChange={cambiar('apellido')} maxLength={80} required />
+        </FormField>
 
-        <div className="campo">
-          <label htmlFor="telefono">Teléfono</label>
-          <input
-            id="telefono"
-            type="tel"
-            value={valores.telefono}
-            onChange={cambiar('telefono')}
-            maxLength={20}
-            required
-          />
-          {errorDe('telefono') && <span className="error-campo">{errorDe('telefono')}</span>}
-        </div>
+        <FormField id="telefono" etiqueta="Teléfono" error={errorDe('telefono')}>
+          <Input type="tel" value={valores.telefono} onChange={cambiar('telefono')} maxLength={20} required />
+        </FormField>
 
-        <div className="campo">
-          <label htmlFor="correo">Correo (opcional)</label>
-          <input id="correo" type="email" value={valores.correo} onChange={cambiar('correo')} maxLength={150} />
-          <span className="ayuda">Necesario solo si el cliente tendrá cuenta de acceso. No puede repetirse.</span>
-          {errorDe('correo') && <span className="error-campo">{errorDe('correo')}</span>}
-        </div>
+        <FormField
+          id="correo"
+          etiqueta="Correo (opcional)"
+          ayuda="Necesario solo si el cliente tendrá cuenta de acceso. No puede repetirse."
+          error={errorDe('correo')}
+        >
+          <Input type="email" value={valores.correo} onChange={cambiar('correo')} maxLength={150} />
+        </FormField>
 
-        <div className="campo">
-          <label htmlFor="direccion">Dirección (opcional)</label>
-          <input id="direccion" value={valores.direccion} onChange={cambiar('direccion')} maxLength={255} />
-          {errorDe('direccion') && <span className="error-campo">{errorDe('direccion')}</span>}
-        </div>
+        <FormField id="direccion" etiqueta="Dirección (opcional)" error={errorDe('direccion')}>
+          <Input value={valores.direccion} onChange={cambiar('direccion')} maxLength={255} />
+        </FormField>
 
         <div className="acciones">
-          <Link to="/clientes" className="boton boton-secundario">
+          <Button to="/clientes" variante="secundario">
             Volver a la lista
-          </Link>
-          <button type="submit" className="boton" disabled={enviando}>
-            {enviando ? 'Guardando…' : 'Guardar'}
-          </button>
+          </Button>
+          <Button type="submit" cargando={enviando}>
+            Guardar
+          </Button>
         </div>
       </form>
 
       {editando && rol === 'administrador' && (
-        <div className="acciones" style={{ marginTop: 16 }}>
+        <div className="acciones acciones-izquierda">
           {original.estado === 'activo' ? (
-            <button type="button" className="boton boton-peligro" onClick={() => setConfirmandoBaja(true)}>
+            <Button variante="peligro" onClick={() => setConfirmandoBaja(true)}>
               Dar de baja
-            </button>
+            </Button>
           ) : (
-            <button type="button" className="boton boton-secundario" onClick={() => cambiarEstado('activo')}>
+            <Button variante="secundario" onClick={() => cambiarEstado('activo')}>
               Reactivar
-            </button>
+            </Button>
           )}
         </div>
       )}
 
-      <Confirmacion
+      <ConfirmDialog
         abierto={confirmandoBaja}
         titulo="Dar de baja al cliente"
         texto={
@@ -214,7 +209,7 @@ export default function ClienteForm() {
         }
         textoConfirmar="Dar de baja"
         onConfirmar={() => cambiarEstado('inactivo')}
-        onCancelar={() => setConfirmandoBaja(false)}
+        onCancelar={cancelarBaja}
       />
     </section>
   );

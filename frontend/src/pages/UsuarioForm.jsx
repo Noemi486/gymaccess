@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ErrorApi, solicitar } from '../api/cliente.js';
-import Mensaje from '../components/Mensaje.jsx';
+import Button from '../components/ui/Button.jsx';
+import FormField from '../components/ui/FormField.jsx';
+import Input from '../components/ui/Input.jsx';
+import PageHeader from '../components/ui/PageHeader.jsx';
+import Select from '../components/ui/Select.jsx';
+import Spinner from '../components/ui/Spinner.jsx';
 import { ETIQUETAS_ROL } from './Usuarios.jsx';
 
 const CAMPOS_DEL_FORMULARIO = ['nombre', 'correo', 'password', 'rol', 'id_cliente'];
 const VACIO = { nombre: '', correo: '', password: '', rol: 'recepcionista', id_cliente: '' };
 
 // Alta (/usuarios/nuevo) y edición (/usuarios/:id/editar) de un usuario. Solo administrador.
+// Al guardar vuelve a la lista, que muestra el aviso de éxito.
 export default function UsuarioForm() {
   const { id } = useParams();
   const editando = Boolean(id);
@@ -149,32 +155,42 @@ export default function UsuarioForm() {
 
   const errorDe = (campo) => error?.mensajeDeCampo(campo);
 
-  if (cargando) return <p>Cargando…</p>;
+  if (cargando) return <Spinner etiqueta="Cargando usuario…" />;
   if (editando && !original) {
     return (
-      <section>
-        <Mensaje tipo="error" texto={error?.message ?? 'El usuario no existe.'} />
-        <Link to="/usuarios">Volver a la lista</Link>
+      <section className="formulario-pagina">
+        <div className="mensaje mensaje-error" role="alert">
+          {error?.message ?? 'El usuario no existe.'}
+        </div>
+        <Button to="/usuarios" variante="secundario">
+          Volver a la lista
+        </Button>
       </section>
     );
   }
 
+  const ayudaCorreo = esCuentaDeCliente
+    ? 'El correo de una cuenta de cliente es el del cliente y no se cambia aquí.'
+    : eligiendoCliente
+      ? 'Se toma del cliente que elijas: la cuenta usa su mismo correo.'
+      : undefined;
+
   return (
-    <section style={{ maxWidth: 520 }}>
-      <h1>{editando ? 'Editar usuario' : 'Nuevo usuario'}</h1>
-      {mostrarGeneral && <Mensaje tipo="error" texto={error.message} />}
-
-      <form onSubmit={alEnviar} noValidate className="tarjeta">
-        <div className="campo">
-          <label htmlFor="nombre">Nombre</label>
-          <input id="nombre" value={valores.nombre} onChange={cambiar('nombre')} maxLength={120} required />
-          {errorDe('nombre') && <span className="error-campo">{errorDe('nombre')}</span>}
+    <section className="formulario-pagina">
+      <PageHeader titulo={editando ? 'Editar usuario' : 'Nuevo usuario'} />
+      {mostrarGeneral && (
+        <div className="mensaje mensaje-error" role="alert">
+          {error.message}
         </div>
+      )}
 
-        <div className="campo">
-          <label htmlFor="correo">Correo</label>
-          <input
-            id="correo"
+      <form onSubmit={alEnviar} noValidate className="card">
+        <FormField id="nombre" etiqueta="Nombre" error={errorDe('nombre')}>
+          <Input value={valores.nombre} onChange={cambiar('nombre')} maxLength={120} required />
+        </FormField>
+
+        <FormField id="correo" etiqueta="Correo" ayuda={ayudaCorreo} error={errorDe('correo')}>
+          <Input
             type="email"
             value={valores.correo}
             onChange={cambiar('correo')}
@@ -182,20 +198,15 @@ export default function UsuarioForm() {
             maxLength={150}
             required
           />
-          {(esCuentaDeCliente || eligiendoCliente) && (
-            <span className="ayuda">
-              {esCuentaDeCliente
-                ? 'El correo de una cuenta de cliente es el del cliente y no se cambia aquí.'
-                : 'Se toma del cliente que elijas: la cuenta usa su mismo correo.'}
-            </span>
-          )}
-          {errorDe('correo') && <span className="error-campo">{errorDe('correo')}</span>}
-        </div>
+        </FormField>
 
-        <div className="campo">
-          <label htmlFor="password">{editando ? 'Nueva contraseña (opcional)' : 'Contraseña'}</label>
-          <input
-            id="password"
+        <FormField
+          id="password"
+          etiqueta={editando ? 'Nueva contraseña (opcional)' : 'Contraseña'}
+          ayuda={`${editando ? 'Déjala vacía para no cambiarla. ' : ''}De 8 a 72 caracteres, con al menos una letra y un número.`}
+          error={errorDe('password')}
+        >
+          <Input
             type="password"
             autoComplete="new-password"
             value={valores.password}
@@ -203,15 +214,10 @@ export default function UsuarioForm() {
             maxLength={72}
             required={!editando}
           />
-          <span className="ayuda">
-            {editando ? 'Déjala vacía para no cambiarla. ' : ''}De 8 a 72 caracteres, con al menos una letra y un número.
-          </span>
-          {errorDe('password') && <span className="error-campo">{errorDe('password')}</span>}
-        </div>
+        </FormField>
 
-        <div className="campo">
-          <label htmlFor="rol">Rol</label>
-          <select id="rol" value={valores.rol} onChange={cambiarRol} disabled={esCuentaDeCliente}>
+        <FormField id="rol" etiqueta="Rol" error={errorDe('rol')}>
+          <Select value={valores.rol} onChange={cambiarRol} disabled={esCuentaDeCliente}>
             {Object.entries(ETIQUETAS_ROL)
               // Un usuario existente no puede pasar al rol cliente: el vínculo se fija al crear la cuenta.
               .filter(([valor]) => !editando || esCuentaDeCliente || valor !== 'cliente')
@@ -220,30 +226,27 @@ export default function UsuarioForm() {
                   {texto}
                 </option>
               ))}
-          </select>
-          {errorDe('rol') && <span className="error-campo">{errorDe('rol')}</span>}
-        </div>
+          </Select>
+        </FormField>
 
         {eligiendoCliente && (
           <>
-            <div className="campo">
-              <label htmlFor="buscar-cliente">Buscar cliente</label>
-              <input
-                id="buscar-cliente"
+            <FormField
+              id="buscar-cliente"
+              etiqueta="Buscar cliente"
+              ayuda="Solo aparecen clientes activos, con correo y que todavía no tienen cuenta."
+            >
+              <Input
                 type="search"
                 value={busquedaCliente}
                 onChange={(e) => setBusquedaCliente(e.target.value)}
                 placeholder="Nombre, apellido o correo"
                 maxLength={150}
               />
-              <span className="ayuda">
-                Solo aparecen clientes activos, con correo y que todavía no tienen cuenta.
-              </span>
-            </div>
+            </FormField>
 
-            <div className="campo">
-              <label htmlFor="id_cliente">Cliente</label>
-              <select id="id_cliente" value={valores.id_cliente} onChange={elegirCliente} required>
+            <FormField id="id_cliente" etiqueta="Cliente" error={errorClientes ?? errorDe('id_cliente')}>
+              <Select value={valores.id_cliente} onChange={elegirCliente} required>
                 <option value="">— Elige un cliente —</option>
                 {clienteElegido && !opcionesCliente.some((c) => c.id_cliente === clienteElegido.id_cliente) && (
                   <option value={String(clienteElegido.id_cliente)}>
@@ -255,20 +258,18 @@ export default function UsuarioForm() {
                     {cliente.nombre} {cliente.apellido} ({cliente.correo})
                   </option>
                 ))}
-              </select>
-              {errorClientes && <span className="error-campo">{errorClientes}</span>}
-              {errorDe('id_cliente') && <span className="error-campo">{errorDe('id_cliente')}</span>}
-            </div>
+              </Select>
+            </FormField>
           </>
         )}
 
         <div className="acciones">
-          <Link to="/usuarios" className="boton boton-secundario">
+          <Button to="/usuarios" variante="secundario">
             Cancelar
-          </Link>
-          <button type="submit" className="boton" disabled={enviando}>
-            {enviando ? 'Guardando…' : 'Guardar'}
-          </button>
+          </Button>
+          <Button type="submit" cargando={enviando}>
+            Guardar
+          </Button>
         </div>
       </form>
     </section>

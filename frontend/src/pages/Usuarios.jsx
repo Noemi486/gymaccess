@@ -1,9 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { Plus } from 'lucide-react';
 import { ErrorApi, solicitar } from '../api/cliente.js';
-import Confirmacion from '../components/Confirmacion.jsx';
-import Mensaje from '../components/Mensaje.jsx';
-import Paginacion from '../components/Paginacion.jsx';
+import Badge from '../components/ui/Badge.jsx';
+import Button from '../components/ui/Button.jsx';
+import ConfirmDialog from '../components/ui/ConfirmDialog.jsx';
+import EmptyState from '../components/ui/EmptyState.jsx';
+import FormField from '../components/ui/FormField.jsx';
+import PageHeader from '../components/ui/PageHeader.jsx';
+import Pagination from '../components/ui/Pagination.jsx';
+import Select from '../components/ui/Select.jsx';
+import Spinner from '../components/ui/Spinner.jsx';
+import Table from '../components/ui/Table.jsx';
+import { useToast } from '../components/ui/Toast.jsx';
 
 export const ETIQUETAS_ROL = {
   administrador: 'Administrador',
@@ -17,14 +26,20 @@ const LIMITE = 20;
 // Lista de usuarios (solo administrador): filtros, paginación, activar y desactivar.
 export default function Usuarios() {
   const location = useLocation();
+  const { mostrar } = useToast();
   const [pagina, setPagina] = useState({ data: [], page: 1, limit: LIMITE, total: 0 });
   const [numeroPagina, setNumeroPagina] = useState(1);
   const [filtroRol, setFiltroRol] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('');
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
-  const [exito, setExito] = useState(location.state?.mensaje ?? null);
   const [pendiente, setPendiente] = useState(null); // usuario que se va a desactivar
+
+  // Aviso de éxito que deja el formulario al guardar (se muestra una sola vez al llegar a la lista).
+  const mensajeInicial = location.state?.mensaje;
+  useEffect(() => {
+    if (mensajeInicial) mostrar({ tipo: 'exito', texto: mensajeInicial });
+  }, [mensajeInicial, mostrar]);
 
   const cargar = useCallback(async () => {
     setCargando(true);
@@ -47,7 +62,6 @@ export default function Usuarios() {
 
   async function cambiarEstado(usuario, estado) {
     setError(null);
-    setExito(null);
     try {
       const actualizado = await solicitar(`/usuarios/${usuario.id_usuario}`, {
         metodo: 'PATCH',
@@ -57,7 +71,7 @@ export default function Usuarios() {
         ...actual,
         data: actual.data.map((fila) => (fila.id_usuario === actualizado.id_usuario ? actualizado : fila)),
       }));
-      setExito(estado === 'activo' ? 'Usuario activado.' : 'Usuario desactivado.');
+      mostrar({ tipo: 'exito', texto: estado === 'activo' ? 'Usuario activado.' : 'Usuario desactivado.' });
     } catch (e) {
       setError(e instanceof ErrorApi ? e.message : 'No se pudo cambiar el estado del usuario.');
     }
@@ -69,23 +83,56 @@ export default function Usuarios() {
     await cambiarEstado(usuario, 'inactivo');
   }
 
+  const cancelarDesactivacion = useCallback(() => setPendiente(null), []);
+
+  const columnas = [
+    { clave: 'nombre', etiqueta: 'Nombre' },
+    { clave: 'correo', etiqueta: 'Correo' },
+    { clave: 'rol', etiqueta: 'Rol', render: (usuario) => ETIQUETAS_ROL[usuario.rol] ?? usuario.rol },
+    { clave: 'estado', etiqueta: 'Estado', render: (usuario) => <Badge estado={usuario.estado} /> },
+    {
+      clave: 'acciones',
+      etiqueta: 'Acciones',
+      render: (usuario) => (
+        <div className="acciones acciones-fila">
+          <Button to={`/usuarios/${usuario.id_usuario}/editar`} variante="secundario">
+            Editar
+          </Button>
+          {usuario.estado === 'activo' ? (
+            <Button variante="secundario" onClick={() => setPendiente(usuario)}>
+              Desactivar
+            </Button>
+          ) : (
+            <Button variante="secundario" onClick={() => cambiarEstado(usuario, 'activo')}>
+              Activar
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <section>
-      <div className="acciones" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Usuarios y roles</h1>
-        <Link to="/usuarios/nuevo" className="boton">
-          Nuevo usuario
-        </Link>
-      </div>
+      <PageHeader
+        titulo="Usuarios y roles"
+        descripcion="Administra las cuentas del personal y sus roles."
+        acciones={
+          <Button to="/usuarios/nuevo" icono={<Plus size={18} aria-hidden="true" />}>
+            Nuevo usuario
+          </Button>
+        }
+      />
 
-      <Mensaje tipo="exito" texto={exito} />
-      <Mensaje tipo="error" texto={error} />
+      {error && (
+        <div className="mensaje mensaje-error" role="alert">
+          {error}
+        </div>
+      )}
 
-      <div className="acciones" style={{ justifyContent: 'flex-start', marginBottom: 16 }}>
-        <div className="campo" style={{ marginBottom: 0 }}>
-          <label htmlFor="filtro-rol">Rol</label>
-          <select
-            id="filtro-rol"
+      <div className="filtros">
+        <FormField id="filtro-rol" etiqueta="Rol">
+          <Select
             value={filtroRol}
             onChange={(e) => {
               setFiltroRol(e.target.value);
@@ -98,12 +145,10 @@ export default function Usuarios() {
                 {texto}
               </option>
             ))}
-          </select>
-        </div>
-        <div className="campo" style={{ marginBottom: 0 }}>
-          <label htmlFor="filtro-estado">Estado</label>
-          <select
-            id="filtro-estado"
+          </Select>
+        </FormField>
+        <FormField id="filtro-estado" etiqueta="Estado">
+          <Select
             value={filtroEstado}
             onChange={(e) => {
               setFiltroEstado(e.target.value);
@@ -113,66 +158,28 @@ export default function Usuarios() {
             <option value="">Todos</option>
             <option value="activo">Activo</option>
             <option value="inactivo">Inactivo</option>
-          </select>
-        </div>
+          </Select>
+        </FormField>
       </div>
 
-      <div className="tabla-contenedor">
-        <table>
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Correo</th>
-              <th>Rol</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagina.data.map((usuario) => (
-              <tr key={usuario.id_usuario}>
-                <td>{usuario.nombre}</td>
-                <td>{usuario.correo}</td>
-                <td>{ETIQUETAS_ROL[usuario.rol] ?? usuario.rol}</td>
-                <td>
-                  <span className={`insignia insignia-${usuario.estado}`}>
-                    {usuario.estado === 'activo' ? 'Activo' : 'Inactivo'}
-                  </span>
-                </td>
-                <td>
-                  <div className="acciones" style={{ justifyContent: 'flex-start' }}>
-                    <Link to={`/usuarios/${usuario.id_usuario}/editar`} className="boton boton-secundario">
-                      Editar
-                    </Link>
-                    {usuario.estado === 'activo' ? (
-                      <button type="button" className="boton boton-secundario" onClick={() => setPendiente(usuario)}>
-                        Desactivar
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className="boton boton-secundario"
-                        onClick={() => cambiarEstado(usuario, 'activo')}
-                      >
-                        Activar
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {!cargando && pagina.data.length === 0 && (
-              <tr>
-                <td colSpan={5}>No hay usuarios con esos filtros.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        etiquetaTabla="Usuarios"
+        columnas={columnas}
+        filas={pagina.data.map((usuario) => ({ ...usuario, id: usuario.id_usuario }))}
+        vacio={
+          cargando ? (
+            <div className="estado-vacio">
+              <Spinner etiqueta="Cargando usuarios…" />
+            </div>
+          ) : (
+            <EmptyState titulo="No hay usuarios con esos filtros." texto="Prueba con otros filtros o crea un usuario nuevo." />
+          )
+        }
+      />
 
-      <Paginacion page={pagina.page} limit={pagina.limit} total={pagina.total} onCambiar={setNumeroPagina} />
+      <Pagination page={pagina.page} limit={pagina.limit} total={pagina.total} onCambiar={setNumeroPagina} />
 
-      <Confirmacion
+      <ConfirmDialog
         abierto={Boolean(pendiente)}
         titulo="Desactivar usuario"
         texto={
@@ -182,7 +189,7 @@ export default function Usuarios() {
         }
         textoConfirmar="Desactivar"
         onConfirmar={confirmarDesactivacion}
-        onCancelar={() => setPendiente(null)}
+        onCancelar={cancelarDesactivacion}
       />
     </section>
   );

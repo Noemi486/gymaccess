@@ -1,17 +1,22 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import { Plus } from 'lucide-react';
 import { ErrorApi, solicitar } from '../api/cliente.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import Mensaje from '../components/Mensaje.jsx';
-import Paginacion from '../components/Paginacion.jsx';
+import Badge from '../components/ui/Badge.jsx';
+import Button from '../components/ui/Button.jsx';
+import EmptyState from '../components/ui/EmptyState.jsx';
+import FormField from '../components/ui/FormField.jsx';
+import Input from '../components/ui/Input.jsx';
+import PageHeader from '../components/ui/PageHeader.jsx';
+import Pagination from '../components/ui/Pagination.jsx';
+import Select from '../components/ui/Select.jsx';
+import Spinner from '../components/ui/Spinner.jsx';
+import Table from '../components/ui/Table.jsx';
 
 const LIMITE = 20;
 
 export const formatearFecha = (iso) => (iso ? new Date(iso).toLocaleDateString('es-MX') : '');
-
-export function InsigniaEstado({ estado }) {
-  return <span className={`insignia insignia-${estado}`}>{estado === 'activo' ? 'Activo' : 'Inactivo'}</span>;
-}
 
 // Lista de clientes para administrador, recepcionista y entrenador.
 // El backend decide qué datos llegan según el rol: el entrenador no recibe teléfono, correo ni
@@ -63,44 +68,78 @@ export default function Clientes() {
     setNumeroPagina(1);
   }
 
-  const columnas = veContacto ? 7 : 5;
+  const columnas = [
+    { clave: 'nombre', etiqueta: 'Nombre' },
+    { clave: 'apellido', etiqueta: 'Apellido' },
+    ...(veContacto
+      ? [
+          { clave: 'telefono', etiqueta: 'Teléfono' },
+          { clave: 'correo', etiqueta: 'Correo', render: (cliente) => cliente.correo ?? '—' },
+        ]
+      : []),
+    { clave: 'estado', etiqueta: 'Estado', render: (cliente) => <Badge estado={cliente.estado} /> },
+    {
+      clave: 'fecha_registro',
+      etiqueta: 'Fecha de registro',
+      render: (cliente) => formatearFecha(cliente.fecha_registro),
+    },
+    {
+      clave: 'acciones',
+      etiqueta: 'Acciones',
+      render: (cliente) => (
+        <div className="acciones acciones-fila">
+          <Button to={`/clientes/${cliente.id_cliente}`} variante="secundario">
+            Ver
+          </Button>
+          {puedeEscribir && (
+            <Button to={`/clientes/${cliente.id_cliente}/editar`} variante="secundario">
+              Editar
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ];
 
   return (
     <section>
-      <div className="acciones" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Clientes</h1>
-        {puedeEscribir && (
-          <Link to="/clientes/nuevo" className="boton">
-            Nuevo cliente
-          </Link>
-        )}
-      </div>
+      <PageHeader
+        titulo="Clientes"
+        descripcion="Consulta y administra a los clientes del gimnasio."
+        acciones={
+          puedeEscribir ? (
+            <Button to="/clientes/nuevo" icono={<Plus size={18} aria-hidden="true" />}>
+              Nuevo cliente
+            </Button>
+          ) : null
+        }
+      />
 
-      <Mensaje tipo="error" texto={error} />
+      {error && (
+        <div className="mensaje mensaje-error" role="alert">
+          {error}
+        </div>
+      )}
 
-      <form onSubmit={buscar} className="acciones" style={{ justifyContent: 'flex-start', alignItems: 'flex-end', marginBottom: 16 }}>
-        <div className="campo" style={{ marginBottom: 0 }}>
-          <label htmlFor="busqueda">Buscar</label>
-          <input
-            id="busqueda"
+      <form onSubmit={buscar} className="filtros">
+        <FormField id="busqueda" etiqueta="Buscar">
+          <Input
             value={texto}
             onChange={(e) => setTexto(e.target.value)}
             placeholder={veContacto ? 'Nombre, apellido o correo' : 'Nombre o apellido'}
             maxLength={150}
           />
+        </FormField>
+        <div className="filtros-acciones">
+          <Button type="submit">Buscar</Button>
+          {busqueda && (
+            <Button variante="secundario" onClick={limpiar}>
+              Limpiar
+            </Button>
+          )}
         </div>
-        <button type="submit" className="boton">
-          Buscar
-        </button>
-        {busqueda && (
-          <button type="button" className="boton boton-secundario" onClick={limpiar}>
-            Limpiar
-          </button>
-        )}
-        <div className="campo" style={{ marginBottom: 0 }}>
-          <label htmlFor="filtro-estado">Estado</label>
-          <select
-            id="filtro-estado"
+        <FormField id="filtro-estado" etiqueta="Estado">
+          <Select
             value={filtroEstado}
             onChange={(e) => {
               setFiltroEstado(e.target.value);
@@ -110,58 +149,29 @@ export default function Clientes() {
             <option value="">Todos</option>
             <option value="activo">Activo</option>
             <option value="inactivo">Inactivo</option>
-          </select>
-        </div>
+          </Select>
+        </FormField>
       </form>
 
-      <div className="tabla-contenedor">
-        <table>
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Apellido</th>
-              {veContacto && <th>Teléfono</th>}
-              {veContacto && <th>Correo</th>}
-              <th>Estado</th>
-              <th>Fecha de registro</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagina.data.map((cliente) => (
-              <tr key={cliente.id_cliente}>
-                <td>{cliente.nombre}</td>
-                <td>{cliente.apellido}</td>
-                {veContacto && <td>{cliente.telefono}</td>}
-                {veContacto && <td>{cliente.correo ?? '—'}</td>}
-                <td>
-                  <InsigniaEstado estado={cliente.estado} />
-                </td>
-                <td>{formatearFecha(cliente.fecha_registro)}</td>
-                <td>
-                  <div className="acciones" style={{ justifyContent: 'flex-start' }}>
-                    <Link to={`/clientes/${cliente.id_cliente}`} className="boton boton-secundario">
-                      Ver
-                    </Link>
-                    {puedeEscribir && (
-                      <Link to={`/clientes/${cliente.id_cliente}/editar`} className="boton boton-secundario">
-                        Editar
-                      </Link>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {!cargando && pagina.data.length === 0 && (
-              <tr>
-                <td colSpan={columnas}>No hay clientes con esos criterios.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        etiquetaTabla="Clientes"
+        columnas={columnas}
+        filas={pagina.data.map((cliente) => ({ ...cliente, id: cliente.id_cliente }))}
+        vacio={
+          cargando ? (
+            <div className="estado-vacio">
+              <Spinner etiqueta="Cargando clientes…" />
+            </div>
+          ) : (
+            <EmptyState
+              titulo="No hay clientes con esos criterios."
+              texto="Cambia la búsqueda o el filtro de estado."
+            />
+          )
+        }
+      />
 
-      <Paginacion page={pagina.page} limit={pagina.limit} total={pagina.total} onCambiar={setNumeroPagina} />
+      <Pagination page={pagina.page} limit={pagina.limit} total={pagina.total} onCambiar={setNumeroPagina} />
     </section>
   );
 }
