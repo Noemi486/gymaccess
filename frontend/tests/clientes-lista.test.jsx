@@ -40,7 +40,7 @@ function usuarioConRol(rol) {
 }
 
 // Prepara una sesión del rol indicado y una API simulada. Devuelve las URLs pedidas.
-function renderizar(rol, { total = 2 } = {}) {
+function renderizar(rol, { total = 2, ruta = '/clientes' } = {}) {
   const usuario = usuarioConRol(rol);
   sessionStorage.setItem('gym_token', 'token-de-prueba');
   sessionStorage.setItem('gym_usuario', JSON.stringify(usuario));
@@ -58,7 +58,7 @@ function renderizar(rol, { total = 2 } = {}) {
   );
 
   render(
-    <MemoryRouter initialEntries={['/clientes']}>
+    <MemoryRouter initialEntries={[ruta]}>
       <AuthProvider>
         <Routes>
           <Route path="/clientes" element={<Clientes />} />
@@ -145,5 +145,12 @@ describe('Clientes (lista)', () => {
 
     await screen.findByText('Ana');
     expect(urls.some((u) => u.includes('estado=inactivo'))).toBe(true);
+  });
+  it('aplica como búsqueda el texto de la URL (viene del buscador del inicio)', async () => {
+    const urls = renderizar('recepcionista', { ruta: '/clientes?q=Ana%20Mar%C3%ADa' });
+
+    expect(await screen.findByText('Ana')).toBeInTheDocument();
+    expect(screen.getByLabelText(/buscar/i)).toHaveValue('Ana María');
+    expect(urls.some((u) => u.startsWith('/api/clientes?') && u.includes('q=Ana+Mar%C3%ADa'))).toBe(true);
   });
 });

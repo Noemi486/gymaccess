@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext.jsx';
-import Layout from './components/Layout.jsx';
+import { AuthProvider } from './context/AuthContext.jsx';
+import Layout from './components/ui/Layout.jsx';
 import RutaProtegida from './components/RutaProtegida.jsx';
 import ClienteDetalle from './pages/ClienteDetalle.jsx';
 import ClienteForm from './pages/ClienteForm.jsx';
@@ -11,16 +11,12 @@ import MiPerfil from './pages/MiPerfil.jsx';
 import UsuarioForm from './pages/UsuarioForm.jsx';
 import Usuarios from './pages/Usuarios.jsx';
 
-// Pantalla privada: exige sesión (y opcionalmente ciertos roles) y la envuelve con el marco común.
-function Privada({ roles, children }) {
-  const { usuario, cerrarSesion } = useAuth();
-  return (
-    <RutaProtegida roles={roles}>
-      <Layout usuario={usuario} onCerrarSesion={cerrarSesion}>
-        {children}
-      </Layout>
-    </RutaProtegida>
-  );
+const PERSONAL = ['administrador', 'recepcionista', 'entrenador'];
+const ESCRITURA_CLIENTES = ['administrador', 'recepcionista'];
+
+// Pantalla que exige ciertos roles (la seguridad real la valida siempre el backend).
+function Con({ roles, children }) {
+  return <RutaProtegida roles={roles}>{children}</RutaProtegida>;
 }
 
 export default function App() {
@@ -28,78 +24,82 @@ export default function App() {
     <AuthProvider>
       <Routes>
         <Route path="/login" element={<Login />} />
+
+        {/* Todas las pantallas autenticadas comparten el mismo marco: menú lateral + barra superior */}
         <Route
-          path="/"
           element={
-            <Privada>
-              <Inicio />
-            </Privada>
+            <RutaProtegida>
+              <Layout />
+            </RutaProtegida>
           }
-        />
-        <Route
-          path="/usuarios"
-          element={
-            <Privada roles={['administrador']}>
-              <Usuarios />
-            </Privada>
-          }
-        />
-        <Route
-          path="/usuarios/nuevo"
-          element={
-            <Privada roles={['administrador']}>
-              <UsuarioForm />
-            </Privada>
-          }
-        />
-        <Route
-          path="/usuarios/:id/editar"
-          element={
-            <Privada roles={['administrador']}>
-              <UsuarioForm />
-            </Privada>
-          }
-        />
-        <Route
-          path="/mi-perfil"
-          element={
-            <Privada roles={['cliente']}>
-              <MiPerfil />
-            </Privada>
-          }
-        />
-        <Route
-          path="/clientes"
-          element={
-            <Privada roles={['administrador', 'recepcionista', 'entrenador']}>
-              <Clientes />
-            </Privada>
-          }
-        />
-        <Route
-          path="/clientes/:id"
-          element={
-            <Privada roles={['administrador', 'recepcionista', 'entrenador']}>
-              <ClienteDetalle />
-            </Privada>
-          }
-        />
-        <Route
-          path="/clientes/nuevo"
-          element={
-            <Privada roles={['administrador', 'recepcionista']}>
-              <ClienteForm />
-            </Privada>
-          }
-        />
-        <Route
-          path="/clientes/:id/editar"
-          element={
-            <Privada roles={['administrador', 'recepcionista']}>
-              <ClienteForm />
-            </Privada>
-          }
-        />
+        >
+          <Route path="/" element={<Inicio />} />
+          <Route
+            path="/usuarios"
+            element={
+              <Con roles={['administrador']}>
+                <Usuarios />
+              </Con>
+            }
+          />
+          <Route
+            path="/usuarios/nuevo"
+            element={
+              <Con roles={['administrador']}>
+                <UsuarioForm />
+              </Con>
+            }
+          />
+          <Route
+            path="/usuarios/:id/editar"
+            element={
+              <Con roles={['administrador']}>
+                <UsuarioForm />
+              </Con>
+            }
+          />
+          <Route
+            path="/mi-perfil"
+            element={
+              <Con roles={['cliente']}>
+                <MiPerfil />
+              </Con>
+            }
+          />
+          <Route
+            path="/clientes"
+            element={
+              <Con roles={PERSONAL}>
+                <Clientes />
+              </Con>
+            }
+          />
+          <Route
+            path="/clientes/:id"
+            element={
+              <Con roles={PERSONAL}>
+                <ClienteDetalle />
+              </Con>
+            }
+          />
+          <Route
+            path="/clientes/nuevo"
+            element={
+              <Con roles={ESCRITURA_CLIENTES}>
+                <ClienteForm />
+              </Con>
+            }
+          />
+          <Route
+            path="/clientes/:id/editar"
+            element={
+              <Con roles={ESCRITURA_CLIENTES}>
+                <ClienteForm />
+              </Con>
+            }
+          />
+        </Route>
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AuthProvider>

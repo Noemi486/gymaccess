@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ErrorApi, solicitar } from '../api/cliente.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import Mensaje from '../components/Mensaje.jsx';
@@ -18,10 +18,13 @@ export function InsigniaEstado({ estado }) {
 // dirección, y aquí simplemente no se muestran esas columnas.
 export default function Clientes() {
   const { rol } = useAuth();
+  // El buscador del inicio llega aquí con el texto en la URL (/clientes?q=…): se aplica como búsqueda inicial.
+  const [parametrosUrl] = useSearchParams();
+  const busquedaInicial = (parametrosUrl.get('q') ?? '').trim().slice(0, 150);
   const [pagina, setPagina] = useState({ data: [], page: 1, limit: LIMITE, total: 0 });
   const [numeroPagina, setNumeroPagina] = useState(1);
-  const [texto, setTexto] = useState(''); // lo que se escribe
-  const [busqueda, setBusqueda] = useState(''); // la búsqueda aplicada
+  const [texto, setTexto] = useState(busquedaInicial); // lo que se escribe
+  const [busqueda, setBusqueda] = useState(busquedaInicial); // la búsqueda aplicada
   const [filtroEstado, setFiltroEstado] = useState('');
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);

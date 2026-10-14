@@ -1,18 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { Pencil } from 'lucide-react';
 import { ErrorApi, solicitar } from '../api/cliente.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import Mensaje from '../components/Mensaje.jsx';
-import { InsigniaEstado, formatearFecha } from './Clientes.jsx';
-
-// Datos que se muestran si el backend los envía (el entrenador no recibe los de contacto).
-const CAMPOS = [
-  ['nombre', 'Nombre'],
-  ['apellido', 'Apellido'],
-  ['telefono', 'Teléfono'],
-  ['correo', 'Correo'],
-  ['direccion', 'Dirección'],
-];
+import PerfilCliente from '../components/PerfilCliente.jsx';
+import Button from '../components/ui/Button.jsx';
+import Spinner from '../components/ui/Spinner.jsx';
 
 export default function ClienteDetalle() {
   const { id } = useParams();
@@ -32,12 +25,16 @@ export default function ClienteDetalle() {
     };
   }, [id]);
 
-  if (cargando) return <p>Cargando…</p>;
+  if (cargando) return <Spinner etiqueta="Cargando cliente…" />;
   if (!cliente) {
     return (
-      <section>
-        <Mensaje tipo="error" texto={error ?? 'El cliente no existe.'} />
-        <Link to="/clientes">Volver a la lista</Link>
+      <section className="perfil-pagina">
+        <div className="mensaje mensaje-error" role="alert">
+          {error ?? 'El cliente no existe.'}
+        </div>
+        <Button to="/clientes" variante="secundario">
+          Volver a la lista
+        </Button>
       </section>
     );
   }
@@ -45,38 +42,17 @@ export default function ClienteDetalle() {
   const puedeEditar = rol === 'administrador' || rol === 'recepcionista';
 
   return (
-    <section style={{ maxWidth: 520 }}>
-      <h1>
-        {cliente.nombre} {cliente.apellido}
-      </h1>
+    <section className="perfil-pagina">
+      <PerfilCliente cliente={cliente} />
 
-      <dl className="tarjeta">
-        {CAMPOS.filter(([campo]) => campo in cliente).map(([campo, etiqueta]) => (
-          <div key={campo} style={{ marginBottom: 12 }}>
-            <dt style={{ fontWeight: 600 }}>{etiqueta}</dt>
-            <dd style={{ margin: 0 }}>{cliente[campo] ?? '—'}</dd>
-          </div>
-        ))}
-        <div style={{ marginBottom: 12 }}>
-          <dt style={{ fontWeight: 600 }}>Estado</dt>
-          <dd style={{ margin: 0 }}>
-            <InsigniaEstado estado={cliente.estado} />
-          </dd>
-        </div>
-        <div>
-          <dt style={{ fontWeight: 600 }}>Fecha de registro</dt>
-          <dd style={{ margin: 0 }}>{formatearFecha(cliente.fecha_registro)}</dd>
-        </div>
-      </dl>
-
-      <div className="acciones" style={{ marginTop: 16 }}>
-        <Link to="/clientes" className="boton boton-secundario">
+      <div className="acciones perfil-acciones">
+        <Button to="/clientes" variante="secundario">
           Volver a la lista
-        </Link>
+        </Button>
         {puedeEditar && (
-          <Link to={`/clientes/${cliente.id_cliente}/editar`} className="boton">
+          <Button to={`/clientes/${cliente.id_cliente}/editar`} icono={<Pencil size={16} aria-hidden="true" />}>
             Editar
-          </Link>
+          </Button>
         )}
       </div>
     </section>

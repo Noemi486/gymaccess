@@ -1,0 +1,83 @@
+/* Tokens de diseño de GymAccess: única fuente de colores, tipografía, espacios y radios.
+   Ninguna otra hoja ni componente debe definir colores propios. */
+:root {
+  color-scheme: dark;
+
+  /* Superficies (fondo casi negro azulado, capas ligeramente más claras) */
+  --color-fondo: #0b0f17;
+  --color-superficie: #111722;
+  --color-superficie-elevada: #171f2d;
+  --color-superficie-hover: #1c2535;
+  --color-borde: #232d3f;
+  --color-borde-fuerte: #33405a;
+  --color-overlay: rgba(4, 7, 12, 0.7);
+
+  /* Texto */
+  --color-texto: #e8edf5;
+  --color-texto-suave: #98a4b8;
+  --color-texto-tenue: #6b778c;
+
+  /* Acento (verde lima): botón principal, opción activa e indicadores */
+  --color-acento: #a3e635;
+  --color-acento-hover: #b6f04f;
+  --color-acento-activo: #8fcf24;
+  --color-acento-suave: rgba(163, 230, 53, 0.12);
+  --color-acento-borde: rgba(163, 230, 53, 0.35);
+  --color-sobre-acento: #0b1304;
+
+  /* Estados */
+  --color-exito: #4ade80;
+  --color-exito-fondo: rgba(74, 222, 128, 0.12);
+  --color-advertencia: #fbbf24;
+  --color-advertencia-fondo: rgba(251, 191, 36, 0.12);
+  --color-error: #f87171;
+  --color-error-fondo: rgba(248, 113, 113, 0.12);
+  --color-info: #60a5fa;
+  --color-info-fondo: rgba(96, 165, 250, 0.12);
+  --color-neutro: #98a4b8;
+  --color-neutro-fondo: rgba(152, 164, 184, 0.12);
+  --color-sobre-peligro: #1a0606;
+
+  /* Tipografía: Inter incluida con la aplicación (@fontsource/inter); respaldo: fuente del sistema */
+  --fuente: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --texto-xs: 0.75rem;
+  --texto-sm: 0.875rem;
+  --texto-base: 0.9375rem;
+  --texto-lg: 1.125rem;
+  --texto-xl: 1.375rem;
+  --texto-2xl: 1.75rem;
+  --peso-normal: 400;
+  --peso-medio: 500;
+  --peso-fuerte: 600;
+  --peso-titulo: 700;
+  --interlineado: 1.5;
+
+  /* Espacios (escala de 4 px) */
+  --espacio-1: 4px;
+  --espacio-2: 8px;
+  --espacio-3: 12px;
+  --espacio-4: 16px;
+  --espacio-5: 20px;
+  --espacio-6: 24px;
+  --espacio-8: 32px;
+  --espacio-10: 40px;
+  --espacio-12: 48px;
+
+  /* Formas */
+  --radio-sm: 6px;
+  --radio: 10px;
+  --radio-lg: 14px;
+  --radio-pleno: 999px;
+
+  /* Sombras y transiciones */
+  --sombra-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --sombra: 0 6px 20px rgba(0, 0, 0, 0.35);
+  --sombra-lg: 0 18px 48px rgba(0, 0, 0, 0.5);
+  --transicion: 150ms ease;
+
+  /* Estructura */
+  --ancho-menu: 240px;
+  --alto-encabezado: 64px;
+  --ancho-contenido: 1120px;
+  --anillo-foco: 0 0 0 3px var(--color-acento-suave), 0 0 0 1px var(--color-acento);
+}

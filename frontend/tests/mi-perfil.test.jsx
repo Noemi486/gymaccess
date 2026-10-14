@@ -79,7 +79,10 @@ describe('Mi información (rol cliente)', () => {
   it('el inicio solo ofrece "Mi información", sin listas de clientes ni usuarios', async () => {
     abrir('/');
 
-    expect(await screen.findByRole('link', { name: /mi información/i })).toHaveAttribute('href', '/mi-perfil');
+    // "Mi información" aparece en el menú lateral y en el inicio; ambos llevan al mismo lugar.
+    const enlaces = await screen.findAllByRole('link', { name: /mi información/i });
+    expect(enlaces.length).toBeGreaterThan(0);
+    for (const enlace of enlaces) expect(enlace).toHaveAttribute('href', '/mi-perfil');
     expect(screen.queryByRole('link', { name: /^clientes$/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /consulta de clientes/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /registrar cliente/i })).not.toBeInTheDocument();

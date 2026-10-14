@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { ErrorApi, solicitar } from '../api/cliente.js';
-import Mensaje from '../components/Mensaje.jsx';
-import { InsigniaEstado, formatearFecha } from './Clientes.jsx';
+import PerfilCliente from '../components/PerfilCliente.jsx';
+import InfoBox from '../components/ui/InfoBox.jsx';
+import Spinner from '../components/ui/Spinner.jsx';
 
 // "Mi información": el cliente consulta únicamente sus propios datos (solo lectura).
 // Pide /clientes/me: no envía ningún id, el servidor usa el cliente vinculado a la sesión.
@@ -21,42 +22,19 @@ export default function MiPerfil() {
     };
   }, []);
 
-  if (cargando) return <p>Cargando…</p>;
-  if (!cliente) return <Mensaje tipo="error" texto={error ?? 'No se encontró tu información.'} />;
-
-  const filas = [
-    ['Teléfono', cliente.telefono],
-    ['Correo', cliente.correo ?? '—'],
-    ['Dirección', cliente.direccion ?? '—'],
-  ];
+  if (cargando) return <Spinner etiqueta="Cargando tu información…" />;
+  if (!cliente) {
+    return (
+      <div className="mensaje mensaje-error" role="alert">
+        {error ?? 'No se encontró tu información.'}
+      </div>
+    );
+  }
 
   return (
-    <section style={{ maxWidth: 520 }}>
-      <h1>
-        {cliente.nombre} {cliente.apellido}
-      </h1>
-      <p className="ayuda">Estos son los datos que el gimnasio tiene registrados de ti.</p>
-
-      <dl className="tarjeta">
-        {filas.map(([etiqueta, valor]) => (
-          <div key={etiqueta} style={{ marginBottom: 12 }}>
-            <dt style={{ fontWeight: 600 }}>{etiqueta}</dt>
-            <dd style={{ margin: 0 }}>{valor}</dd>
-          </div>
-        ))}
-        <div style={{ marginBottom: 12 }}>
-          <dt style={{ fontWeight: 600 }}>Estado</dt>
-          <dd style={{ margin: 0 }}>
-            <InsigniaEstado estado={cliente.estado} />
-          </dd>
-        </div>
-        <div>
-          <dt style={{ fontWeight: 600 }}>Fecha de registro</dt>
-          <dd style={{ margin: 0 }}>{formatearFecha(cliente.fecha_registro)}</dd>
-        </div>
-      </dl>
-
-      <p className="ayuda">Si algún dato es incorrecto, pide a recepción que lo actualice.</p>
+    <section className="perfil-pagina">
+      <PerfilCliente cliente={cliente} />
+      <InfoBox>Si algún dato es incorrecto, pide a recepción que lo actualice.</InfoBox>
     </section>
   );
 }
