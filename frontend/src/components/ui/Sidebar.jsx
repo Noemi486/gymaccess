@@ -1,9 +1,17 @@
+import { useEffect, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Dumbbell } from 'lucide-react';
 
 // Menú lateral. `grupos` es el resultado de menuParaRol(rol): [{ bloque, secciones }].
 // La opción activa lleva aria-current="page" y se resalta con fondo suave y barra de acento.
+// En pantallas pequeñas es un panel que se abre con `abierto`; al abrirse, el foco pasa a su primera opción.
 export default function Sidebar({ grupos, abierto = false, onCerrar }) {
+  const nav = useRef(null);
+
+  useEffect(() => {
+    if (abierto) nav.current?.querySelector('a')?.focus();
+  }, [abierto]);
+
   return (
     <aside id="menu-lateral" className={`sidebar${abierto ? ' sidebar-abierto' : ''}`}>
       <div className="sidebar-marca">
@@ -12,7 +20,7 @@ export default function Sidebar({ grupos, abierto = false, onCerrar }) {
         </span>
         <strong>GymAccess</strong>
       </div>
-      <nav aria-label="Menú principal" className="sidebar-nav">
+      <nav ref={nav} aria-label="Menú principal" className="sidebar-nav">
         {grupos.map(({ bloque, secciones }) => (
           <div key={bloque.id} className="sidebar-grupo">
             <p className="sidebar-bloque">{bloque.etiqueta}</p>

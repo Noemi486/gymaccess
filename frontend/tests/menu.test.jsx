@@ -86,3 +86,120 @@ describe('Sidebar', () => {
     expect(activos.map((a) => a.textContent)).toEqual(['Inicio']);
   });
 });
+
+// ---------------------------------------------------------------------------------------------
+// Menú ocultable en pantallas pequeñas (< 1024 px). El ocultamiento visual lo hace el CSS; aquí se
+// prueba el estado, la accesibilidad (aria) y el comportamiento al abrir y cerrar.
+// ---------------------------------------------------------------------------------------------
+import { afterEach, beforeEach, vi } from 'vitest';
+import { fireEvent } from '@testing-library/react';
+import App from '../src/App.jsx';
+
+function respuesta(status, cuerpo) {
+  return { ok: status >= 200 && status < 300, status, json: async () => cuerpo };
+}
+
+describe('Menú lateral ocultable', () => {
+  const cuenta = { id_usuario: 3, nombre: 'Rita Recepción', correo: 'rita@example.com', rol: 'recepcionista', estado: 'activo', id_cliente: null };
+
+  beforeEach(() => {
+    sessionStorage.clear();
+    sessionStorage.setItem('gym_token', 'token-de-prueba');
+    sessionStorage.setItem('gym_usuario', JSON.stringify(cuenta));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url) => {
+        if (url === '/api/auth/me') return respuesta(200, cuenta);
+        if (url === '/api/resumen') return respuesta(200, { clientes: { activos: 1, registrados_hoy: 0 }, ultimos_clientes: [] });
+        return respuesta(200, { data: [], page: 1, limit: 20, total: 0 });
+      }),
+    );
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  function abrirApp(ruta = '/') {
+    render(
+      <MemoryRouter initialEntries={[ruta]}>
+        <App />
+      </MemoryRouter>,
+    );
+  }
+
+  const botonMenu = () => screen.getByRole('button', { name: /menú de navegación|abrir menú|cerrar menú/i });
+  const sidebar = () => document.getElementById('menu-lateral');
+
+  it('el botón de menú empieza cerrado y apunta al menú con aria-controls', async () => {
+    abrirApp();
+    await screen.findByRole('banner');
+    expect(botonMenu()).toHaveAttribute('aria-expanded', 'false');
+    expect(botonMenu()).toHaveAttribute('aria-controls', 'menu-lateral');
+    expect(botonMenu()).toHaveAccessibleName('Abrir menú');
+    expect(sidebar()).not.toHaveClass('sidebar-abierto');
+    expect(document.querySelector('.sidebar-fondo')).not.toBeInTheDocument();
+  });
+
+  it('el botón abre el panel (aria-expanded, clase y fondo) y vuelve a cerrarlo', async () => {
+    abrirApp();
+    await screen.findByRole('banner');
+
+    fireEvent.click(botonMenu());
+    expect(botonMenu()).toHaveAttribute('aria-expanded', 'true');
+    expect(botonMenu()).toHaveAccessibleName('Cerrar menú');
+    expect(sidebar()).toHaveClass('sidebar-abierto');
+    expect(document.querySelector('.sidebar-fondo')).toBeInTheDocument();
+
+    fireEvent.click(botonMenu());
+    expect(sidebar()).not.toHaveClass('sidebar-abierto');
+    expect(botonMenu()).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('al abrir, el foco pasa a la primera opción del menú', async () => {
+    abrirApp();
+    await screen.findByRole('banner');
+    fireEvent.click(botonMenu());
+    expect(within(sidebar()).getByRole('link', { name: 'Inicio' })).toHaveFocus();
+  });
+
+  it('elegir una sección cierra el menú y navega', async () => {
+    abrirApp();
+    await screen.findByRole('banner');
+    fireEvent.click(botonMenu());
+
+    fireEvent.click(within(sidebar()).getByRole('link', { name: 'Clientes' }));
+
+    expect(sidebar()).not.toHaveClass('sidebar-abierto');
+    expect(await screen.findByRole('heading', { name: 'Clientes' })).toBeInTheDocument();
+    expect(screen.getByRole('banner')).toHaveTextContent('Clientes');
+  });
+
+  it('Escape cierra el menú y devuelve el foco al botón', async () => {
+    abrirApp();
+    await screen.findByRole('banner');
+    fireEvent.click(botonMenu());
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(sidebar()).not.toHaveClass('sidebar-abierto');
+    expect(botonMenu()).toHaveFocus();
+  });
+
+  it('pulsar el fondo oscuro cierra el menú y devuelve el foco al botón', async () => {
+    abrirApp();
+    await screen.findByRole('banner');
+    fireEvent.click(botonMenu());
+
+    fireEvent.click(document.querySelector('.sidebar-fondo'));
+
+    expect(sidebar()).not.toHaveClass('sidebar-abierto');
+    expect(document.querySelector('.sidebar-fondo')).not.toBeInTheDocument();
+    expect(botonMenu()).toHaveFocus();
+  });
+
+  it('Escape con el menú cerrado no hace nada', async () => {
+    abrirApp();
+    await screen.findByRole('banner');
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(sidebar()).not.toHaveClass('sidebar-abierto');
+    expect(botonMenu()).not.toHaveFocus();
+  });
+});

@@ -129,7 +129,7 @@
 
 **Independent Test**: abrir sin sesión; se ve el logotipo, el formulario estilizado y el error claro con credenciales incorrectas.
 
-- [X] T040 [US5] Rediseñar `frontend/src/pages/Login.jsx` en dos paneles (izquierda: marca "GymAccess" con ícono y una frase; derecha: el formulario; en pantallas pequeñas el panel de marca pasa arriba reducido a la marca; el panel izquierdo lleva, centrados verticalmente, un ícono grande ScanFace en un círculo de acento suave, tres características con check verde y un degradado verde visible; el campo Contraseña usa `frontend/src/components/ui/PasswordInput.jsx` con botón de ojo accesible por teclado), `FormField`/`Input`/`Button` con `cargando` y error accesible en español sin detalles técnicos; conservar etiquetas y textos que verifica `frontend/tests/login.test.jsx`
+- [X] T040 [US5] Rediseñar `frontend/src/pages/Login.jsx` en dos paneles con identidad propia (sin marcas, logos ni fotos de terceros): izquierda con el logo y el carrusel `frontend/src/components/CarruselLogin.jsx` (3 diapositivas para todos los roles; cambio cada 5 s con transición suave; pausa con mouse o foco; puntos clicables; con `prefers-reduced-motion` solo la primera diapositiva) cuyas frases en dos líneas llevan la segunda con degradado verde: "Controla quién entra, / sin filas.", "Membresías y pagos, / siempre al día." y "Consulta tu membresía / y tus visitas."; ilustraciones decorativas en `frontend/src/components/IlustracionAcceso.jsx` hechas solo con HTML/CSS y componentes del sistema (1: rostro con `ScanFace`, esquinas de escáner, "Min Cabrera", burbuja "Acceso autorizado" y "128 accesos hoy"; 2: "Plan Mensual" con `Badge` "Vigente", "Pago registrado $450" y "3 membresías por vencer" en amarillo; 3: perfil "MC" / "Min Cabrera", "Vence en 18 días" con barra de progreso y "Últimas visitas"); derecha con el título "Iniciar sesión en GymAccess", campos redondeados con placeholder y etiqueta accesible oculta (`etiquetaOculta` en `FormField`), `frontend/src/components/ui/PasswordInput.jsx` con botón de ojo, botón de ancho completo y el texto "¿Olvidaste tu contraseña? Pide a recepción que la restablezca.", sin registro de cuenta nueva; en pantallas pequeñas se oculta el carrusel y queda el formulario con el logo arriba; pruebas en `frontend/tests/login.test.jsx` y `frontend/tests/carrusel-login.test.jsx`
 - [X] T041 [US5] Ajustar `frontend/tests/login.test.jsx` solo en lo estructural y comprobar que el mensaje de credenciales incorrectas sigue visible
 
 ---
@@ -140,9 +140,9 @@
 
 **Independent Test**: reducir la ventana a < 1024 px y 360 px; el menú se oculta, se abre con el botón y se cierra al elegir sección, al pulsar fuera o con Escape.
 
-- [ ] T042 [P] [US6] Añadir a `frontend/tests/menu.test.jsx` pruebas del estado del menú: el botón de menú abre el panel, elegir una sección lo cierra, Escape lo cierra, el botón tiene `aria-expanded`/`aria-controls`
-- [ ] T043 [US6] Implementar en `frontend/src/components/ui/Layout.jsx`, `Sidebar.jsx` y `Topbar.jsx` el panel superpuesto con fondo de cierre, botón de menú (ícono) visible solo < 1024 px, cierre al navegar, al pulsar fuera y con Escape, y foco devuelto al botón
-- [ ] T044 [US6] Añadir en `frontend/src/styles/estilos.css` las reglas `@media (max-width: 1023px)` (menú superpuesto, tablas con desplazamiento contenido dentro de su contenedor, formularios en una columna) para que no haya desplazamiento horizontal de la página entre 360 px y 1920 px
+- [X] T042 [P] [US6] Añadir a `frontend/tests/menu.test.jsx` pruebas del estado del menú: el botón de menú abre el panel, elegir una sección lo cierra, Escape lo cierra, el botón tiene `aria-expanded`/`aria-controls`
+- [X] T043 [US6] Implementar en `frontend/src/components/ui/Layout.jsx`, `Sidebar.jsx` y `Topbar.jsx` el panel superpuesto con fondo de cierre, botón de menú (ícono) visible solo < 1024 px, cierre al navegar, al pulsar fuera y con Escape, y foco devuelto al botón
+- [X] T044 [US6] Añadir en `frontend/src/styles/estilos.css` las reglas `@media (max-width: 1023px)` (menú superpuesto, tablas con desplazamiento contenido dentro de su contenedor, formularios en una columna) para que no haya desplazamiento horizontal de la página entre 360 px y 1920 px
 
 ---
 

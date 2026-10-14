@@ -889,14 +889,14 @@ tbody tr:last-child td {
 /* Cuadrícula de indicadores: admite más tarjetas (Sprint 2) sin cambios de diseño */
 .inicio-indicadores {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   gap: var(--espacio-4);
   margin-bottom: var(--espacio-6);
 }
 
 .inicio-paneles {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
   gap: var(--espacio-4);
   align-items: start;
 }
@@ -928,7 +928,7 @@ tbody tr:last-child td {
 /* Panel reservado para las tarjetas del cliente de Sprint 2 (2 columnas; 1 en pantallas pequeñas) */
 .inicio-cliente-panel {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
   gap: var(--espacio-4);
   margin-top: var(--espacio-4);
 }
@@ -1214,49 +1214,10 @@ tbody tr:last-child td {
   border-right: 1px solid var(--color-borde);
 }
 
-/* Bloque central del panel de marca: centrado verticalmente entre el logo y el pie */
-.login-marca-centro {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-block: auto;
-}
 
-.login-icono {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 136px;
-  height: 136px;
-  margin-bottom: var(--espacio-6);
-  border-radius: var(--radio-pleno);
-  background: var(--color-acento-suave);
-  border: 1px solid var(--color-acento-borde);
-  color: var(--color-acento);
-}
 
-.login-caracteristicas {
-  display: flex;
-  flex-direction: column;
-  gap: var(--espacio-3);
-  margin: var(--espacio-6) 0 0;
-}
 
-.login-caracteristicas li {
-  display: flex;
-  align-items: center;
-  gap: var(--espacio-3);
-  font-weight: var(--peso-medio);
-}
 
-.login-caracteristicas svg {
-  flex-shrink: 0;
-  padding: 3px;
-  box-sizing: content-box;
-  border-radius: var(--radio-pleno);
-  background: var(--color-exito-fondo);
-  color: var(--color-exito);
-}
 
 .login-marca-logo {
   display: flex;
@@ -1265,21 +1226,7 @@ tbody tr:last-child td {
   font-size: var(--texto-xl);
 }
 
-.login-frase {
-  max-width: 460px;
-  margin: 0 0 var(--espacio-4);
-  font-size: var(--texto-2xl);
-  font-weight: var(--peso-titulo);
-  line-height: 1.25;
-  letter-spacing: -0.02em;
-}
 
-.login-subfrase {
-  max-width: 420px;
-  margin: 0;
-  color: var(--color-texto-suave);
-  font-size: var(--texto-lg);
-}
 
 .login-formulario {
   display: flex;
@@ -1297,10 +1244,6 @@ tbody tr:last-child td {
   margin: 0 0 var(--espacio-2);
 }
 
-.login-ayuda {
-  margin: 0 0 var(--espacio-6);
-  color: var(--color-texto-suave);
-}
 
 .login-boton {
   width: 100%;
@@ -1358,4 +1301,504 @@ tbody tr:last-child td {
 
 .campo-password-boton[aria-pressed='true'] {
   color: var(--color-acento);
+}
+
+/* Botón de menú del encabezado (solo en pantallas pequeñas) */
+.topbar-titulo {
+  flex: 1;
+}
+
+.topbar-menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  margin-right: calc(-1 * var(--espacio-2));
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: transparent;
+  color: var(--color-texto);
+  cursor: pointer;
+  transition: background var(--transicion);
+}
+
+.topbar-menu:hover {
+  background: var(--color-superficie-hover);
+}
+
+@media (min-width: 1024px) {
+  .topbar-menu,
+  .sidebar-fondo {
+    display: none;
+  }
+}
+
+/* Pantallas menores a 1024 px: el menú es un panel que se abre sobre el contenido */
+@media (max-width: 1023px) {
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 40;
+    width: min(280px, 85vw);
+    border-bottom: 0;
+    border-right: 1px solid var(--color-borde);
+    transform: translateX(-100%);
+    /* Cerrado: fuera de pantalla y fuera del orden de tabulación (visibility) */
+    visibility: hidden;
+    transition: transform 200ms ease, visibility 0s linear 200ms;
+  }
+
+  .sidebar-abierto {
+    transform: none;
+    visibility: visible;
+    box-shadow: var(--sombra-lg);
+    transition: transform 200ms ease;
+  }
+
+  .sidebar-fondo {
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    background: var(--color-overlay);
+  }
+
+  .contenido {
+    padding: var(--espacio-4);
+  }
+
+  .topbar {
+    gap: var(--espacio-3);
+  }
+}
+
+/* Entre 360 y 1023 px: nada debe ensanchar la página; las tablas se desplazan dentro de su contenedor */
+@media (max-width: 1023px) {
+  .app-principal,
+  .contenido,
+  .card,
+  .formulario-pagina,
+  .perfil-pagina {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .tabla-contenedor {
+    max-width: 100%;
+  }
+
+  .modal {
+    max-height: calc(100vh - 2 * var(--espacio-4));
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-header-acciones .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .buscador {
+    flex-wrap: wrap;
+    padding: var(--espacio-3);
+  }
+
+  .buscador-campo {
+    flex-basis: calc(100% - 40px);
+  }
+
+  .buscador .btn {
+    width: 100%;
+  }
+
+  .toasts {
+    right: var(--espacio-3);
+    left: var(--espacio-3);
+    max-width: none;
+  }
+}
+
+/* Inicio de sesión (diseño con ilustración) */
+.login-marca-centro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-10);
+  margin-block: auto;
+  text-align: center;
+}
+
+.login-frase {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  font-size: clamp(2rem, 3.2vw, 3rem);
+  font-weight: var(--peso-titulo);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.login-frase-acento {
+  /* Degradado del acento (verde lima) a verde; el color liso es el respaldo */
+  color: var(--color-acento);
+  background: linear-gradient(90deg, var(--color-acento), var(--color-exito));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Ilustración: tres tarjetas encimadas e inclinadas, hechas solo con HTML/CSS */
+.ilustracion {
+  position: relative;
+  width: min(520px, 100%);
+  height: 340px;
+  text-align: left;
+}
+
+
+
+.ilu-etiqueta {
+  color: var(--color-texto-suave);
+  font-size: var(--texto-sm);
+}
+
+
+
+.ilu-escaner {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  color: var(--color-acento);
+}
+
+.ilu-esquina {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border: 0 solid var(--color-acento);
+}
+
+.ilu-esquina-sup-izq {
+  top: 0;
+  left: 0;
+  border-top-width: 3px;
+  border-left-width: 3px;
+  border-top-left-radius: var(--radio);
+}
+
+.ilu-esquina-sup-der {
+  top: 0;
+  right: 0;
+  border-top-width: 3px;
+  border-right-width: 3px;
+  border-top-right-radius: var(--radio);
+}
+
+.ilu-esquina-inf-izq {
+  bottom: 0;
+  left: 0;
+  border-bottom-width: 3px;
+  border-left-width: 3px;
+  border-bottom-left-radius: var(--radio);
+}
+
+.ilu-esquina-inf-der {
+  bottom: 0;
+  right: 0;
+  border-bottom-width: 3px;
+  border-right-width: 3px;
+  border-bottom-right-radius: var(--radio);
+}
+
+.ilu-nombre {
+  font-size: var(--texto-lg);
+}
+
+.ilu-burbuja {
+  position: absolute;
+  top: 6px;
+  right: 6%;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  padding: var(--espacio-2) var(--espacio-4);
+  border-radius: var(--radio-pleno);
+  background: var(--color-exito);
+  color: var(--color-sobre-acento);
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-fuerte);
+  box-shadow: var(--sombra);
+  rotate: 3deg;
+  animation: flotar 5s ease-in-out infinite;
+  animation-delay: -1s;
+}
+
+/* Flotación sutil: se mueve con la propiedad `translate`, sin tocar la rotación de cada tarjeta */
+@keyframes flotar {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ilustracion .card,
+  .ilu-burbuja {
+    animation: none;
+  }
+}
+
+/* Formulario: campos muy redondeados, botón de pastilla y texto de ayuda */
+.login-caja h1 {
+  margin-bottom: var(--espacio-6);
+  font-size: var(--texto-2xl);
+}
+
+.login .entrada-grande {
+  padding: 14px var(--espacio-5);
+  border-radius: var(--radio-lg);
+  font-size: var(--texto-base);
+}
+
+.login .campo-password-entrada {
+  padding-right: 52px;
+}
+
+.login .campo-password-boton {
+  right: var(--espacio-3);
+}
+
+.login .login-boton {
+  width: 100%;
+  margin-top: var(--espacio-2);
+  padding: 14px var(--espacio-5);
+  border-radius: var(--radio-pleno);
+}
+
+.login-olvido {
+  margin: var(--espacio-6) 0 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-sm);
+  text-align: center;
+}
+
+.login-logo-movil {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  /* En pantallas pequeñas queda solo el formulario con el logo arriba */
+  .login {
+    display: block;
+    min-height: 100vh;
+  }
+
+  .login-marca {
+    display: none;
+  }
+
+  .login-logo-movil {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--espacio-3);
+    margin-bottom: var(--espacio-8);
+    font-size: var(--texto-xl);
+  }
+
+  .login-formulario {
+    min-height: 100vh;
+    padding: var(--espacio-8) var(--espacio-5);
+  }
+}
+
+/* Ilustraciones del carrusel: las tarjetas se colocan por posición (atrás izquierda, centro, atrás derecha) */
+.ilustracion .card {
+  position: absolute;
+  box-shadow: var(--sombra);
+  animation: flotar 6s ease-in-out infinite;
+}
+
+.ilustracion .ilu-izq {
+  left: 0;
+  top: 80px;
+  z-index: 1;
+  width: 190px;
+  rotate: -8deg;
+  animation-delay: -2s;
+}
+
+.ilustracion .ilu-der {
+  right: 0;
+  top: 120px;
+  z-index: 1;
+  width: 200px;
+  rotate: 7deg;
+  animation-delay: -4s;
+}
+
+.ilustracion .ilu-centro {
+  left: 50%;
+  top: 0;
+  z-index: 3;
+  width: 230px;
+  margin-left: -115px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-4);
+  rotate: -2deg;
+  background: var(--color-superficie-elevada);
+  border-color: var(--color-acento-borde);
+  box-shadow: var(--sombra-lg);
+}
+
+.ilustracion .ilu-plan {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+.ilu-monto {
+  font-size: var(--texto-2xl);
+  line-height: 1;
+}
+
+.ilustracion .ilu-alerta {
+  background: var(--color-advertencia-fondo);
+  border-color: var(--color-advertencia);
+  color: var(--color-advertencia);
+}
+
+.ilustracion .ilu-alerta .card-icono {
+  background: var(--color-advertencia-fondo);
+  color: var(--color-advertencia);
+}
+
+.ilustracion .ilu-alerta .stat-etiqueta {
+  color: var(--color-advertencia);
+}
+
+.ilu-visitas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  margin: var(--espacio-3) 0 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-sm);
+}
+
+.ilu-visitas-lista li {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+.ilu-vence-texto {
+  display: block;
+  margin-bottom: var(--espacio-3);
+}
+
+.ilu-barra {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radio-pleno);
+  background: var(--color-superficie-hover);
+}
+
+.ilu-barra-relleno {
+  display: block;
+  width: 60%;
+  height: 100%;
+  border-radius: var(--radio-pleno);
+  background: linear-gradient(90deg, var(--color-acento), var(--color-exito));
+}
+
+/* Carrusel del panel de marca */
+.carrusel {
+  width: 100%;
+}
+
+.carrusel-pistas {
+  display: grid;
+}
+
+.carrusel-diapositiva {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-10);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  /* Salida suave; el `visibility` se oculta al terminar para sacarla del teclado y de lectores de pantalla */
+  transition:
+    opacity 600ms ease,
+    transform 600ms ease,
+    visibility 0s linear 600ms;
+}
+
+.carrusel-activa {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 600ms ease,
+    transform 600ms ease,
+    visibility 0s;
+}
+
+.carrusel-puntos {
+  display: flex;
+  justify-content: center;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-8);
+}
+
+.carrusel-punto {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radio-pleno);
+  background: var(--color-borde-fuerte);
+  cursor: pointer;
+  transition:
+    width var(--transicion),
+    background var(--transicion);
+}
+
+.carrusel-punto:hover {
+  background: var(--color-texto-tenue);
+}
+
+.carrusel-punto-activo,
+.carrusel-punto-activo:hover {
+  width: 28px;
+  background: var(--color-acento);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carrusel-diapositiva,
+  .carrusel-activa {
+    transition: none;
+    transform: none;
+  }
 }

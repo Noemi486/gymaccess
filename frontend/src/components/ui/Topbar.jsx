@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, KeyRound, LogOut } from 'lucide-react';
+import { ChevronDown, KeyRound, LogOut, Menu, X } from 'lucide-react';
 import Avatar, { iniciales } from './Avatar.jsx';
 
 export const ETIQUETAS_ROL = {
@@ -13,7 +13,15 @@ export { iniciales };
 
 // Encabezado: título de la sección a la izquierda y menú de usuario (avatar con iniciales) a la derecha.
 // El menú de usuario se cierra con Escape, al pulsar fuera o al elegir una opción.
-export default function Topbar({ titulo, usuario, onCerrarSesion, onCambiarPassword }) {
+export default function Topbar({
+  titulo,
+  usuario,
+  onCerrarSesion,
+  onCambiarPassword,
+  onMenu,
+  menuAbierto = false,
+  botonMenuRef,
+}) {
   const [abierto, setAbierto] = useState(false);
   const contenedor = useRef(null);
   const boton = useRef(null);
@@ -41,6 +49,19 @@ export default function Topbar({ titulo, usuario, onCerrarSesion, onCambiarPassw
 
   return (
     <header className="topbar">
+      {onMenu && (
+        <button
+          ref={botonMenuRef}
+          type="button"
+          className="topbar-menu"
+          aria-label={menuAbierto ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={menuAbierto}
+          aria-controls="menu-lateral"
+          onClick={onMenu}
+        >
+          {menuAbierto ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
+        </button>
+      )}
       <p className="topbar-titulo">{titulo}</p>
 
       <div className="menu-usuario" ref={contenedor}>

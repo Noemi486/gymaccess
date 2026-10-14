@@ -32,7 +32,7 @@ function renderizar(ruta, rutas) {
 }
 
 function llenarYEnviar(correo, password) {
-  fireEvent.change(screen.getByLabelText('Correo'), { target: { value: correo } });
+  fireEvent.change(screen.getByLabelText('Correo electrónico'), { target: { value: correo } });
   fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: password } });
   fireEvent.click(screen.getByRole('button', { name: /iniciar sesión/i }));
 }
@@ -62,33 +62,60 @@ describe('Login', () => {
 
     const marca = document.querySelector('.login-marca');
     expect(marca).toHaveTextContent('GymAccess');
-    expect(marca).toHaveTextContent('Clientes, membresías y accesos, en un solo lugar.');
-    expect(marca.querySelector('svg')).toBeInTheDocument();
+    expect(marca.querySelector('.login-marca-logo svg')).toBeInTheDocument();
 
     const formulario = screen.getByRole('region', { name: /iniciar sesión/i });
-    expect(formulario).toContainElement(screen.getByLabelText('Correo'));
+    expect(formulario).toContainElement(screen.getByLabelText('Correo electrónico'));
     expect(formulario).toContainElement(screen.getByLabelText('Contraseña'));
-    expect(marca).not.toContainElement(screen.getByLabelText('Correo'));
-    expect(screen.getByRole('heading', { level: 1, name: 'Iniciar sesión' })).toBeInTheDocument();
+    expect(marca).not.toContainElement(screen.getByLabelText('Correo electrónico'));
+    expect(screen.getByRole('heading', { level: 1, name: 'Iniciar sesión en GymAccess' })).toBeInTheDocument();
     expect(screen.getByLabelText('Contraseña')).toHaveAttribute('type', 'password');
   });
 
-  it('el panel de marca muestra un ícono grande y tres características con su check', () => {
+  it('el panel de marca contiene el carrusel de tres diapositivas (el detalle está en carrusel-login.test.jsx)', () => {
     vi.stubGlobal('fetch', vi.fn());
     renderizar('/login', <Route path="/login" element={<Login />} />);
+    const carrusel = document.querySelector('.login-marca .carrusel');
+    expect(carrusel).toBeInTheDocument();
+    expect(carrusel.querySelectorAll('.carrusel-diapositiva')).toHaveLength(3);
+  });
 
-    const centro = document.querySelector('.login-marca-centro');
-    const icono = centro.querySelector('.login-icono');
-    expect(icono).toHaveAttribute('aria-hidden', 'true');
-    expect(icono.querySelector('svg')).toBeInTheDocument();
 
-    const caracteristicas = within(centro).getAllByRole('listitem');
-    expect(caracteristicas.map((li) => li.textContent)).toEqual([
-      'Acceso con reconocimiento facial',
-      'Membresías y pagos al día',
-      'Control de permisos por rol',
-    ]);
-    for (const li of caracteristicas) expect(li.querySelector('svg')).toBeInTheDocument();
+  describe('formulario', () => {
+    it('muestra el título, los placeholders y el botón principal de ancho completo', () => {
+      vi.stubGlobal('fetch', vi.fn());
+      renderizar('/login', <Route path="/login" element={<Login />} />);
+
+      expect(screen.getByRole('heading', { level: 1, name: 'Iniciar sesión en GymAccess' })).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Correo electrónico')).toBe(screen.getByLabelText('Correo electrónico'));
+      expect(screen.getByPlaceholderText('Contraseña')).toBe(screen.getByLabelText('Contraseña'));
+      expect(screen.getByLabelText('Correo electrónico')).toHaveClass('entrada-grande');
+      expect(screen.getByRole('button', { name: 'Iniciar sesión' })).toHaveClass('login-boton');
+    });
+
+    it('las etiquetas están ocultas a la vista pero disponibles para lectores de pantalla', () => {
+      vi.stubGlobal('fetch', vi.fn());
+      renderizar('/login', <Route path="/login" element={<Login />} />);
+      const etiqueta = document.querySelector('label[for="correo"]');
+      expect(etiqueta).toHaveClass('solo-lectores');
+      expect(etiqueta).toHaveTextContent('Correo electrónico');
+    });
+
+    it('indica que quien olvidó su contraseña debe pedir a recepción que la restablezca', () => {
+      vi.stubGlobal('fetch', vi.fn());
+      renderizar('/login', <Route path="/login" element={<Login />} />);
+      expect(
+        screen.getByText('¿Olvidaste tu contraseña? Pide a recepción que la restablezca.'),
+      ).toBeInTheDocument();
+    });
+
+    it('no ofrece registro de cuenta nueva ni enlaces de recuperación por correo', () => {
+      vi.stubGlobal('fetch', vi.fn());
+      renderizar('/login', <Route path="/login" element={<Login />} />);
+      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+      expect(screen.queryByText(/regístrate|crear cuenta|registrarse|nueva cuenta/i)).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /registr|crear cuenta/i })).not.toBeInTheDocument();
+    });
   });
 
   describe('botón para mostrar u ocultar la contraseña', () => {
@@ -186,8 +213,8 @@ describe('Login', () => {
     llenarYEnviar('no-es-correo', 'Secreta123');
 
     await screen.findByText('El correo no tiene un formato válido.');
-    expect(screen.getByLabelText('Correo')).toHaveAttribute('aria-invalid', 'true');
-    expect(screen.getByLabelText('Correo')).toHaveAccessibleDescription('El correo no tiene un formato válido.');
+    expect(screen.getByLabelText('Correo electrónico')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByLabelText('Correo electrónico')).toHaveAccessibleDescription('El correo no tiene un formato válido.');
     expect(screen.getByLabelText('Contraseña')).not.toHaveAttribute('aria-invalid');
   });
 
