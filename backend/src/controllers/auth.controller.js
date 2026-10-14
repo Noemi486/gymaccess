@@ -11,3 +11,8 @@ export async function login(req, res) {
 export function me(req, res) {
   res.json(authService.obtenerSesion(req.usuario));
 }
+
+// PATCH /api/auth/password
+export async function cambiarPassword(req, res) {
+  res.json(await authService.cambiarPassword(req.usuario, req.validado.body));
+}

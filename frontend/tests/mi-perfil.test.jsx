@@ -59,8 +59,9 @@ describe('Mi información (rol cliente)', () => {
     const urls = abrir('/mi-perfil');
 
     expect(await screen.findByRole('heading', { name: /ana propia/i })).toBeInTheDocument();
-    expect(screen.getByText('555-100-2000')).toBeInTheDocument();
-    expect(screen.getByText('ana@example.com')).toBeInTheDocument();
+    expect(screen.getByText('555 100 2000')).toBeInTheDocument(); // teléfono en grupos de 3 dígitos
+    // El correo aparece en el perfil y como correo de acceso en la tarjeta "Mi cuenta".
+    expect(screen.getAllByText('ana@example.com')).toHaveLength(2);
     expect(screen.getByText('Calle Propia 10')).toBeInTheDocument();
     expect(screen.getByText('Activo')).toBeInTheDocument();
     // Pide únicamente su propio recurso: nunca un id de otro cliente ni la lista.

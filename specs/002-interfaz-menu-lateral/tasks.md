@@ -158,14 +158,30 @@
 
 ---
 
-## Phase 10: Polish & Cross-Cutting
+## Phase 10: User Story 8 - Cuenta y cambio de contraseña (Priority: P2)
 
-- [ ] T048 Preguntar al equipo y, con su confirmación, retirar los componentes sustituidos `frontend/src/components/Layout.jsx`, `Mensaje.jsx`, `Confirmacion.jsx` y `Paginacion.jsx` (tras comprobar con búsqueda que ninguna pantalla los importa); si no se confirma, dejarlos sin uso y anotarlo en `docs/estado.md`
-- [ ] T049 Comprobar FR-015/SC-005: buscar en `frontend/src` colores literales (`#`, `rgb(`, `hsl(`) fuera de `frontend/src/styles/tokens.css` y corregirlos
-- [ ] T050 Revisar contraste (≥ 4.5:1) del texto sobre el acento, textos secundarios e insignias, y que el foco de teclado sea visible
-- [ ] T051 Ejecutar `npm test` y `npm run build` en `frontend/` y `npm test` en `backend/`; todo debe pasar (SC-010)
-- [ ] T052 Recorrer `specs/002-interfaz-menu-lateral/quickstart.md` con los 4 roles y marcar los resultados
-- [ ] T053 Actualizar `docs/estado.md` con el avance del sprint de interfaz (fase terminada, pruebas, decisiones: verde lima, fuente del sistema, `lucide-react`)
+**Goal**: "Mi información" con número de cliente, teléfono formateado y diseño de 2 columnas con la tarjeta "Mi cuenta"; cambio de contraseña para cualquier usuario autenticado desde el menú del avatar y desde "Mi cuenta", con `PATCH /api/auth/password` (endpoint nuevo aprobado el 2026-10-13).
+
+**Independent Test**: con cualquier rol, cambiar la contraseña desde el menú del avatar, iniciar sesión con la nueva (la anterior ya no sirve) y comprobar los errores por campo; como cliente, ver "Cliente #NNNN", el teléfono en grupos y la tarjeta "Mi cuenta".
+
+- [X] T048 [P] [US8] Crear `backend/tests/integration/auth-password.test.js` contra `gymaccess_test`: 401 sin sesión; con cada rol (administrador, recepcionista, entrenador y cliente) cambia la contraseña con 200 y el mensaje "Contraseña actualizada correctamente."; después el inicio de sesión funciona solo con la nueva; contraseña actual incorrecta → 400 con detalle en `password_actual` y la cuenta no cambia (y no es 401); nueva sin letra, sin número, de menos de 8 o de más de 72 caracteres → 400 en `password_nueva`; nueva igual a la actual → 400; confirmación distinta → 400 en `password_confirmacion`; campos faltantes o extra → 400; el hash guardado cambia y no es texto plano; la respuesta nunca incluye contraseñas ni hash; intentos fallidos repetidos de contraseña actual → 423
+- [X] T049 [US8] Implementar `PATCH /api/auth/password`: exportar `passwordEsquema` de `backend/src/validators/usuario.validator.js`; agregar `passwordCambioEsquema` (`z.strictObject` con `password_actual` 1–200, `password_nueva` con la política y `password_confirmacion`, con `superRefine` de coincidencia) en `backend/src/validators/auth.validator.js`; `cambiarPassword` en `backend/src/services/auth.service.js` (lee el usuario por id de la sesión, compara con bcrypt, rechaza nueva igual a la actual, hashea con `hashearContrasena` y guarda con `modelo.actualizar`, cuenta los fallos con el servicio de intentos); `cambiarPassword` en `backend/src/controllers/auth.controller.js`; ruta con `autenticar` y `validar` en `backend/src/routes/auth.routes.js`; errores de campo con HTTP 400 (nunca 401, que cierra la sesión en el frontend)
+- [X] T050 [P] [US8] Crear `frontend/src/utils/formato.js` con `formatearTelefono` (solo dígitos, grupos de 3 y el último grupo absorbe un dígito sobrante; conserva el "+" inicial; menos de 4 dígitos sin cambios) y `formatearNumeroCliente` ("Cliente #0012") y su prueba `frontend/tests/formato.test.js`
+- [X] T051 [US8] Crear `frontend/src/components/CambiarPassword.jsx` (proveedor, hook `useCambiarPassword` y diálogo accesible con contraseña actual, nueva y confirmación; ayuda con la política; validación de coincidencia; errores por campo desde el servidor; botón con estado de carga; Escape y "Cancelar" cierran y vacían los campos; éxito con `useToast`); mover `ToastProvider` de `frontend/src/main.jsx` a `frontend/src/App.jsx` para que las pantallas y pruebas que montan `App` lo tengan; prueba en `frontend/tests/cambiar-password.test.jsx`
+- [X] T052 [US8] Agregar "Cambiar contraseña" al menú del avatar en `frontend/src/components/ui/Topbar.jsx` (ícono, antes de "Cerrar sesión", todos los roles) y conectarlo en `frontend/src/components/ui/Layout.jsx` con el proveedor; ampliar `frontend/tests/topbar.test.jsx`
+- [X] T053 [US8] Rediseñar "Mi información": en `frontend/src/components/PerfilCliente.jsx` mostrar "Cliente #NNNN" junto a "Cliente desde" y el teléfono con `formatearTelefono`; en `frontend/src/pages/MiPerfil.jsx` usar 2 columnas en pantallas grandes (perfil + aviso a la izquierda; tarjeta "Mi cuenta" con el correo de acceso y el botón "Cambiar contraseña" a la derecha; 1 columna en pantallas pequeñas); estilos en `frontend/src/styles/estilos.css`; actualizar `frontend/tests/perfil.test.jsx` y `frontend/tests/mi-perfil.test.jsx`
+- [X] T054 [US8] Documentar el contrato en `specs/002-interfaz-menu-lateral/contracts/auth-password-api.md` y registrar la aprobación del endpoint en `spec.md`
+
+---
+
+## Phase 11: Polish & Cross-Cutting
+
+- [ ] T055 Preguntar al equipo y, con su confirmación, retirar los componentes sustituidos `frontend/src/components/Layout.jsx`, `Mensaje.jsx`, `Confirmacion.jsx` y `Paginacion.jsx` (tras comprobar con búsqueda que ninguna pantalla los importa); si no se confirma, dejarlos sin uso y anotarlo en `docs/estado.md`
+- [ ] T056 Comprobar FR-015/SC-005: buscar en `frontend/src` colores literales (`#`, `rgb(`, `hsl(`) fuera de `frontend/src/styles/tokens.css` y corregirlos
+- [ ] T057 Revisar contraste (≥ 4.5:1) del texto sobre el acento, textos secundarios e insignias, y que el foco de teclado sea visible
+- [ ] T058 Ejecutar `npm test` y `npm run build` en `frontend/` y `npm test` en `backend/`; todo debe pasar (SC-010)
+- [ ] T059 Recorrer `specs/002-interfaz-menu-lateral/quickstart.md` con los 4 roles y marcar los resultados
+- [ ] T060 Actualizar `docs/estado.md` con el avance del sprint de interfaz (fase terminada, pruebas, decisiones: verde lima, fuente del sistema, `lucide-react`)
 
 ---
 
@@ -222,6 +238,6 @@ Después del MVP: US3 (inicio) → US4 (pantallas consistentes, la fase más gra
 
 ## Notes
 
-- Total: 53 tareas. Por fase: Setup 2, Foundational 11, US1 8, US2 3, US3 8 (T025–T026 son el endpoint de resumen aprobado), US4 7, US5 2, US6 3, US7 3, Polish 6.
-- Solo T025–T026 tocan `backend/` (solo el endpoint de resumen, de solo lectura, aprobado el 2026-10-13); ninguna tarea modifica `database/`.
+- Total: 60 tareas. Por fase: Setup 2, Foundational 11, US1 8, US2 3, US3 8 (T025–T026 son el endpoint de resumen aprobado), US4 7, US5 2, US6 3, US7 3, US8 7, Polish 6.
+- Solo T025–T026 y T048–T049 tocan `backend/` (el endpoint de resumen, de solo lectura, y el de cambio de contraseña, ambos aprobados el 2026-10-13); ninguna tarea modifica `database/`.
 - Hacer commits pequeños por tarea o grupo lógico, en la rama de la funcionalidad.

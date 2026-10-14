@@ -64,6 +64,25 @@ describe('Topbar', () => {
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
+  it('ofrece "Cambiar contraseña" en el menú del avatar, antes de "Cerrar sesión"', () => {
+    const alCambiar = vi.fn();
+    abrir({ onCambiarPassword: alCambiar });
+    fireEvent.click(screen.getByRole('button', { name: /menú de usuario/i }));
+
+    const opciones = screen.getAllByRole('menuitem').map((o) => o.textContent);
+    expect(opciones).toEqual(['Cambiar contraseña', 'Cerrar sesión']);
+
+    fireEvent.click(screen.getByRole('menuitem', { name: /cambiar contraseña/i }));
+    expect(alCambiar).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  });
+
+  it('sin la acción de contraseña solo ofrece "Cerrar sesión"', () => {
+    abrir();
+    fireEvent.click(screen.getByRole('button', { name: /menú de usuario/i }));
+    expect(screen.getAllByRole('menuitem').map((o) => o.textContent)).toEqual(['Cerrar sesión']);
+  });
+
   it('un nombre largo usa la clase que lo recorta sin romper el diseño', () => {
     abrir({ usuario: { nombre: 'Maximiliano de la Santísima Trinidad Fernández', rol: 'administrador' } });
     expect(document.querySelector('.menu-usuario-nombre')).toBeInTheDocument();

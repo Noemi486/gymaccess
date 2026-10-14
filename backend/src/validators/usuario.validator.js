@@ -11,7 +11,7 @@ const rolEsquema = z.enum(ROLES);
 const nombreEsquema = z.string().trim().min(1).max(120);
 
 // 8 a 72 caracteres, al menos una letra y un número (FR-007a).
-const passwordEsquema = z.string().refine((valor) => validarPoliticaContrasena(valor) === null, {
+export const passwordEsquema = z.string().refine((valor) => validarPoliticaContrasena(valor) === null, {
   error: MENSAJE_POLITICA,
 });
 

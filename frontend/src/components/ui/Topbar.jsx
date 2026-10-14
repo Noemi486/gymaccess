@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, LogOut } from 'lucide-react';
+import { ChevronDown, KeyRound, LogOut } from 'lucide-react';
 import Avatar, { iniciales } from './Avatar.jsx';
 
 export const ETIQUETAS_ROL = {
@@ -13,7 +13,7 @@ export { iniciales };
 
 // Encabezado: título de la sección a la izquierda y menú de usuario (avatar con iniciales) a la derecha.
 // El menú de usuario se cierra con Escape, al pulsar fuera o al elegir una opción.
-export default function Topbar({ titulo, usuario, onCerrarSesion }) {
+export default function Topbar({ titulo, usuario, onCerrarSesion, onCambiarPassword }) {
   const [abierto, setAbierto] = useState(false);
   const contenedor = useRef(null);
   const boton = useRef(null);
@@ -67,6 +67,20 @@ export default function Topbar({ titulo, usuario, onCerrarSesion }) {
               <strong>{usuario.nombre}</strong>
               <span>{rol}</span>
             </div>
+            {onCambiarPassword && (
+              <button
+                type="button"
+                role="menuitem"
+                className="menu-usuario-opcion"
+                onClick={() => {
+                  setAbierto(false);
+                  onCambiarPassword();
+                }}
+              >
+                <KeyRound size={16} aria-hidden="true" />
+                Cambiar contraseña
+              </button>
+            )}
             <button
               type="button"
               role="menuitem"

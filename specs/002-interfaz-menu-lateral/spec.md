@@ -14,6 +14,7 @@
 
 - Q: ¿Qué color de acento debe usar la interfaz? → A: Verde lima
 - Q: ¿Qué tipografía debe usar la interfaz? → A: Fuente del sistema (sin descargas externas)
+- Cambio 2026-10-13 (Mi información y cuenta): "Mi información" muestra el número de cliente ("Cliente #0012"), el teléfono en grupos de 3 dígitos y un diseño de 2 columnas (perfil a la izquierda y tarjeta "Mi cuenta" a la derecha). Se agrega el cambio de contraseña para cualquier usuario autenticado, con el endpoint nuevo `PATCH /api/auth/password` aprobado por el equipo.
 - Aprobación 2026-10-13: el equipo aprobó el endpoint de resumen `GET /api/resumen` (solo lectura, permisos por rol validados en el backend, pruebas sobre `gymaccess_test`), diseñado para que en Sprint 2 se le agreguen los indicadores de accesos de hoy y membresías por vencer.
 - Cambio 2026-10-13 (Inicio): el Inicio deja de mostrar tarjetas de acceso rápido (repiten el menú) y pasa a ser un panel de resumen según el rol; se reserva el espacio para indicadores de Sprint 2.
 - Ajuste 2026-10-13 (dirección de diseño del equipo): tipografía Inter incluida localmente con @fontsource/inter (aprobada por el equipo), acento verde lima #A3E635, menú fijo de 240 px, menú de usuario con avatar de iniciales en el encabezado, tarjetas grandes de acceso rápido y login dividido en dos paneles.
@@ -140,6 +141,26 @@ Como usuario, quiero ver una página clara cuando entro a una dirección que no 
 
 ---
 
+### User Story 8 - Cuenta y cambio de contraseña (Priority: P2)
+
+Como usuario autenticado de cualquier rol, quiero cambiar mi contraseña desde el sistema, para mantener segura mi cuenta sin pedir ayuda al administrador.
+
+**Why this priority**: Es una necesidad básica de seguridad de cuentas (Principio V) y se ofrece en dos lugares de la interfaz nueva: el menú del avatar y la tarjeta "Mi cuenta".
+
+**Independent Test**: Con cualquier rol, abrir el diálogo desde el menú del avatar, cambiar la contraseña, cerrar sesión e iniciar sesión con la nueva; comprobar que la anterior ya no funciona y que los errores se muestran junto a cada campo.
+
+**Acceptance Scenarios**:
+
+1. **Given** un usuario de cualquier rol con sesión iniciada, **When** abre el menú del avatar, **Then** ve la opción "Cambiar contraseña", que abre un diálogo con tres campos: contraseña actual, nueva y confirmación.
+2. **Given** un cliente en "Mi información", **When** observa la tarjeta "Mi cuenta", **Then** ve su correo de acceso y un botón "Cambiar contraseña" que abre el mismo diálogo.
+3. **Given** el diálogo abierto, **When** el usuario escribe su contraseña actual correcta y una nueva que cumple la política (8 a 72 caracteres, al menos una letra y un número) con su confirmación, **Then** el sistema guarda la nueva contraseña, cierra el diálogo y muestra el aviso "Contraseña actualizada correctamente."
+4. **Given** el diálogo abierto, **When** la contraseña actual es incorrecta, **Then** el campo "contraseña actual" muestra "La contraseña actual no es correcta." y no se cambia nada.
+5. **Given** el diálogo abierto, **When** la nueva contraseña no cumple la política, es igual a la actual o no coincide con la confirmación, **Then** el campo correspondiente muestra un mensaje claro y no se cambia nada.
+6. **Given** una contraseña cambiada, **When** el usuario inicia sesión de nuevo, **Then** solo funciona la contraseña nueva.
+7. **Given** demasiados intentos fallidos de contraseña actual, **When** vuelve a intentar, **Then** el sistema bloquea temporalmente los intentos con un mensaje claro.
+
+---
+
 ### Edge Cases
 
 - ¿Qué pasa cuando el nombre o correo del usuario es muy largo? El encabezado lo recorta sin romper el diseño.
@@ -147,6 +168,7 @@ Como usuario, quiero ver una página clara cuando entro a una dirección que no 
 - ¿Qué pasa si la sesión expira mientras se usa el sistema? Se regresa a inicio de sesión con un aviso claro.
 - ¿Qué pasa si una operación falla por un error del servidor? Se muestra un aviso de error comprensible, sin detalles técnicos internos.
 - ¿Qué pasa si aún no hay clientes registrados? Los indicadores muestran 0 y la tabla de últimos registros muestra un estado vacío con una invitación a registrar el primer cliente (si el rol puede hacerlo).
+- ¿Qué pasa si el usuario cierra el diálogo de contraseña con datos escritos? Se descartan y no se envía nada; al reabrirlo los campos están vacíos.
 - ¿Qué pasa al recargar la página estando en una sección? Se conserva la sesión y la sección activa permanece resaltada.
 - ¿Qué pasa al cambiar el tamaño de la ventana con el menú abierto? El menú se adapta al nuevo ancho sin perder la posición del usuario.
 
@@ -172,17 +194,21 @@ Como usuario, quiero ver una página clara cuando entro a una dirección que no 
 - **FR-016**: El sistema DEBE usar la fuente Inter, incluida con la aplicación (sin descargar fuentes externas), un tema oscuro como predeterminado, con el verde lima como color de acento, usado con moderación (botón principal, opción activa del menú, elementos destacados) y contraste de texto legible.
 - **FR-017**: Debe existir un conjunto de elementos visuales reutilizables (estructura, menú, encabezado, cabecera de página, tarjetas, botones con variantes y estado de carga, campos de formulario, tablas, insignias, avisos, diálogo de confirmación, estado vacío e indicador de carga) usados en todas las pantallas actuales y disponibles para Sprint 2.
 - **FR-018**: Los textos de la interfaz DEBEN estar en español.
-- **FR-019**: El rediseño NO DEBE modificar los endpoints existentes, las validaciones del servidor, las reglas de negocio ni la base de datos; las rutas protegidas y la validación de permisos en el servidor se mantienen, y ocultar una opción del menú no sustituye esa validación. La única adición posible en el servidor es un endpoint nuevo de solo lectura para los conteos y últimos registros del inicio (FR-021), aprobado por el equipo el 2026-10-13.
+- **FR-019**: El rediseño NO DEBE modificar los endpoints existentes, las validaciones del servidor, las reglas de negocio ni la base de datos; las rutas protegidas y la validación de permisos en el servidor se mantienen, y ocultar una opción del menú no sustituye esa validación. Las únicas adiciones en el servidor son dos endpoints nuevos aprobados por el equipo el 2026-10-13: el de resumen del inicio (solo lectura, FR-021) y el de cambio de contraseña (FR-026).
 - **FR-020**: Las pruebas existentes del frontend DEBEN actualizarse a la nueva estructura y seguir pasando, y las pruebas del backend DEBEN seguir pasando sin cambios.
 - **FR-021**: Los datos del resumen DEBEN provenir de los datos reales del sistema y cada rol DEBE recibir únicamente lo que su rol puede consultar (el entrenador no recibe datos de contacto ni cifras de usuarios; el cliente no recibe datos de otros clientes). Si se crea un endpoint de resumen, DEBE ser de solo lectura, validar el rol en el servidor, rechazar al rol cliente y contar con pruebas sobre la base `gymaccess_test`.
 - **FR-022**: El inicio DEBE dejar preparado el espacio para indicadores de Sprint 2 (accesos de hoy y membresías por vencer) sin mostrarlos todavía, de modo que agregarlos requiera solo añadir una entrada a su configuración.
 - **FR-023**: El Inicio del cliente DEBE dejar reservado el espacio de un panel para las tarjetas de Sprint 2 (Mi membresía, Acceso facial, Mis últimas visitas y Mis pagos) sin mostrarlas todavía; su diseño queda anotado en el Anexo "Diseño reservado para Sprint 2: Inicio del cliente" y agregarlas debe requerir solo declararlas disponibles en su configuración.
 - **FR-024**: "Mi información" y el detalle de cliente DEBEN compartir un mismo perfil: encabezado con avatar grande de iniciales, nombre completo, insignia de estado y el texto "Cliente desde <fecha>"; debajo, los datos en una cuadrícula de 2 columnas (1 columna en pantallas pequeñas), cada uno con ícono, etiqueta pequeña en gris y valor. En "Mi información" el aviso de que los datos incorrectos se corrigen en recepción se muestra en una caja informativa con ícono.
+- **FR-025**: El perfil (en "Mi información" y en el detalle de cliente) DEBE mostrar el número de cliente con el formato "Cliente #0012" (mínimo 4 dígitos, con ceros a la izquierda) junto a "Cliente desde <fecha>", y el teléfono en grupos de 3 dígitos (el último grupo absorbe un dígito sobrante, por ejemplo "555 100 2000"). En pantallas grandes, "Mi información" DEBE usar 2 columnas: el perfil a la izquierda y la tarjeta "Mi cuenta" a la derecha, con el correo de acceso y el botón "Cambiar contraseña"; en pantallas pequeñas, una sola columna.
+- **FR-026**: Cualquier usuario autenticado DEBE poder cambiar su contraseña desde un diálogo con contraseña actual, nueva y confirmación. El servidor DEBE validar la contraseña actual con bcrypt, aplicar la misma política de contraseñas que el alta de usuarios, exigir que la nueva sea distinta de la actual y coincida con la confirmación, guardar solo el hash de la nueva y responder con un mensaje claro; los intentos fallidos repetidos de contraseña actual DEBEN bloquearse temporalmente. El error de contraseña actual incorrecta NO DEBE cerrar la sesión.
+- **FR-027**: La opción "Cambiar contraseña" DEBE estar en el menú del avatar del encabezado para todos los roles.
 
 ### Key Entities *(include if feature involves data)*
 
 - **Sección de menú**: Entrada de navegación con nombre, ícono, ruta, bloque al que pertenece y roles que pueden verlo. La lista completa de secciones es la configuración del menú.
 - **Usuario en sesión**: Nombre y rol que determinan qué secciones del menú y qué resumen del inicio se muestran. No se crean ni modifican datos de negocio.
+- **Cuenta de acceso**: Correo de acceso y contraseña (guardada solo como hash) del usuario en sesión; el cambio de contraseña actualiza únicamente el hash.
 - **Indicador de resumen**: Cifra del inicio (por ejemplo, clientes activos) con su etiqueta, visible según el rol. Los de Sprint 2 (accesos de hoy, membresías por vencer) están reservados en la configuración pero no se muestran todavía.
 - **Tarjeta del cliente (Sprint 2, reservada)**: Tarjeta del Inicio del cliente con información propia de su membresía, rostro, visitas o pagos. No se muestran todavía.
 
@@ -201,10 +227,12 @@ Como usuario, quiero ver una página clara cuando entro a una dirección que no 
 - **SC-009**: Un recepcionista nuevo identifica cómo llegar a Clientes y a la acción "Registrar cliente" en menos de 30 segundos sin ayuda.
 - **SC-010**: Todas las pruebas existentes del frontend y del backend pasan tras el rediseño.
 - **SC-011**: Las cifras del resumen coinciden con los datos reales: el 100 % de los indicadores de las pruebas coincide con los conteos de la lista de clientes y de usuarios.
+- **SC-012**: Un usuario cambia su contraseña en menos de 1 minuto desde el menú del avatar, y el 100 % de los intentos con contraseña actual incorrecta o nueva inválida se rechaza sin cambiar la cuenta.
 
 ## Assumptions
 
 - Es un rediseño del frontend. El resumen del inicio necesita datos que los endpoints actuales no entregan (últimos clientes registrados y conteos de registrados hoy/este mes); por eso se propone un único endpoint nuevo de solo lectura, aprobado por el equipo el 2026-10-13 (Principios I, II y V). Sin él, el inicio solo podría mostrar conteos por estado y por rol.
+- El cambio de contraseña no invalida la sesión abierta ni otras sesiones (el sistema no guarda sesiones en el servidor); la nueva contraseña rige desde el siguiente inicio de sesión. El restablecimiento por olvido de contraseña queda fuera de alcance.
 - "Hoy" y "este mes" se calculan con la fecha del servidor (zona horaria local del gimnasio).
 - Las secciones de Sprint 2 (Membresías, Pagos, Control de acceso) quedan fuera de este alcance; solo se deja el menú y los estados visuales preparados.
 - El logotipo del menú es el texto "GymAccess" acompañado de un ícono de pesa o rayo. El color de acento ya está definido (verde lima) y la tipografía es Inter incluida localmente, para que se vea igual en todos los equipos y funcione sin internet.

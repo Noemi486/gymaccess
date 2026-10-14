@@ -2,6 +2,7 @@ import { Mail, MapPin, Phone } from 'lucide-react';
 import Avatar from './ui/Avatar.jsx';
 import Badge from './ui/Badge.jsx';
 import Card from './ui/Card.jsx';
+import { formatearNumeroCliente, formatearTelefono } from '../utils/formato.js';
 
 // Datos que se muestran si el backend los envía (el entrenador no recibe los de contacto).
 const CAMPOS = [
@@ -9,6 +10,12 @@ const CAMPOS = [
   { campo: 'correo', etiqueta: 'Correo', icono: Mail },
   { campo: 'direccion', etiqueta: 'Dirección', icono: MapPin },
 ];
+
+// Valor a mostrar de un dato: el teléfono va en grupos de 3 dígitos y lo vacío se muestra como "—".
+const valorDe = (campo, valor) => {
+  if (valor === null || valor === undefined || valor === '') return '—';
+  return campo === 'telefono' ? formatearTelefono(valor) : valor;
+};
 
 // "12 de octubre de 2026"
 const fechaLarga = (iso) =>
@@ -29,7 +36,9 @@ export default function PerfilCliente({ cliente }) {
           <h1>{nombreCompleto}</h1>
           <div className="perfil-estado">
             <Badge estado={cliente.estado} />
-            <span className="perfil-desde">Cliente desde {fechaLarga(cliente.fecha_registro)}</span>
+            <span className="perfil-desde">
+              {formatearNumeroCliente(cliente.id_cliente)} · Cliente desde {fechaLarga(cliente.fecha_registro)}
+            </span>
           </div>
         </div>
       </div>
@@ -43,7 +52,7 @@ export default function PerfilCliente({ cliente }) {
               </span>
               <div>
                 <dt>{etiqueta}</dt>
-                <dd>{cliente[campo] ?? '—'}</dd>
+                <dd>{valorDe(campo, cliente[campo])}</dd>
               </div>
             </div>
           ))}

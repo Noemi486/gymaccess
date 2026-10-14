@@ -66,7 +66,7 @@ describe('Perfil de cliente', () => {
       expect(await contenido.findByRole('heading', { name: 'Ana Propia' })).toBeInTheDocument();
       expect(contenido.getByText('AP')).toHaveClass('avatar-grande');
       expect(contenido.getByText('Activo')).toBeInTheDocument();
-      expect(contenido.getByText(/^Cliente desde 12 de octubre de 2026$/)).toBeInTheDocument();
+      expect(contenido.getByText(/^Cliente #0007 · Cliente desde 12 de octubre de 2026$/)).toBeInTheDocument();
     });
 
     it('muestra los datos con su etiqueta e ícono, y "—" si no hay valor', async () => {
@@ -74,13 +74,13 @@ describe('Perfil de cliente', () => {
       const contenido = within(principal());
       await contenido.findByRole('heading', { name: 'Ana Propia' });
 
-      const etiquetas = contenido.getAllByRole('term').map((dt) => dt.textContent);
+      const etiquetas = within(document.querySelector('.perfil-datos')).getAllByRole('term').map((dt) => dt.textContent);
       expect(etiquetas).toEqual(['Teléfono', 'Correo', 'Dirección']);
-      expect(contenido.getByText('555-100-2000')).toBeInTheDocument();
-      expect(contenido.getByText('ana@example.com')).toBeInTheDocument();
+      expect(contenido.getByText('555 100 2000')).toBeInTheDocument();
+      expect(within(document.querySelector('.perfil-datos')).getByText('ana@example.com')).toBeInTheDocument();
       expect(contenido.getByText('Dirección').closest('.perfil-dato')).toHaveTextContent('—');
       // Cada dato lleva un ícono decorativo.
-      expect(document.querySelectorAll('.perfil-dato .perfil-dato-icono svg')).toHaveLength(3);
+      expect(document.querySelectorAll('.perfil-datos .perfil-dato-icono svg')).toHaveLength(3);
     });
 
     it('incluye el aviso de ayuda en una caja informativa con ícono', async () => {
@@ -98,8 +98,9 @@ describe('Perfil de cliente', () => {
 
       expect(await contenido.findByRole('heading', { name: 'Ana Propia' })).toBeInTheDocument();
       expect(contenido.getByText('AP')).toHaveClass('avatar-grande');
-      expect(contenido.getByText(/^Cliente desde 12 de octubre de 2026$/)).toBeInTheDocument();
+      expect(contenido.getByText(/^Cliente #0007 · Cliente desde 12 de octubre de 2026$/)).toBeInTheDocument();
       expect(contenido.getAllByRole('term')).toHaveLength(3);
+      expect(contenido.getByText('555 100 2000')).toBeInTheDocument();
       expect(contenido.getByRole('link', { name: /volver a la lista/i })).toHaveAttribute('href', '/clientes');
       expect(contenido.getByRole('link', { name: /editar/i })).toHaveAttribute('href', '/clientes/7/editar');
       expect(contenido.queryByRole('note')).not.toBeInTheDocument();
