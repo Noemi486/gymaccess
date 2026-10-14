@@ -1,6 +1,6 @@
 # Estado del proyecto — GymAccess
 
-Última actualización: 13 de octubre de 2026 (cierre de la funcionalidad 002)
+Última actualización: 13 de octubre de 2026 (listo para Sprint 2)
 
 ## Resumen
 
@@ -8,7 +8,7 @@
 |---|---|---|---|
 | 001 | Sprint 1: autenticación, usuarios, roles y clientes | `001-base-usuarios-clientes` | ✅ Terminado |
 | 002 | Rediseño de interfaz: menú lateral y sistema visual | `002-interfaz-menu-lateral` | ✅ Terminado (rama `feature/interfaz`) |
-| 003 | Sprint 2: membresías, pagos, reconocimiento facial y acceso (**completa el MVP**) | `003-...` | ⏳ Siguiente |
+| 003 | Sprint 2: membresías, pagos, reconocimiento facial y acceso (**completa el MVP**) | `003-...` | ⏳ Siguiente (rama `feature/sprint-2`) |
 | 004 | Sprint 3: entrenadores, rutinas y dashboard (extra) | `004-...` | ⬜ Opcional |
 
 ## MVP
@@ -24,12 +24,18 @@ El MVP queda completo al terminar la funcionalidad **003 (Sprint 2)**. Criterio 
 ## Ramas de Git
 
 - `feature/sprint-1` — Sprint 1 terminado (commit `b129cf8`).
-- `feature/interfaz` — Funcionalidad 002 terminada (rediseño de interfaz). Pendiente de integrar a `main`.
+- `feature/interfaz` — Funcionalidad 002 terminada (rediseño de interfaz), integrada a `main`.
+- `main` — Igual a `feature/interfaz` (commit `0dbbc30`): Sprint 1 y rediseño de interfaz.
+- `feature/sprint-2` — **Rama de trabajo actual**, creada a partir de `main`. Aquí se desarrolla la funcionalidad 003 (Sprint 2).
+
+## Siguiente paso
+
+Funcionalidad **003 — Sprint 2** (membresías, pagos, reconocimiento facial y control de acceso): empezar con `/speckit-specify` usando `docs/sprint-2.md` como insumo, en la rama `feature/sprint-2`.
 
 ## Pendientes del equipo
 
-- [ ] Recorrido manual final de la funcionalidad 002 en el navegador, con los 4 roles, siguiendo `specs/002-interfaz-menu-lateral/quickstart.md` (las pruebas automáticas pasan, pero el aspecto visual, el menú en pantallas pequeñas y los 360–1920 px solo se confirman a mano).
-- [ ] Integrar `feature/interfaz` a `main` cuando el equipo la apruebe.
+- [x] Recorrido manual final de la funcionalidad 002 en el navegador (revisado por el equipo el 2026-10-13: todo se ve bien).
+- [x] Integrar `feature/interfaz` a `main` (hecho el 2026-10-13: `main` creada en el commit `0dbbc30`, igual a `feature/interfaz`).
 - [ ] Ratificar la constitución (fecha de ratificación).
 - [ ] Aprobar decisiones técnicas propuestas: `mysql2`, Context de React, sin librería de componentes, Vitest.
 - [ ] Activar GitHub Copilot para estudiantes (GitHub Education).
@@ -50,3 +56,5 @@ El MVP queda completo al terminar la funcionalidad **003 (Sprint 2)**. Criterio 
   - Limpieza: se retiraron los componentes antiguos `Layout`, `Mensaje`, `Confirmacion` y `Paginacion` (verificado que nadie los importaba) y el CSS heredado sin uso. Contraste revisado: textos, insignias y bordes de campos cumplen 4.5:1 y 3:1 (se aclararon el texto tenue y los bordes de campos).
   - Pruebas: backend 214 pasan y 1 omitida (0 fallos) sobre `gymaccess_test`; frontend 171 pasan; `npm run build` compila.
   - Pendiente anotado: revisar el Inicio del entrenador (ver "Pendientes").
+
+- **2026-10-13** — Rediseño de interfaz revisado en el navegador por el equipo. `feature/interfaz` integrada a `main` (`main` no existía: se creó en el commit `0dbbc30`, idéntica a `feature/interfaz`; las ramas `feature/sprint-1` y `feature/interfaz` se conservan). Creada `feature/sprint-2` a partir de `main`, que pasa a ser la rama de trabajo. Siguiente: funcionalidad 003 (Sprint 2).
