@@ -152,9 +152,9 @@
 
 **Independent Test**: abrir una dirección inexistente y una de otro rol; se muestran las páginas correspondientes con botón "Volver al inicio".
 
-- [ ] T045 [P] [US7] Crear `frontend/tests/paginas-error.test.jsx`: ruta inexistente con sesión muestra "No encontrado"; rol no permitido muestra "Sin permiso"; ambas con enlace "Volver al inicio"; ruta inexistente sin sesión lleva a `/login`
-- [ ] T046 [P] [US7] Crear `frontend/src/pages/NoEncontrado.jsx` y `frontend/src/pages/SinPermiso.jsx` con `EmptyState`/ícono, texto en español y `Button` "Volver al inicio"
-- [ ] T047 [US7] Conectar en `frontend/src/App.jsx` y `frontend/src/components/RutaProtegida.jsx`: ruta `*` con sesión → `NoEncontrado`, sin sesión → `/login`; rol no permitido → `SinPermiso` dentro del Layout (la validación real sigue en el backend)
+- [X] T045 [P] [US7] Crear `frontend/tests/paginas-error.test.jsx`: ruta inexistente con sesión muestra "No encontrado"; rol no permitido muestra "Sin permiso"; ambas con enlace "Volver al inicio"; ruta inexistente sin sesión lleva a `/login`
+- [X] T046 [P] [US7] Crear `frontend/src/pages/NoEncontrado.jsx` y `frontend/src/pages/SinPermiso.jsx` con `EmptyState`/ícono, texto en español y `Button` "Volver al inicio"
+- [X] T047 [US7] Conectar en `frontend/src/App.jsx` y `frontend/src/components/RutaProtegida.jsx`: ruta `*` con sesión → `NoEncontrado`, sin sesión → `/login`; rol no permitido → `SinPermiso` dentro del Layout (la validación real sigue en el backend)
 
 ---
 

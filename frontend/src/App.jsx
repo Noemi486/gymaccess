@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ToastProvider } from './components/ui/Toast.jsx';
 import Layout from './components/ui/Layout.jsx';
@@ -8,6 +8,8 @@ import ClienteForm from './pages/ClienteForm.jsx';
 import Clientes from './pages/Clientes.jsx';
 import Inicio from './pages/Inicio.jsx';
 import Login from './pages/Login.jsx';
+import NoEncontrado from './pages/NoEncontrado.jsx';
+import SinPermiso from './pages/SinPermiso.jsx';
 import MiPerfil from './pages/MiPerfil.jsx';
 import UsuarioForm from './pages/UsuarioForm.jsx';
 import Usuarios from './pages/Usuarios.jsx';
@@ -98,9 +100,11 @@ function Rutas() {
             </Con>
           }
         />
-      </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/sin-permiso" element={<SinPermiso />} />
+        {/* Cualquier otra dirección: con sesión muestra "No encontrado"; sin sesión lleva a /login */}
+        <Route path="*" element={<NoEncontrado />} />
+      </Route>
     </Routes>
   );
 }

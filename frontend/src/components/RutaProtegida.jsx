@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import SinPermiso from '../pages/SinPermiso.jsx';
 
 // Protege una pantalla: sin sesión lleva a /login; con un rol no permitido muestra "Sin permiso".
 // `roles` es opcional: si se omite basta con haber iniciado sesión.
@@ -9,13 +10,7 @@ export default function RutaProtegida({ roles, children }) {
 
   if (!usuario) return <Navigate to="/login" replace />;
 
-  if (roles && !roles.includes(usuario.rol)) {
-    return (
-      <div className="mensaje mensaje-error" role="alert">
-        Sin permiso: tu rol no puede ver esta página.
-      </div>
-    );
-  }
+  if (roles && !roles.includes(usuario.rol)) return <SinPermiso />;
 
   return children;
 }

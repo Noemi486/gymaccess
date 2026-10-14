@@ -1802,3 +1802,23 @@ tbody tr:last-child td {
     transform: none;
   }
 }
+
+/* Páginas "No encontrado" y "Sin permiso" */
+.pagina-error {
+  display: flex;
+  justify-content: center;
+  padding: var(--espacio-12) 0;
+}
+
+.pagina-error .estado-vacio {
+  max-width: 420px;
+  gap: var(--espacio-3);
+}
+
+.pagina-error .estado-vacio svg {
+  color: var(--color-acento);
+}
+
+.pagina-error .estado-vacio .btn {
+  margin-top: var(--espacio-3);
+}
