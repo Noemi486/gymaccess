@@ -189,12 +189,12 @@
 
 ## Phase 12: Polish & Cross-Cutting
 
-- [ ] T059 Preguntar al equipo y, con su confirmación, retirar los componentes sustituidos `frontend/src/components/Layout.jsx`, `Mensaje.jsx`, `Confirmacion.jsx` y `Paginacion.jsx` (tras comprobar con búsqueda que ninguna pantalla los importa); si no se confirma, dejarlos sin uso y anotarlo en `docs/estado.md`
-- [ ] T060 Comprobar FR-015/SC-005: buscar en `frontend/src` colores literales (`#`, `rgb(`, `hsl(`) fuera de `frontend/src/styles/tokens.css` y corregirlos
-- [ ] T061 Revisar contraste (≥ 4.5:1) del texto sobre el acento, textos secundarios e insignias, y que el foco de teclado sea visible
-- [ ] T062 Ejecutar `npm test` y `npm run build` en `frontend/` y `npm test` en `backend/`; todo debe pasar (SC-010)
-- [ ] T063 Recorrer `specs/002-interfaz-menu-lateral/quickstart.md` con los 4 roles y marcar los resultados
-- [ ] T064 Actualizar `docs/estado.md` con el avance del sprint de interfaz (fase terminada, pruebas, decisiones: verde lima, fuente del sistema, `lucide-react`)
+- [X] T059 (autorizado por el equipo el 2026-10-13; sin importaciones, verificado) Preguntar al equipo y, con su confirmación, retirar los componentes sustituidos `frontend/src/components/Layout.jsx`, `Mensaje.jsx`, `Confirmacion.jsx` y `Paginacion.jsx` (tras comprobar con búsqueda que ninguna pantalla los importa); si no se confirma, dejarlos sin uso y anotarlo en `docs/estado.md`
+- [X] T060 Comprobar FR-015/SC-005: buscar en `frontend/src` colores literales (`#`, `rgb(`, `hsl(`) fuera de `frontend/src/styles/tokens.css` y corregirlos
+- [X] T061 Revisar contraste (≥ 4.5:1) del texto sobre el acento, textos secundarios e insignias, y que el foco de teclado sea visible
+- [X] T062 Ejecutar `npm test` y `npm run build` en `frontend/` y `npm test` en `backend/`; todo debe pasar (SC-010)
+- [ ] T063 (pendiente: recorrido manual en el navegador por el equipo; anotado en `docs/estado.md`) Recorrer `specs/002-interfaz-menu-lateral/quickstart.md` con los 4 roles y marcar los resultados
+- [X] T064 Actualizar `docs/estado.md` con el avance del sprint de interfaz (fase terminada, pruebas, decisiones: verde lima, fuente del sistema, `lucide-react`)
 
 ---
 

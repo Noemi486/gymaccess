@@ -57,37 +57,6 @@ ol {
 }
 
 /* Marco provisional (se sustituye por el menú lateral en la Fase 3) */
-.layout {
-  min-height: 100vh;
-}
-
-.encabezado {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--espacio-3) var(--espacio-6);
-  padding: var(--espacio-3) var(--espacio-4);
-  background: var(--color-superficie);
-  border-bottom: 1px solid var(--color-borde);
-}
-
-.marca {
-  color: var(--color-acento);
-}
-
-.encabezado nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--espacio-2) var(--espacio-4);
-}
-
-.sesion {
-  display: flex;
-  align-items: center;
-  gap: var(--espacio-3);
-  margin-left: auto;
-  color: var(--color-texto-suave);
-}
 
 .contenido {
   max-width: var(--ancho-contenido);
@@ -96,7 +65,6 @@ ol {
 }
 
 /* Tarjetas */
-.tarjeta,
 .card {
   background: var(--color-superficie);
   border: 1px solid var(--color-borde);
@@ -180,7 +148,7 @@ ol {
 .entrada {
   width: 100%;
   padding: 10px var(--espacio-3);
-  border: 1px solid var(--color-borde-fuerte);
+  border: 1px solid var(--color-borde-campo);
   border-radius: var(--radio);
   background: var(--color-superficie-elevada);
   color: var(--color-texto);
@@ -222,9 +190,8 @@ ol {
   font-size: var(--texto-sm);
 }
 
-/* Botones (.boton se mantiene para las pantallas aún no migradas) */
-.btn,
-.boton {
+/* Botones */
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -241,46 +208,39 @@ ol {
   transition: background var(--transicion), border-color var(--transicion), transform var(--transicion);
 }
 
-.btn:hover:not(:disabled),
-.boton:hover:not(:disabled) {
+.btn:hover:not(:disabled) {
   background: var(--color-acento-hover);
   color: var(--color-sobre-acento);
 }
 
-.btn:active:not(:disabled),
-.boton:active:not(:disabled) {
+.btn:active:not(:disabled) {
   background: var(--color-acento-activo);
   transform: translateY(1px);
 }
 
 .btn:disabled,
-.boton:disabled,
 .btn[aria-busy='true'] {
   opacity: 0.55;
   cursor: not-allowed;
 }
 
-.btn-secundario,
-.boton-secundario {
+.btn-secundario {
   background: transparent;
-  border-color: var(--color-borde-fuerte);
+  border-color: var(--color-borde-campo);
   color: var(--color-texto);
 }
 
-.btn-secundario:hover:not(:disabled),
-.boton-secundario:hover:not(:disabled) {
+.btn-secundario:hover:not(:disabled) {
   background: var(--color-superficie-hover);
   color: var(--color-texto);
 }
 
-.btn-peligro,
-.boton-peligro {
+.btn-peligro {
   background: var(--color-error);
   color: var(--color-sobre-peligro);
 }
 
-.btn-peligro:hover:not(:disabled),
-.boton-peligro:hover:not(:disabled) {
+.btn-peligro:hover:not(:disabled) {
   background: var(--color-error);
   color: var(--color-sobre-peligro);
   filter: brightness(1.1);
@@ -449,8 +409,7 @@ tbody tr:last-child td {
 }
 
 /* Insignias de estado (siempre color y texto) */
-.badge,
-.insignia {
+.badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -471,14 +430,12 @@ tbody tr:last-child td {
   background: currentColor;
 }
 
-.badge-exito,
-.insignia-activo {
+.badge-exito {
   background: var(--color-exito-fondo);
   color: var(--color-exito);
 }
 
-.badge-neutral,
-.insignia-inactivo {
+.badge-neutral {
   background: var(--color-neutro-fondo);
   color: var(--color-neutro);
 }
@@ -529,14 +486,6 @@ tbody tr:last-child td {
   border: 1px solid var(--color-borde-fuerte);
   border-radius: var(--radio-lg);
   box-shadow: var(--sombra-lg);
-}
-
-@media (max-width: 600px) {
-  .sesion {
-    margin-left: 0;
-    width: 100%;
-    justify-content: space-between;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -852,7 +801,7 @@ tbody tr:last-child td {
   padding: var(--espacio-2) var(--espacio-2) var(--espacio-2) var(--espacio-4);
   margin-bottom: var(--espacio-6);
   background: var(--color-superficie);
-  border: 1px solid var(--color-borde-fuerte);
+  border: 1px solid var(--color-borde-campo);
   border-radius: var(--radio-lg);
   transition: border-color var(--transicion), box-shadow var(--transicion);
 }
@@ -1214,19 +1163,12 @@ tbody tr:last-child td {
   border-right: 1px solid var(--color-borde);
 }
 
-
-
-
-
-
 .login-marca-logo {
   display: flex;
   align-items: center;
   gap: var(--espacio-3);
   font-size: var(--texto-xl);
 }
-
-
 
 .login-formulario {
   display: flex;
@@ -1243,7 +1185,6 @@ tbody tr:last-child td {
 .login-caja h1 {
   margin: 0 0 var(--espacio-2);
 }
-
 
 .login-boton {
   width: 100%;
@@ -1463,14 +1404,10 @@ tbody tr:last-child td {
   text-align: left;
 }
 
-
-
 .ilu-etiqueta {
   color: var(--color-texto-suave);
   font-size: var(--texto-sm);
 }
-
-
 
 .ilu-escaner {
   position: relative;
@@ -1778,7 +1715,7 @@ tbody tr:last-child td {
   padding: 0;
   border: 0;
   border-radius: var(--radio-pleno);
-  background: var(--color-borde-fuerte);
+  background: var(--color-borde-campo);
   cursor: pointer;
   transition:
     width var(--transicion),

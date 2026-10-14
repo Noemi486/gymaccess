@@ -10,12 +10,13 @@
   --color-superficie-hover: #1c2535;
   --color-borde: #232d3f;
   --color-borde-fuerte: #33405a;
+  --color-borde-campo: #5f6c86; /* bordes de campos y botones: contraste 3:1 */
   --color-overlay: rgba(4, 7, 12, 0.7);
 
   /* Texto */
   --color-texto: #e8edf5;
   --color-texto-suave: #98a4b8;
-  --color-texto-tenue: #6b778c;
+  --color-texto-tenue: #8591a6;
 
   /* Acento (verde lima): botón principal, opción activa e indicadores */
   --color-acento: #a3e635;

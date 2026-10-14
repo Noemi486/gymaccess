@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-13
 
-**Status**: Draft
+**Status**: Implementada (pendiente del recorrido manual final en el navegador)
 
 **Input**: User description: "Usa la descripción de docs/sprint-ui.md con el contexto de docs/project-context.md y CLAUDE.md"
 
