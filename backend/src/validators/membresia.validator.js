@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import './mensajes.js'; // mensajes de zod en español
+import { pagoEnLineaEsquema } from './pago.validator.js';
 
-// Asignar y renovar membresías. El pago opcional (`pago`) se incorpora en la historia de pagos (US3).
+// Asignar y renovar membresías. `pago` es opcional: se registra en la misma transacción (todo o nada).
 
 const MENSAJE_FECHA = 'La fecha debe tener el formato AAAA-MM-DD y existir en el calendario.';
 
@@ -28,11 +29,13 @@ const idTipoEsquema = z
 export const membresiaAsignarEsquema = z.strictObject({
   id_tipo_membresia: idTipoEsquema,
   fecha_inicio: fechaEsquema.optional(),
+  pago: pagoEnLineaEsquema.optional(),
 });
 
 // POST /api/membresias/:id/renovar (el plan es el de la membresía que se renueva)
 export const membresiaRenovarEsquema = z.strictObject({
   fecha_inicio: fechaEsquema.optional(),
+  pago: pagoEnLineaEsquema.optional(),
 });
 
 // PATCH /api/membresias/:id/estado

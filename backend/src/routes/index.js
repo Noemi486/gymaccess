@@ -2,6 +2,7 @@ import { Router } from 'express';
 import authRoutes from './auth.routes.js';
 import clientesRoutes from './clientes.routes.js';
 import membresiasRoutes from './membresias.routes.js';
+import pagosRoutes from './pagos.routes.js';
 import resumenRoutes from './resumen.routes.js';
 import tiposMembresiaRoutes from './tiposMembresia.routes.js';
 import usuariosRoutes from './usuarios.routes.js';
@@ -19,6 +20,7 @@ router.use('/usuarios', usuariosRoutes);
 router.use('/clientes', clientesRoutes);
 router.use('/resumen', resumenRoutes);
 router.use('/tipos-membresia', tiposMembresiaRoutes);
+router.use('/pagos', pagosRoutes);
 router.use('/', membresiasRoutes); // /clientes/:id/membresias y /membresias/:id/... (después de /clientes)
 
 export default router;

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { ErrorApi, solicitar } from '../api/cliente.js';
 import { calcularFechaFin, hoyLocal, MAX_DIAS_ADELANTO, sumarDias } from '../utils/fechas.js';
-import { formatearFechaCorta } from '../utils/formato.js';
+import { formatearFechaCorta, formatearMoneda } from '../utils/formato.js';
+import SelectorMetodoPago from './SelectorMetodoPago.jsx';
 import Button from './ui/Button.jsx';
 import FormField from './ui/FormField.jsx';
 import Input from './ui/Input.jsx';
@@ -12,8 +13,21 @@ import Input from './ui/Input.jsx';
 export default function RenovarMembresia({ membresia, onCerrar, onGuardado }) {
   const vigente = membresia.estado === 'vigente';
   const [inicio, setInicio] = useState('');
+  const [precio, setPrecio] = useState(null); // precio vigente del plan (para cobrar al renovar)
+  const [pagarAhora, setPagarAhora] = useState(false);
+  const [metodo, setMetodo] = useState('efectivo');
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let activo = true;
+    solicitar(`/tipos-membresia/${membresia.tipo.id_tipo_membresia}`)
+      .then((plan) => activo && setPrecio(plan.precio))
+      .catch(() => {}); // sin precio no se ofrece cobrar ahora; el servidor valida todo
+    return () => {
+      activo = false;
+    };
+  }, [membresia.tipo.id_tipo_membresia]);
 
   useEffect(() => {
     const alTeclear = (evento) => {
@@ -31,6 +45,7 @@ export default function RenovarMembresia({ membresia, onCerrar, onGuardado }) {
     evento.preventDefault();
     setError(null);
     const cuerpo = !vigente && inicio ? { fecha_inicio: inicio } : {};
+    if (pagarAhora && precio !== null) cuerpo.pago = { metodo_pago: metodo, monto: precio };
     setEnviando(true);
     try {
       const resultado = await solicitar(`/membresias/${membresia.id_membresia}/renovar`, { metodo: 'POST', cuerpo });
@@ -43,7 +58,7 @@ export default function RenovarMembresia({ membresia, onCerrar, onGuardado }) {
   }
 
   const detalles = error?.detalles ?? [];
-  const mostrarGeneral = error && (detalles.length === 0 || detalles.some((d) => d.field !== 'fecha_inicio'));
+  const mostrarGeneral = error && (detalles.length === 0 || detalles.some((d) => !['fecha_inicio', 'pago.monto', 'pago.metodo_pago'].includes(d.field)));
 
   return (
     <div className="fondo-modal" role="presentation">
@@ -74,8 +89,25 @@ export default function RenovarMembresia({ membresia, onCerrar, onGuardado }) {
 
           <p className="resumen-membresia" aria-live="polite">
             {vigente ? 'Empieza el día siguiente al fin de la actual: ' : ''}
-            Vigente del {formatearFechaCorta(inicioEfectivo)} al {formatearFechaCorta(fin)}. Quedará pendiente de pago al precio vigente del plan.
+            Vigente del {formatearFechaCorta(inicioEfectivo)} al {formatearFechaCorta(fin)}. {pagarAhora ? 'Se cobrará' : 'Quedará pendiente de pago'} al precio vigente del plan{precio !== null && ` (${formatearMoneda(precio)})`}.
           </p>
+
+          {precio !== null && (
+            <>
+              <label className="casilla">
+                <input type="checkbox" checked={pagarAhora} onChange={(e) => setPagarAhora(e.target.checked)} />
+                Registrar el pago ahora
+              </label>
+              {pagarAhora && (
+                <SelectorMetodoPago
+                  id="metodo-pago-ahora"
+                  valor={metodo}
+                  onChange={setMetodo}
+                  error={error?.mensajeDeCampo('pago.metodo_pago') ?? error?.mensajeDeCampo('pago.monto')}
+                />
+              )}
+            </>
+          )}
 
           <div className="acciones">
             <Button variante="secundario" onClick={onCerrar}>

@@ -2,6 +2,7 @@ import { conTransaccion as conTransaccionReal } from '../config/db.js';
 import * as clienteModeloReal from '../models/cliente.model.js';
 import * as fechaModeloReal from '../models/fecha.model.js';
 import * as membresiaModeloReal from '../models/membresia.model.js';
+import * as pagosServicioReal from './pagos.service.js';
 import * as tipoModeloReal from '../models/tipoMembresia.model.js';
 import * as auditoriaServicio from './auditoria.service.js';
 import { MODULOS } from './auditoria.service.js';
@@ -35,6 +36,7 @@ export function crearMembresiasService({
   tipoModelo = tipoModeloReal,
   fechaModelo = fechaModeloReal,
   auditoria = auditoriaServicio,
+  pagos = pagosServicioReal,
   conTransaccion = conTransaccionReal,
 } = {}) {
   // La fecha de inicio indicada debe estar entre hoy y 60 días después.
@@ -66,6 +68,16 @@ export function crearMembresiasService({
     await auditoria.registrarError({ id_usuario: actor.id_usuario, accion, modulo: MODULOS.MEMBRESIAS, descripcion });
   }
 
+  // Si viene `pago`, se registra en la misma transacción: si falla, tampoco se crea la membresía.
+  async function resultadoConPago(conexion, id, pago, actor, hoy) {
+    if (pago) {
+      const fila = await modelo.buscarPorId(id, conexion, { bloquear: true });
+      await pagos.registrarEnTransaccion(conexion, { fila, ...pago, actor, hoy, campoMonto: 'pago.monto' });
+    }
+    const membresia = membresiaPublica(await modelo.buscarPorId(id, conexion), hoy);
+    return { membresia, pago: membresia.pago };
+  }
+
   // GET /clientes/:id/membresias
   async function listarDeCliente(idCliente) {
     const cliente = await clienteModelo.buscarPorId(idCliente);
@@ -84,7 +96,7 @@ export function crearMembresiasService({
   }
 
   // POST /clientes/:id/membresias
-  async function asignar(idCliente, { id_tipo_membresia, fecha_inicio }, actor) {
+  async function asignar(idCliente, { id_tipo_membresia, fecha_inicio, pago }, actor) {
     try {
       return await conTransaccion(async (conexion) => {
         await cargarClienteActivo(idCliente, conexion);
@@ -112,7 +124,7 @@ export function crearMembresiasService({
           conexion,
         );
         await auditar(conexion, actor, 'asignar', `Membresía ${id} asignada al cliente ${idCliente} (plan ${id_tipo_membresia}).`);
-        return { membresia: membresiaPublica(await modelo.buscarPorId(id, conexion), hoy), pago: null };
+        return resultadoConPago(conexion, id, pago, actor, hoy);
       });
     } catch (error) {
       if (error.status === 409) await registrarFallo(actor, 'asignar', `Asignación rechazada para el cliente ${idCliente}.`);
@@ -121,10 +133,12 @@ export function crearMembresiasService({
   }
 
   // POST /membresias/:id/renovar
-  async function renovar(idMembresia, { fecha_inicio }, actor) {
+  async function renovar(idMembresia, { fecha_inicio, pago }, actor) {
     try {
       return await conTransaccion(async (conexion) => {
-        const previa = await modelo.buscarPorId(idMembresia, conexion);
+        // Fuera de la transacción (pool): una lectura dentro de ella fijaría la instantánea antes de bloquear
+        // y no vería los cambios que otra transacción confirme mientras esperamos el bloqueo.
+        const previa = await modelo.buscarPorId(idMembresia);
         if (!previa) throw errorNoEncontrado('La membresía no existe.');
         const idCliente = previa.id_cliente;
 
@@ -180,7 +194,7 @@ export function crearMembresiasService({
           conexion,
         );
         await auditar(conexion, actor, 'renovar', `Membresía ${idMembresia} renovada como ${id} (cliente ${idCliente}).`);
-        return { membresia: membresiaPublica(await modelo.buscarPorId(id, conexion), hoy), pago: null };
+        return resultadoConPago(conexion, id, pago, actor, hoy);
       });
     } catch (error) {
       if (error.status === 409) await registrarFallo(actor, 'renovar', `Renovación rechazada para la membresía ${idMembresia}.`);
@@ -192,7 +206,9 @@ export function crearMembresiasService({
   async function cambiarEstado(idMembresia, accion, actor) {
     try {
       return await conTransaccion(async (conexion) => {
-        const previa = await modelo.buscarPorId(idMembresia, conexion);
+        // Fuera de la transacción (pool): una lectura dentro de ella fijaría la instantánea antes de bloquear
+        // y no vería los cambios que otra transacción confirme mientras esperamos el bloqueo.
+        const previa = await modelo.buscarPorId(idMembresia);
         if (!previa) throw errorNoEncontrado('La membresía no existe.');
         await clienteModelo.buscarPorId(previa.id_cliente, conexion, { bloquear: true });
         const fila = await modelo.buscarPorId(idMembresia, conexion, { bloquear: true });

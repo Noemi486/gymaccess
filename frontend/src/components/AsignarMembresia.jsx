@@ -5,6 +5,7 @@ import { formatearFechaCorta, formatearMoneda } from '../utils/formato.js';
 import Button from './ui/Button.jsx';
 import FormField from './ui/FormField.jsx';
 import Input from './ui/Input.jsx';
+import SelectorMetodoPago from './SelectorMetodoPago.jsx';
 import Select from './ui/Select.jsx';
 import Spinner from './ui/Spinner.jsx';
 
@@ -15,6 +16,8 @@ export default function AsignarMembresia({ idCliente, onCerrar, onGuardado }) {
   const [cargando, setCargando] = useState(true);
   const [idPlan, setIdPlan] = useState('');
   const [inicio, setInicio] = useState('');
+  const [pagarAhora, setPagarAhora] = useState(false);
+  const [metodo, setMetodo] = useState('efectivo');
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState(null);
 
@@ -51,6 +54,7 @@ export default function AsignarMembresia({ idCliente, onCerrar, onGuardado }) {
     }
     const cuerpo = { id_tipo_membresia: plan.id_tipo_membresia };
     if (inicio) cuerpo.fecha_inicio = inicio;
+    if (pagarAhora) cuerpo.pago = { metodo_pago: metodo, monto: plan.precio };
     setEnviando(true);
     try {
       const resultado = await solicitar(`/clientes/${idCliente}/membresias`, { metodo: 'POST', cuerpo });
@@ -63,7 +67,7 @@ export default function AsignarMembresia({ idCliente, onCerrar, onGuardado }) {
   }
 
   const detalles = error?.detalles ?? [];
-  const mostrarGeneral = error && (detalles.length === 0 || detalles.some((d) => !['id_tipo_membresia', 'fecha_inicio'].includes(d.field)));
+  const mostrarGeneral = error && (detalles.length === 0 || detalles.some((d) => !['id_tipo_membresia', 'fecha_inicio', 'pago.monto', 'pago.metodo_pago'].includes(d.field)));
   const errorDe = (campo) => error?.mensajeDeCampo(campo);
 
   return (
@@ -107,9 +111,22 @@ export default function AsignarMembresia({ idCliente, onCerrar, onGuardado }) {
 
                 {plan && (
                   <p className="resumen-membresia" aria-live="polite">
-                    Vigente del {formatearFechaCorta(inicioEfectivo)} al {formatearFechaCorta(fin)}. Quedará pendiente de pago por{' '}
+                    Vigente del {formatearFechaCorta(inicioEfectivo)} al {formatearFechaCorta(fin)}. {pagarAhora ? 'Se cobrará' : 'Quedará pendiente de pago por'}{' '}
                     <strong>{formatearMoneda(plan.precio)}</strong>.
                   </p>
+                )}
+
+                <label className="casilla">
+                  <input type="checkbox" checked={pagarAhora} onChange={(e) => setPagarAhora(e.target.checked)} />
+                  Registrar el pago ahora
+                </label>
+                {pagarAhora && (
+                  <SelectorMetodoPago
+                    id="metodo-pago-ahora"
+                    valor={metodo}
+                    onChange={setMetodo}
+                    error={error?.mensajeDeCampo('pago.metodo_pago') ?? error?.mensajeDeCampo('pago.monto')}
+                  />
                 )}
               </>
             )}

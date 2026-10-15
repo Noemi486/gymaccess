@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ErrorApi, solicitar } from '../api/cliente.js';
 import { formatearFechaCorta, formatearMoneda } from '../utils/formato.js';
 import AsignarMembresia from './AsignarMembresia.jsx';
+import RegistrarPago from './RegistrarPago.jsx';
 import RenovarMembresia from './RenovarMembresia.jsx';
 import Badge from './ui/Badge.jsx';
 import Button from './ui/Button.jsx';
@@ -91,6 +92,7 @@ export default function PanelMembresia({ idCliente, clienteActivo, rol }) {
   const [avisoAccion, setAvisoAccion] = useState(null);
   const [asignando, setAsignando] = useState(false);
   const [renovando, setRenovando] = useState(null);
+  const [pagando, setPagando] = useState(null);
   const [confirmacion, setConfirmacion] = useState(null); // { accion, membresia }
 
   const cargar = useCallback(async () => {
@@ -110,12 +112,14 @@ export default function PanelMembresia({ idCliente, clienteActivo, rol }) {
 
   const cerrarAsignar = useCallback(() => setAsignando(false), []);
   const cerrarRenovar = useCallback(() => setRenovando(null), []);
+  const cerrarPago = useCallback(() => setPagando(null), []);
   const cancelarConfirmacion = useCallback(() => setConfirmacion(null), []);
 
   function alGuardar(mensaje) {
     return () => {
       setAsignando(false);
       setRenovando(null);
+      setPagando(null);
       mostrar({ tipo: 'exito', texto: mensaje });
       cargar();
     };
@@ -150,20 +154,24 @@ export default function PanelMembresia({ idCliente, clienteActivo, rol }) {
   const renovable = !actual && !proxima && historial[0]?.estado === 'vencida' ? historial[0] : null;
   const puedeAsignar = clienteActivo && !actual && !proxima;
   const accionesAdmin = (membresia) =>
-    esAdmin && (
+    (esAdmin || membresia.estado === 'pendiente_de_pago') && (
       <div className="acciones acciones-fila">
-        {membresia.estado === 'suspendida' ? (
+        {membresia.estado === 'pendiente_de_pago' && <Button onClick={() => setPagando(membresia)}>Registrar pago</Button>}
+        {esAdmin && membresia.estado === 'suspendida' && (
           <Button variante="secundario" onClick={() => setConfirmacion({ accion: 'reactivar', membresia })}>
             Reactivar
           </Button>
-        ) : (
+        )}
+        {esAdmin && membresia.estado !== 'suspendida' && (
           <Button variante="secundario" onClick={() => setConfirmacion({ accion: 'suspender', membresia })}>
             Suspender
           </Button>
         )}
-        <Button variante="secundario" onClick={() => setConfirmacion({ accion: 'cancelar', membresia })}>
-          Cancelar membresía
-        </Button>
+        {esAdmin && (
+          <Button variante="secundario" onClick={() => setConfirmacion({ accion: 'cancelar', membresia })}>
+            Cancelar membresía
+          </Button>
+        )}
       </div>
     );
 
@@ -225,6 +233,7 @@ export default function PanelMembresia({ idCliente, clienteActivo, rol }) {
       />
 
       {asignando && <AsignarMembresia idCliente={idCliente} onCerrar={cerrarAsignar} onGuardado={alGuardar('Membresía asignada.')} />}
+      {pagando && <RegistrarPago membresia={pagando} onCerrar={cerrarPago} onGuardado={alGuardar('Pago registrado.')} />}
       {renovando && <RenovarMembresia membresia={renovando} onCerrar={cerrarRenovar} onGuardado={alGuardar('Membresía renovada.')} />}
 
       <ConfirmDialog
