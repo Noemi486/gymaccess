@@ -2,6 +2,7 @@ import { Router } from 'express';
 import authRoutes from './auth.routes.js';
 import clientesRoutes from './clientes.routes.js';
 import resumenRoutes from './resumen.routes.js';
+import tiposMembresiaRoutes from './tiposMembresia.routes.js';
 import usuariosRoutes from './usuarios.routes.js';
 
 // Router principal de la API (se monta bajo /api).
@@ -16,5 +17,6 @@ router.use('/auth', authRoutes);
 router.use('/usuarios', usuariosRoutes);
 router.use('/clientes', clientesRoutes);
 router.use('/resumen', resumenRoutes);
+router.use('/tipos-membresia', tiposMembresiaRoutes);
 
 export default router;

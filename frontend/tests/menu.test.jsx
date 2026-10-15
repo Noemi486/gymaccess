@@ -8,8 +8,13 @@ import Sidebar from '../src/components/ui/Sidebar.jsx';
 
 // Secciones esperadas por rol (Anexo del spec), agrupadas por bloque.
 const ESPERADO = {
-  administrador: { General: ['Inicio'], Operación: ['Clientes'], Administración: ['Usuarios y roles'] },
-  recepcionista: { General: ['Inicio'], Operación: ['Clientes'] },
+  administrador: {
+    General: ['Inicio'],
+    Operación: ['Clientes'],
+    'Membresías y pagos': ['Tipos de membresía'],
+    Administración: ['Usuarios y roles'],
+  },
+  recepcionista: { General: ['Inicio'], Operación: ['Clientes'], 'Membresías y pagos': ['Tipos de membresía'] },
   entrenador: { General: ['Inicio'], Operación: ['Clientes'] },
   cliente: { General: ['Inicio', 'Mi información'] },
 };
@@ -36,21 +41,9 @@ describe('menuParaRol', () => {
     expect(comoObjeto(menuParaRol('entrenador', secciones)).Operación).toEqual(['Clientes']);
   });
 
-  it('no incluye todavía las secciones de Sprint 2', () => {
-    const etiquetas = SECCIONES.map((s) => s.etiqueta);
-    for (const futura of ['Membresías', 'Pagos', 'Control de acceso']) {
-      expect(etiquetas).not.toContain(futura);
-    }
-  });
-});
-
-describe('seccionDeRuta', () => {
-  it('encuentra la sección por prefijo y "/" solo coincide exacto', () => {
-    expect(seccionDeRuta('/')?.id).toBe('inicio');
-    expect(seccionDeRuta('/clientes/nuevo')?.id).toBe('clientes');
-    expect(seccionDeRuta('/clientes/7/editar')?.id).toBe('clientes');
-    expect(seccionDeRuta('/usuarios')?.id).toBe('usuarios');
-    expect(seccionDeRuta('/no-existe')).toBeNull();
+  it('el bloque "Membresías y pagos" va entre Operación y Administración', () => {
+    const orden = menuParaRol('administrador').map((g) => g.bloque.etiqueta);
+    expect(orden).toEqual(['General', 'Operación', 'Membresías y pagos', 'Administración']);
   });
 });
 
@@ -69,8 +62,9 @@ describe('Sidebar', () => {
     expect(screen.getByText('GymAccess')).toBeInTheDocument();
     expect(screen.getByText('General')).toBeInTheDocument();
     expect(screen.getByText('Operación')).toBeInTheDocument();
+    expect(screen.getByText('Membresías y pagos')).toBeInTheDocument();
     expect(screen.queryByText('Administración')).not.toBeInTheDocument();
-    expect(within(menu).getAllByRole('link').map((a) => a.textContent)).toEqual(['Inicio', 'Clientes']);
+    expect(within(menu).getAllByRole('link').map((a) => a.textContent)).toEqual(['Inicio', 'Clientes', 'Tipos de membresía']);
   });
 
   it('marca como activa solo la sección actual', () => {

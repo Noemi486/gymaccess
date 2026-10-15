@@ -10,6 +10,7 @@ import Inicio from './pages/Inicio.jsx';
 import Login from './pages/Login.jsx';
 import NoEncontrado from './pages/NoEncontrado.jsx';
 import SinPermiso from './pages/SinPermiso.jsx';
+import TiposMembresia from './pages/TiposMembresia.jsx';
 import MiPerfil from './pages/MiPerfil.jsx';
 import UsuarioForm from './pages/UsuarioForm.jsx';
 import Usuarios from './pages/Usuarios.jsx';
@@ -97,6 +98,15 @@ function Rutas() {
           element={
             <Con roles={ESCRITURA_CLIENTES}>
               <ClienteForm />
+            </Con>
+          }
+        />
+
+        <Route
+          path="/tipos-membresia"
+          element={
+            <Con roles={['administrador', 'recepcionista']}>
+              <TiposMembresia />
             </Con>
           }
         />

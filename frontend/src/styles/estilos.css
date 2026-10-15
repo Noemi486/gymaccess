@@ -1759,3 +1759,19 @@ tbody tr:last-child td {
 .pagina-error .estado-vacio .btn {
   margin-top: var(--espacio-3);
 }
+
+/* Tipos de membresía */
+.modal-ancho {
+  max-width: 520px;
+}
+
+.plan-nombre {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+}
+
+.plan-descripcion {
+  color: var(--color-texto-suave);
+  font-size: var(--texto-sm);
+}

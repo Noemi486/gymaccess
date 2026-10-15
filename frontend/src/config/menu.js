@@ -1,4 +1,4 @@
-import { House, UserCog, UserRound, Users } from 'lucide-react';
+import { House, Tags, UserCog, UserRound, Users } from 'lucide-react';
 
 // ÚNICA fuente de las secciones del menú lateral.
 // Para agregar una sección (por ejemplo, las de Sprint 2) basta con añadir una entrada a SECCIONES.
@@ -7,6 +7,7 @@ import { House, UserCog, UserRound, Users } from 'lucide-react';
 export const BLOQUES = [
   { id: 'general', etiqueta: 'General' },
   { id: 'operacion', etiqueta: 'Operación' },
+  { id: 'membresias-pagos', etiqueta: 'Membresías y pagos' },
   { id: 'administracion', etiqueta: 'Administración' },
 ];
 
@@ -34,6 +35,14 @@ export const SECCIONES = [
     icono: Users,
     bloque: 'operacion',
     roles: ['administrador', 'recepcionista', 'entrenador'],
+  },
+  {
+    id: 'tipos-membresia',
+    etiqueta: 'Tipos de membresía',
+    ruta: '/tipos-membresia',
+    icono: Tags,
+    bloque: 'membresias-pagos',
+    roles: ['administrador', 'recepcionista'],
   },
   {
     id: 'usuarios',

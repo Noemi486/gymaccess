@@ -29,7 +29,7 @@ Roles: **A** administrador · **R** recepcionista · **E** entrenador · **C** c
 | Método y ruta | Roles | Cuerpo / parámetros | Respuesta |
 |---|---|---|---|
 | `GET /` | A, R | `estado`, `q`, `page`, `limit` (R solo recibe planes `activo`, sin importar `estado`) | lista de `{ id_tipo_membresia, nombre, descripcion, duracion, precio, estado }` |
-| `GET /:id` | A, R | — | un plan |
+| `GET /:id` | A, R | — | un plan con `membresias_pendientes_de_pago` (cantidad de membresías de ese plan sin pago registrado que no han vencido ni se cancelaron; la usa la interfaz para advertir antes de cambiar el precio). El recepcionista recibe 404 si el plan está inactivo |
 | `POST /` | A | `nombre` (1–80), `descripcion?` (≤255), `duracion` (1–3650), `precio` (> 0, ≤ 2 decimales) | 201 plan; 409 si el nombre existe |
 | `PATCH /:id` | A | cualquiera de los campos anteriores (al menos uno) | plan; no cambia membresías ya pagadas |
 | `PATCH /:id/estado` | A | `{ "estado": "activo" \| "inactivo" }` | plan |
