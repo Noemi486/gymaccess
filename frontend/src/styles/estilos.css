@@ -1775,3 +1775,76 @@ tbody tr:last-child td {
   color: var(--color-texto-suave);
   font-size: var(--texto-sm);
 }
+
+/* Membresía del cliente (panel en el detalle) */
+.panel-membresia {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+.membresia-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--espacio-3);
+  flex-wrap: wrap;
+}
+
+.membresia-insignias {
+  display: flex;
+  gap: var(--espacio-2);
+  flex-wrap: wrap;
+}
+
+.membresia-titulo {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-sm);
+}
+
+.membresia-plan {
+  font-size: var(--texto-lg);
+}
+
+.membresia-datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--espacio-3);
+  margin: var(--espacio-3) 0 0;
+}
+
+.membresia-datos dt {
+  color: var(--color-texto-suave);
+  font-size: var(--texto-sm);
+}
+
+.membresia-datos dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.membresia-adeudo {
+  margin: var(--espacio-3) 0 0;
+  color: var(--color-advertencia);
+}
+
+.subtitulo-panel {
+  margin: var(--espacio-3) 0 0;
+  font-size: var(--texto-base);
+}
+
+.resumen-membresia {
+  margin: var(--espacio-3) 0;
+}
+
+.texto-suave {
+  color: var(--color-texto-suave);
+  margin: 0;
+}
+
+.separador {
+  border: 0;
+  border-top: 1px solid var(--color-borde);
+  margin: 0;
+}
