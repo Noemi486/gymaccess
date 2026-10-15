@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatearNumeroCliente, formatearTelefono } from '../src/utils/formato.js';
+import { formatearFechaCorta, formatearMoneda, formatearNumeroCliente, formatearTelefono } from '../src/utils/formato.js';
 
 describe('formatearTelefono', () => {
   it('agrupa de 3 en 3 y el último grupo absorbe un dígito sobrante', () => {
@@ -42,5 +42,40 @@ describe('formatearNumeroCliente', () => {
 
   it('no recorta números más largos', () => {
     expect(formatearNumeroCliente(123456)).toBe('Cliente #123456');
+  });
+});
+
+describe('formatearMoneda', () => {
+  it('muestra dos decimales y separador de miles', () => {
+    expect(formatearMoneda(450)).toBe('$450.00');
+    expect(formatearMoneda(450.5)).toBe('$450.50');
+    expect(formatearMoneda(1250)).toBe('$1,250.00');
+    expect(formatearMoneda(1234567.891)).toBe('$1,234,567.89');
+    expect(formatearMoneda(0)).toBe('$0.00');
+    expect(formatearMoneda('450')).toBe('$450.00');
+  });
+
+  it('muestra un guion si no hay valor numérico', () => {
+    for (const valor of [null, undefined, '', 'abc', NaN, Infinity]) expect(formatearMoneda(valor)).toBe('—');
+  });
+
+  it('respeta el signo negativo', () => {
+    expect(formatearMoneda(-5)).toBe('-$5.00');
+  });
+});
+
+describe('formatearFechaCorta', () => {
+  it('formatea una fecha YYYY-MM-DD sin desfase de zona horaria', () => {
+    expect(formatearFechaCorta('2026-10-14')).toBe('14 oct 2026');
+    expect(formatearFechaCorta('2026-01-01')).toBe('1 ene 2026');
+    expect(formatearFechaCorta('2026-12-31')).toBe('31 dic 2026');
+  });
+
+  it('formatea una fecha con hora', () => {
+    expect(formatearFechaCorta('2026-10-14T12:00:00')).toBe('14 oct 2026');
+  });
+
+  it('devuelve vacío si no hay fecha o no es válida', () => {
+    for (const valor of [null, undefined, '', 'no-es-fecha']) expect(formatearFechaCorta(valor)).toBe('');
   });
 });

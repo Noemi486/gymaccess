@@ -21,6 +21,25 @@ describe('Badge', () => {
     }
   });
 
+  it('muestra los estados de membresía con su texto y su variante (color + texto)', () => {
+    const esperado = {
+      vigente: ['Vigente', 'badge-exito'],
+      por_vencer: ['Por vencer', 'badge-advertencia'],
+      pendiente_de_pago: ['Pendiente de pago', 'badge-advertencia'],
+      proxima: ['Próxima', 'badge-info'],
+      vencida: ['Vencida', 'badge-error'],
+      suspendida: ['Suspendida', 'badge-advertencia'],
+      cancelada: ['Cancelada', 'badge-error'],
+      autorizado: ['Autorizado', 'badge-exito'],
+      rechazado: ['Rechazado', 'badge-error'],
+    };
+    for (const [estado, [texto, clase]] of Object.entries(esperado)) {
+      const { unmount } = render(<Badge estado={estado} />);
+      expect(screen.getByText(texto)).toHaveClass('badge', clase);
+      unmount();
+    }
+  });
+
   it('usa una variante distinta para activo e inactivo', () => {
     render(
       <>

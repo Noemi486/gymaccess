@@ -8,6 +8,7 @@ export const CODIGOS = Object.freeze({
   NOT_FOUND: 'NOT_FOUND',
   CONFLICT: 'CONFLICT',
   ACCOUNT_LOCKED: 'ACCOUNT_LOCKED',
+  TOO_MANY_REQUESTS: 'TOO_MANY_REQUESTS',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
 });
 
@@ -38,3 +39,6 @@ export const errorConflicto = (message, details) =>
 
 export const errorBloqueado = (message = 'Cuenta bloqueada temporalmente. Inténtalo más tarde.') =>
   new ErrorApp(423, CODIGOS.ACCOUNT_LOCKED, message);
+
+export const errorDemasiadasPeticiones = (message = 'Demasiados intentos. Espera un momento.') =>
+  new ErrorApp(429, CODIGOS.TOO_MANY_REQUESTS, message);

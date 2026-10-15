@@ -1,7 +1,9 @@
+import { leerFaceKey } from './faceKey.js';
+
 // Lectura y validación de las variables de entorno.
 // Los valores reales viven en backend/.env (nunca en el repositorio).
 
-const obligatorias = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME', 'JWT_SECRET'];
+const obligatorias = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME', 'JWT_SECRET', 'FACE_KEY'];
 
 function entero(nombre, porDefecto) {
   const bruto = process.env[nombre];
@@ -30,6 +32,9 @@ if (process.env.JWT_SECRET.trim().length < 16) {
   throw new Error('JWT_SECRET debe tener al menos 16 caracteres.');
 }
 
+// Clave de cifrado de los descriptores faciales: 64 hexadecimales (32 bytes). Falla con un mensaje claro.
+const faceKey = leerFaceKey(process.env.FACE_KEY);
+
 export const env = Object.freeze({
   db: Object.freeze({
     host: process.env.DB_HOST.trim(),
@@ -42,6 +47,7 @@ export const env = Object.freeze({
     secreto: process.env.JWT_SECRET.trim(),
     expiracion: process.env.JWT_EXPIRES_IN?.trim() || '8h',
   }),
+  faceKey,
   puerto: entero('PORT', 3000),
   corsOrigen: process.env.CORS_ORIGIN?.trim() || 'http://localhost:5173',
   login: Object.freeze({

@@ -10,6 +10,8 @@ export const pool = mysql.createPool({
   password: env.db.password,
   database: env.db.database,
   charset: 'utf8mb4',
+  // Las columnas DATE llegan como texto 'YYYY-MM-DD' (sin objetos Date ni desfases de zona horaria).
+  dateStrings: ['DATE'],
   waitForConnections: true,
   connectionLimit: 10,
 });

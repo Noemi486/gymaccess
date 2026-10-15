@@ -21,3 +21,24 @@ export function formatearTelefono(telefono) {
 export function formatearNumeroCliente(id) {
   return `Cliente #${String(id).padStart(4, '0')}`;
 }
+
+// Dinero para mostrar: 450 -> "$450.00"; 1250 -> "$1,250.00". Sin valor o no numérico -> "—".
+export function formatearMoneda(numero) {
+  const valor = Number(numero);
+  if (numero === null || numero === undefined || numero === '' || !Number.isFinite(valor)) return '—';
+  const [enteros, decimales] = Math.abs(valor).toFixed(2).split('.');
+  return `${valor < 0 ? '-' : ''}$${enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}.${decimales}`;
+}
+
+const MESES_CORTOS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+// "2026-10-14" o "2026-10-14T15:00:00.000Z" -> "14 oct 2026". Un texto de solo fecha no se pasa por
+// Date (evita el desfase de un día por zona horaria). Sin valor o no válido -> "".
+export function formatearFechaCorta(valor) {
+  if (!valor) return '';
+  const solo = String(valor).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (solo) return `${Number(solo[3])} ${MESES_CORTOS[Number(solo[2]) - 1]} ${solo[1]}`;
+  const fecha = new Date(valor);
+  if (Number.isNaN(fecha.getTime())) return '';
+  return `${fecha.getDate()} ${MESES_CORTOS[fecha.getMonth()]} ${fecha.getFullYear()}`;
+}
