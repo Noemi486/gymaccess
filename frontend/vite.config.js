@@ -10,6 +10,10 @@ export default defineConfig({
       '/api': 'http://localhost:3000',
     },
   },
+  build: {
+    // face-api (con TensorFlow) pesa ~1,3 MB y se carga de forma diferida solo en las pantallas de cámara.
+    chunkSizeWarningLimit: 1400,
+  },
   test: {
     environment: 'jsdom',
     globals: true,

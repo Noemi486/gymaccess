@@ -1856,3 +1856,61 @@ tbody tr:last-child td {
   margin: var(--espacio-3) 0;
   cursor: pointer;
 }
+
+/* Cámara facial (registro de rostro y estación de acceso) */
+.camara-facial {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+  margin: var(--espacio-3) 0;
+}
+
+.camara-marco {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: var(--color-superficie-elevada);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  overflow: hidden;
+}
+
+.camara-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* vista de espejo */
+  display: none;
+}
+
+.camara-activa .camara-video {
+  display: block;
+}
+
+.camara-centro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--espacio-3);
+}
+
+.esquina {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border: 0 solid var(--color-exito);
+}
+
+.esquina-ai { top: 12px; left: 12px; border-top-width: 4px; border-left-width: 4px; }
+.esquina-ad { top: 12px; right: 12px; border-top-width: 4px; border-right-width: 4px; }
+.esquina-bi { bottom: 12px; left: 12px; border-bottom-width: 4px; border-left-width: 4px; }
+.esquina-bd { bottom: 12px; right: 12px; border-bottom-width: 4px; border-right-width: 4px; }
+
+.camara-indicacion {
+  margin: 0;
+  color: var(--color-advertencia);
+  font-weight: 600;
+}

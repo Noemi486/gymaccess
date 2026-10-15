@@ -3,6 +3,7 @@ import authRoutes from './auth.routes.js';
 import clientesRoutes from './clientes.routes.js';
 import membresiasRoutes from './membresias.routes.js';
 import pagosRoutes from './pagos.routes.js';
+import rostrosRoutes from './rostros.routes.js';
 import resumenRoutes from './resumen.routes.js';
 import tiposMembresiaRoutes from './tiposMembresia.routes.js';
 import usuariosRoutes from './usuarios.routes.js';
@@ -21,6 +22,7 @@ router.use('/clientes', clientesRoutes);
 router.use('/resumen', resumenRoutes);
 router.use('/tipos-membresia', tiposMembresiaRoutes);
 router.use('/pagos', pagosRoutes);
+router.use('/', rostrosRoutes);
 router.use('/', membresiasRoutes); // /clientes/:id/membresias y /membresias/:id/... (después de /clientes)
 
 export default router;

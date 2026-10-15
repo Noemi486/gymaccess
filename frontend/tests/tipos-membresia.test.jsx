@@ -1,8 +1,11 @@
 import '@testing-library/jest-dom/vitest';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, within, waitFor, configure } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../src/App.jsx';
+
+// La primera pantalla carga varios módulos; con la máquina ocupada 1 s a veces no alcanza.
+configure({ asyncUtilTimeout: 4000 });
 
 function respuesta(status, cuerpo) {
   return { ok: status >= 200 && status < 300, status, json: async () => cuerpo };

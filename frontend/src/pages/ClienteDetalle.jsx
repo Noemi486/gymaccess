@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Pencil } from 'lucide-react';
 import { ErrorApi, solicitar } from '../api/cliente.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import PanelRostro from '../components/PanelRostro.jsx';
 import PanelMembresia from '../components/PanelMembresia.jsx';
 import PerfilCliente from '../components/PerfilCliente.jsx';
 import Button from '../components/ui/Button.jsx';
@@ -47,6 +48,7 @@ export default function ClienteDetalle() {
       <PerfilCliente cliente={cliente} />
 
       {puedeEditar && <PanelMembresia idCliente={cliente.id_cliente} clienteActivo={cliente.estado === 'activo'} rol={rol} />}
+      {puedeEditar && <PanelRostro cliente={cliente} rol={rol} />}
 
       <div className="acciones perfil-acciones">
         <Button to="/clientes" variante="secundario">
