@@ -39,11 +39,11 @@ description: "Lista de tareas de la funcionalidad 003: membresías, pagos, recon
 
 ## Phase 1: Setup
 
-- [ ] T001 Instalar la única dependencia nueva con versión exacta: en `frontend/` ejecutar `npm install --save-exact @vladmandic/face-api@1.7.15` y verificar que `frontend/package.json` la lista sin `^` ni `~` y que no se agregó nada más (justificada en research.md R2 y R9)
-- [ ] T002 Copiar a `frontend/public/models/` SOLO los tres modelos de `frontend/node_modules/@vladmandic/face-api/model/` (`tiny_face_detector_model-weights_manifest.json` y `.bin`, `face_landmark_68_model-weights_manifest.json` y `.bin`, `face_recognition_model-weights_manifest.json` y `.bin`) y crear `frontend/public/models/LEEME.md` con el origen (paquete y versión), la licencia MIT, el tamaño de cada archivo y su huella SHA-256 (`Get-FileHash`); no copiar los modelos de edad, género, expresiones ni el detector SSD
-- [ ] T003 [P] Agregar `FACE_KEY=` SIN valor, con un comentario que indique "64 caracteres hexadecimales (32 bytes); si se pierde, los rostros deben registrarse de nuevo; generar con el comando de quickstart.md", a `backend/.env.example` y `backend/.env.test.example`
-- [ ] T004 Generar dos claves distintas (`node --input-type=module -e "import {randomBytes} from 'node:crypto'; console.log(randomBytes(32).toString('hex'))"`) y escribirlas como `FACE_KEY` en `backend/.env` y `backend/.env.test` (archivos locales, ignorados por Git; NUNCA mostrar ni commitear las claves)
-- [ ] T005 Confirmar la línea base antes de cambiar nada: `npm test` en `backend/` y en `frontend/` deben pasar (backend 214 + 1 omitida, frontend 171)
+- [X] T001 Instalar la única dependencia nueva con versión exacta: en `frontend/` ejecutar `npm install --save-exact @vladmandic/face-api@1.7.15` y verificar que `frontend/package.json` la lista sin `^` ni `~` y que no se agregó nada más (justificada en research.md R2 y R9)
+- [X] T002 Copiar a `frontend/public/models/` SOLO los tres modelos de `frontend/node_modules/@vladmandic/face-api/model/` (`tiny_face_detector_model-weights_manifest.json` y `.bin`, `face_landmark_68_model-weights_manifest.json` y `.bin`, `face_recognition_model-weights_manifest.json` y `.bin`) y crear `frontend/public/models/LEEME.md` con el origen (paquete y versión), la licencia MIT, el tamaño de cada archivo y su huella SHA-256 (`Get-FileHash`); no copiar los modelos de edad, género, expresiones ni el detector SSD
+- [X] T003 [P] Agregar `FACE_KEY=` SIN valor, con un comentario que indique "64 caracteres hexadecimales (32 bytes); si se pierde, los rostros deben registrarse de nuevo; generar con el comando de quickstart.md", a `backend/.env.example` y `backend/.env.test.example`
+- [X] T004 Generar dos claves distintas (`node --input-type=module -e "import {randomBytes} from 'node:crypto'; console.log(randomBytes(32).toString('hex'))"`) y escribirlas como `FACE_KEY` en `backend/.env` y `backend/.env.test` (archivos locales, ignorados por Git; NUNCA mostrar ni commitear las claves)
+- [X] T005 Confirmar la línea base antes de cambiar nada: `npm test` en `backend/` y en `frontend/` deben pasar (backend 214 + 1 omitida, frontend 171)
 
 ---
 

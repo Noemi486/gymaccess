@@ -54,7 +54,9 @@ export function crearToken(idUsuario, opciones = {}) {
 // Correo único para datos de prueba: test+<marca de tiempo>-<n>@example.com
 export function correoUnico(prefijo = 'test') {
   contador += 1;
-  return `${prefijo}+${Date.now()}-${contador}@example.com`;
+  // El número de proceso evita choques entre archivos de prueba que corren en paralelo
+  // (cada uno tiene su propio contador y pueden coincidir en el mismo milisegundo).
+  return `${prefijo}+${Date.now()}-${process.pid}-${contador}@example.com`;
 }
 
 // Crea una cuenta de prueba directamente en la base (correo "test+...").
