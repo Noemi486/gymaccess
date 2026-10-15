@@ -16,6 +16,7 @@
 - Q: Cuando se rechaza un acceso, ¿qué muestra la pantalla de la Estación de acceso? → A: El nombre del cliente identificado y el motivo exacto del rechazo.
 - Q: Cuando un administrador desactiva el rostro de un cliente, ¿se borra su información facial o solo se marca inactiva? → A: Solo se marca inactiva y se conserva (protegida); un administrador puede reactivarla sin repetir la captura.
 - Q: Si en la Estación de acceso varias personas seguidas no son reconocidas, ¿el sistema solo registra cada intento o hace algo más? → A: Registra cada intento y, tras 5 rechazos "Rostro no reconocido" seguidos, pausa la estación 30 segundos con un mensaje que invita a pedir ayuda en recepción.
+- Planificación (2026-10-14): los intentos fallidos seguidos en la estación pasan a **3** con el mensaje "No te reconocemos. Pide ayuda en recepción" (se conserva la pausa de 30 s); el estado "pendiente de pago" se deriva sin migraciones y el precio pagado queda en el pago, por lo que los planes deben tener precio mayor a 0 y una membresía pendiente de pago se cobra al precio vigente del plan.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -29,12 +30,13 @@ Como administrador, quiero registrar, consultar y modificar los tipos de membres
 
 **Acceptance Scenarios**:
 
-1. **Given** un administrador en "Tipos de membresía", **When** registra un plan con nombre, duración en días mayor a 0 y precio mayor o igual a 0, **Then** el plan aparece en la lista como activo y se muestra un aviso de éxito.
-2. **Given** un plan existente, **When** el administrador cambia su nombre, descripción, duración o precio, **Then** los cambios se guardan y las membresías ya asignadas conservan el precio y la duración con que se asignaron.
+1. **Given** un administrador en "Tipos de membresía", **When** registra un plan con nombre, duración en días mayor a 0 y precio mayor a 0, **Then** el plan aparece en la lista como activo y se muestra un aviso de éxito.
+2. **Given** un plan existente, **When** el administrador cambia su nombre, descripción, duración o precio, **Then** los cambios se guardan; las membresías ya pagadas conservan el monto que pagaron y todas conservan sus fechas, y las pendientes de pago se cobrarán al nuevo precio (el sistema lo advierte antes de guardar si el plan tiene membresías pendientes de pago).
 3. **Given** un plan que ya tiene membresías, **When** el administrador lo desactiva (tras confirmar), **Then** deja de poder elegirse para nuevas asignaciones pero las membresías existentes no cambian y el plan no se borra.
 4. **Given** un nombre de plan que ya existe, **When** el administrador intenta registrarlo, **Then** ve un error junto al campo indicando que el nombre ya está en uso.
 5. **Given** un recepcionista, **When** abre "Tipos de membresía", **Then** puede consultar los planes activos pero no ve controles para crear, editar ni desactivar.
 6. **Given** un entrenador o un cliente, **When** intenta abrir "Tipos de membresía", **Then** no ve la sección en el menú y, si escribe la dirección, ve "Sin permiso".
+7. **Given** un plan con precio 0 o negativo, **When** el administrador intenta registrarlo o guardarlo, **Then** ve un error junto al campo indicando que el precio debe ser mayor a 0 (no se admiten planes gratuitos).
 
 ---
 
@@ -48,9 +50,9 @@ Como administrador o recepcionista, quiero asignar y renovar la membresía de un
 
 **Acceptance Scenarios**:
 
-1. **Given** el detalle de un cliente activo sin membresía vigente ni pendiente de pago, **When** el personal elige un plan activo y una fecha de inicio (hoy por defecto), **Then** se crea la membresía con la fecha de fin calculada según la duración del plan y el precio acordado, y queda **pendiente de pago** (con un adeudo por el precio completo) hasta que se registre su pago; el detalle muestra plan, fechas, estado y adeudo.
+1. **Given** el detalle de un cliente activo sin membresía en curso, **When** el personal elige un plan activo y una fecha de inicio (hoy por defecto), **Then** se crea la membresía con la fecha de fin calculada según la duración del plan y queda **pendiente de pago** (con un adeudo por el precio del plan) hasta que se registre su pago; el detalle muestra plan, fechas, estado y adeudo.
 2. **Given** el formulario de asignación, **When** el personal marca "Registrar el pago ahora" y elige el método de pago, **Then** se crean en una sola operación la membresía y su pago por el precio completo, y la membresía queda activa (vigente) sin adeudo.
-3. **Given** un plan con precio $0, **When** se asigna, **Then** la membresía queda activa de inmediato, sin pago y sin adeudo.
+3. **Given** una membresía pendiente de pago cuyo plan cambió de precio, **When** el personal registra su pago, **Then** el monto exigido es el precio vigente del plan en ese momento, y las membresías ya pagadas conservan el monto con que se pagaron.
 4. **Given** un cliente que ya tiene una membresía en curso (la que cubre la fecha de hoy, vigente o pendiente de pago), **When** el personal intenta asignarle otra, **Then** el sistema lo impide: si es vigente, sugiere renovarla; si está pendiente de pago, pide registrar su pago (o que un administrador la cancele si se asignó por error).
 5. **Given** una membresía vigente que vence en el futuro y que no tiene una renovación futura, **When** el personal la renueva, **Then** se crea un nuevo periodo que empieza el día siguiente a la fecha de fin actual (sin perder días), pendiente de pago hasta que se registre su pago (o activo de inmediato si se paga en la misma operación); el periodo actual sigue dando acceso hasta su fecha de fin y la membresía anterior conserva su historial.
 6. **Given** una membresía vencida, **When** el personal la renueva, **Then** el nuevo periodo empieza en la fecha indicada (hoy por defecto) y queda pendiente de pago o activo según se registre o no el pago.
@@ -74,7 +76,7 @@ Como administrador o recepcionista, quiero registrar el pago completo de la memb
 
 **Acceptance Scenarios**:
 
-1. **Given** una membresía pendiente de pago, **When** el personal registra un pago por el precio acordado completo con un método de pago (efectivo, tarjeta o transferencia), **Then** el pago queda asociado al cliente y a esa membresía con la fecha y hora actuales y el usuario que lo registró, la membresía pasa a estar activa (vigente mientras su periodo cubra la fecha de hoy) y el adeudo desaparece.
+1. **Given** una membresía pendiente de pago, **When** el personal registra un pago por el precio completo del plan con un método de pago (efectivo, tarjeta o transferencia), **Then** el pago queda asociado al cliente y a esa membresía con la fecha y hora actuales y el usuario que lo registró, la membresía pasa a estar activa (vigente mientras su periodo cubra la fecha de hoy) y el adeudo desaparece.
 2. **Given** una membresía pendiente de pago de $450, **When** el personal intenta registrar un monto distinto (menor o mayor), **Then** el sistema lo rechaza con un mensaje claro: no hay pagos parciales y el pago debe ser por $450.
 3. **Given** una membresía que ya tiene su pago registrado, **When** el personal intenta registrar otro, **Then** el sistema lo impide indicando que ya está pagada.
 4. **Given** una membresía cancelada, **When** el personal intenta registrarle un pago, **Then** el sistema lo impide.
@@ -126,7 +128,7 @@ Como cliente registrado, quiero identificarme con mi rostro en la entrada para q
 10. **Given** un cliente al corriente (membresía vigente con su pago completo registrado), **When** se presenta, **Then** se autoriza el acceso sin ninguna otra condición.
 11. **Given** un rol sin permiso (entrenador o cliente), **When** intenta abrir la estación, **Then** no ve la sección y, si escribe la dirección, ve "Sin permiso".
 12. **Given** un cliente identificado con una membresía cuyo periodo cubre hoy pero que no tiene su pago registrado (adeudo), **When** se presenta, **Then** NO se autoriza el acceso: la pantalla muestra en rojo "Acceso rechazado" con su nombre y el motivo "Pago pendiente" junto con una invitación amable a pasar por recepción, y se registra un acceso rechazado con ese motivo y el cliente identificado.
-13. **Given** que la estación acumula 5 rechazos "Rostro no reconocido" seguidos, **When** llega el quinto, **Then** se registra normalmente y la estación se pausa 30 segundos mostrando un mensaje que invita a pedir ayuda en recepción; durante la pausa no se procesa ni se registra ningún intento, y al terminar vuelve al estado de espera con el conteo en cero. El conteo también vuelve a cero cuando se identifica a un cliente (aunque su acceso sea rechazado por otro motivo).
+13. **Given** que la estación acumula 3 rechazos "Rostro no reconocido" seguidos, **When** llega el tercero, **Then** se registra normalmente y la pantalla muestra "No te reconocemos. Pide ayuda en recepción" y la estación se pausa 30 segundos; durante la pausa no se procesa ni se registra ningún intento, y al terminar vuelve al estado de espera con el conteo en cero. El conteo también vuelve a cero cuando se identifica a un cliente (aunque su acceso sea rechazado por otro motivo).
 
 ---
 
@@ -251,13 +253,13 @@ Como administrador, quiero que el sistema deje constancia de las acciones import
 - ¿Qué pasa si el reloj del servidor cambia de día mientras la estación está abierta? Cada intento se evalúa con la fecha del momento en que ocurre.
 - ¿Qué pasa si dos clientes se parecen y el sistema duda? Si no hay una coincidencia clara con un solo cliente, se rechaza como "Rostro no reconocido" y nunca se autoriza por parecido dudoso.
 - ¿Qué pasa si hay varios rostros a la vez frente a la cámara? La estación no registra ningún intento y pide pasar de uno en uno.
-- ¿Qué pasa si alguien prueba rostros repetidamente? Tras 5 rechazos "Rostro no reconocido" seguidos, la estación se pausa 30 segundos y pide ayuda en recepción; todos los intentos previos quedan registrados.
+- ¿Qué pasa si alguien prueba rostros repetidamente? Tras 3 rechazos "Rostro no reconocido" seguidos, la estación muestra "No te reconocemos. Pide ayuda en recepción" y se pausa 30 segundos; todos los intentos previos quedan registrados.
 - ¿Qué pasa si hay poca luz o la cámara se desconecta durante el uso? La estación muestra un mensaje claro de que no puede leer el rostro y permite reintentar, sin registrar intentos falsos.
 - ¿Qué pasa si el navegador no concede el permiso de cámara? Se explica cómo habilitarlo y el sistema no registra nada.
 - ¿Qué pasa si se presenta una fotografía de un cliente en lugar de su rostro real? Esta versión no incluye detección de vida; el riesgo se documenta como limitación conocida.
 - ¿Qué pasa con el rostro de un cliente que se da de baja? El rostro se conserva inactivo y el cliente se rechaza con "Cliente dado de baja"; si se reactiva al cliente, vuelve a poder identificarse.
 - ¿Qué pasa si el plan de una membresía se desactiva? Las membresías existentes siguen su curso; solo se impide usarlo en asignaciones nuevas.
-- ¿Qué pasa si se cambia el precio de un plan con membresías pendientes de pago? El adeudo de esas membresías no cambia; el nuevo precio rige solo para asignaciones futuras.
+- ¿Qué pasa si se cambia el precio de un plan con membresías pendientes de pago? Esas membresías se cobran al nuevo precio (el sistema advierte al administrador antes de guardar); las ya pagadas conservan el monto con que se pagaron.
 - ¿Qué pasa si una lista (pagos, adeudos o accesos) tiene miles de registros? Se pagina y se puede filtrar; el rendimiento no se degrada de forma perceptible.
 - ¿Qué pasa si falla la carga del Dashboard o de las tarjetas del Inicio? Se muestra un aviso de error claro y el resto de la pantalla sigue disponible.
 - ¿Qué pasa si la sesión del personal vence con la estación abierta? La estación deja de aceptar intentos y pide iniciar sesión.
@@ -275,14 +277,14 @@ Como administrador, quiero que el sistema deje constancia de las acciones import
 
 **Tipos de membresía**
 
-- **FR-005**: El sistema DEBE permitir al administrador registrar, consultar, modificar y desactivar (baja lógica) tipos de membresía con nombre único, descripción opcional, duración en días mayor a 0 y precio mayor o igual a 0.
+- **FR-005**: El sistema DEBE permitir al administrador registrar, consultar, modificar y desactivar (baja lógica) tipos de membresía con nombre único, descripción opcional, duración en días mayor a 0 y precio mayor a 0 (no se admiten planes gratuitos, porque la gratuidad no puede registrarse como pago).
 - **FR-006**: El recepcionista DEBE poder consultar los tipos de membresía activos para asignarlos, sin poder modificarlos.
-- **FR-007**: Los cambios de precio o duración de un tipo NO DEBEN alterar las membresías ya asignadas: cada membresía conserva el precio y la duración acordados al asignarla.
+- **FR-007**: Los cambios de precio o duración de un tipo NO DEBEN alterar las membresías ya pagadas (conservan el monto pagado) ni las fechas de ninguna membresía; una membresía pendiente de pago se cobra al precio vigente del plan al momento de pagar, y el sistema DEBE advertir al administrador cuando un cambio de precio afecte a membresías pendientes de pago.
 - **FR-008**: Un tipo de membresía desactivado NO DEBE poder usarse en asignaciones nuevas y NO DEBE eliminarse.
 
 **Membresías**
 
-- **FR-009**: El personal (administrador y recepcionista) DEBE poder asignar una membresía a un cliente activo y registrado, eligiendo un tipo activo y una fecha de inicio (hoy por defecto); el sistema DEBE calcular la fecha de fin a partir de la duración del tipo y guardar fecha de inicio, fecha de fin y el precio acordado. La membresía DEBE quedar pendiente de pago, salvo que se registre su pago en la misma operación o que su precio sea $0, casos en que queda activa de inmediato.
+- **FR-009**: El personal (administrador y recepcionista) DEBE poder asignar una membresía a un cliente activo y registrado, eligiendo un tipo activo y una fecha de inicio (hoy por defecto); el sistema DEBE calcular la fecha de fin a partir de la duración del tipo. La membresía DEBE quedar pendiente de pago, salvo que se registre su pago en la misma operación, en cuyo caso queda activa de inmediato.
 - **FR-010**: Un cliente NO DEBE tener más de una membresía en curso (la que cubre la fecha de hoy, vigente o pendiente de pago) ni más de una renovación futura. Si ya tiene una membresía en curso, el sistema DEBE impedir una nueva asignación y ofrecer renovar la vigente o registrar el pago de la pendiente; si ya tiene una renovación futura, DEBE impedir renovar de nuevo hasta que esa empiece.
 - **FR-011**: La renovación DEBE crear un nuevo periodo con las mismas reglas de pago que una asignación: si la membresía vigente aún no vence, empieza el día siguiente a su fecha de fin; si ya venció, empieza en la fecha indicada (hoy por defecto). Los periodos anteriores DEBEN conservarse como historial y el periodo vigente sigue dando acceso hasta su fecha de fin. NO se puede renovar una membresía en curso pendiente de pago ni cuando ya existe una renovación futura (FR-010).
 - **FR-012**: El sistema DEBE determinar el estado real de una membresía a partir de su estado guardado, sus fechas y su pago: pendiente de pago (sin pago registrado), activa, vencida (fecha de fin anterior a hoy, sin depender de procesos manuales), suspendida o cancelada. Una membresía solo es **vigente** cuando está activa, su pago completo está registrado y la fecha de hoy está dentro de su periodo.
@@ -292,9 +294,9 @@ Como administrador, quiero que el sistema deje constancia de las acciones import
 
 **Pagos y adeudos**
 
-- **FR-016**: El personal (administrador y recepcionista) DEBE poder registrar el pago de una membresía pendiente de pago indicando el método (efectivo, tarjeta o transferencia); el pago DEBE quedar asociado al cliente y a esa membresía, con fecha y hora actuales y el usuario que lo registró, y la membresía DEBE pasar a activa. Las membresías de precio $0 no requieren pago.
-- **FR-017**: NO existen pagos parciales: cada membresía se paga una sola vez y por su precio acordado completo. El sistema DEBE rechazar cualquier monto distinto al precio acordado (indicando el monto correcto) y cualquier segundo pago de una membresía ya pagada.
-- **FR-018**: El adeudo de una membresía DEBE ser su precio acordado completo mientras no tenga pago registrado, y cero en cuanto se registre; una membresía sin adeudo NO DEBE aparecer en Adeudos.
+- **FR-016**: El personal (administrador y recepcionista) DEBE poder registrar el pago de una membresía pendiente de pago indicando el método (efectivo, tarjeta o transferencia); el pago DEBE quedar asociado al cliente y a esa membresía, con fecha y hora actuales y el usuario que lo registró, y la membresía DEBE pasar a activa.
+- **FR-017**: NO existen pagos parciales: cada membresía se paga una sola vez y por el precio completo del plan. El sistema DEBE rechazar cualquier monto distinto al precio vigente (indicando el monto correcto), cualquier segundo pago de una membresía ya pagada y el pago de membresías canceladas o vencidas.
+- **FR-018**: El adeudo de una membresía DEBE ser el precio del plan mientras no tenga pago registrado, y cero en cuanto se registre; una membresía sin adeudo NO DEBE aparecer en Adeudos.
 - **FR-019**: Los pagos NO DEBEN poder editarse ni eliminarse desde el sistema; el historial financiero se conserva.
 - **FR-020**: La pantalla "Pagos" DEBE listar el historial paginado (más reciente primero) con filtros por fecha o rango, método y búsqueda por cliente, y un botón principal "Registrar pago". La pantalla "Adeudos" DEBE listar las membresías pendientes de pago con la fecha de inicio más antigua primero, con acceso directo a registrar su pago.
 - **FR-021**: Los pagos y adeudos DEBEN ser visibles solo para administrador y recepcionista; el entrenador NO DEBE acceder a información financiera y el cliente solo a la suya.
@@ -317,7 +319,7 @@ Como administrador, quiero que el sistema deje constancia de las acciones import
 - **FR-032**: La estación NO DEBE registrar un intento nuevo en cada instante: DEBE registrar un solo intento por persona presente y respetar una espera de al menos 10 segundos antes de aceptar otro de la misma persona. Sin una persona frente a la cámara NO DEBE registrar nada ni conservar imágenes.
 - **FR-033**: Un cliente con adeudo (membresía sin pago registrado) NO DEBE poder entrar: el acceso solo se autoriza a clientes al corriente, aunque las fechas de su membresía cubran la fecha de hoy.
 - **FR-034**: El reconocimiento facial se usa EXCLUSIVAMENTE para identificar a clientes registrados en el punto de acceso: NO DEBE usarse para vigilancia, seguimiento, ni identificar a personas no registradas con otros fines.
-- **FR-053**: Como medida contra intentos repetidos, la estación DEBE contar los rechazos "Rostro no reconocido" consecutivos; al llegar a 5 DEBE pausarse 30 segundos mostrando un mensaje que invita a pedir ayuda en recepción, sin procesar ni registrar intentos durante la pausa. El conteo vuelve a cero al identificar a un cliente o al terminar la pausa. Cada intento previo a la pausa se registra normalmente.
+- **FR-053**: Como medida contra intentos repetidos, la estación DEBE contar los rechazos "Rostro no reconocido" consecutivos; al llegar a 3 DEBE mostrar "No te reconocemos. Pide ayuda en recepción" y pausarse 30 segundos, sin procesar ni registrar intentos durante la pausa. El conteo vuelve a cero al identificar a un cliente o al terminar la pausa. Cada intento previo a la pausa, incluido el tercero, se registra normalmente.
 
 **Consulta de accesos**
 
@@ -346,7 +348,7 @@ Como administrador, quiero que el sistema deje constancia de las acciones import
 **Interfaz, seguridad y datos**
 
 - **FR-047**: Todas las pantallas nuevas DEBEN usar el sistema visual y los componentes comunes existentes (tablas con estado vacío y paginación, formularios con error por campo y estado de carga, insignias con color y texto, avisos de éxito o error y confirmación en bajas y cambios de estado), con textos en español y adaptables a pantallas de 360 a 1920 px.
-- **FR-048**: Los datos DEBEN guardarse en las tablas existentes (`tipos_membresia`, `membresias`, `pagos`, `rostros`, `accesos`, `auditoria`); NO DEBEN crearse tablas nuevas. Si hiciera falta un cambio de estructura (por ejemplo, conservar el precio acordado por membresía), DEBE justificarse y hacerse con un script de migración numerado nuevo, sin tocar la base real con scripts destructivos.
+- **FR-048**: Los datos DEBEN guardarse en las tablas existentes (`tipos_membresia`, `membresias`, `pagos`, `rostros`, `accesos`, `auditoria`); NO DEBEN crearse tablas nuevas ni agregarse columnas o migraciones: el estado "pendiente de pago" se deriva de la ausencia de pago y el precio cobrado queda en el monto del pago.
 - **FR-049**: Las bajas DEBEN ser lógicas (cambio de estado); los registros de pagos, accesos y auditoría NO DEBEN eliminarse.
 - **FR-050**: Los errores mostrados al usuario DEBEN ser claros y no revelar información interna del sistema.
 - **FR-051**: Las pruebas automáticas de esta funcionalidad DEBEN ejecutarse únicamente contra la base de pruebas `gymaccess_test` y cubrir permisos por rol, reglas de negocio, el registro de todos los intentos de acceso y que ninguna respuesta exponga datos biométricos.
@@ -355,9 +357,9 @@ Como administrador, quiero que el sistema deje constancia de las acciones import
 ### Key Entities *(include if feature involves data)*
 
 - **Tipo de membresía**: Plan que ofrece el gimnasio: nombre único, descripción, duración en días, precio y estado (activo o inactivo).
-- **Membresía**: Periodo de acceso de un cliente a un plan: cliente, tipo, fecha de inicio, fecha de fin, precio acordado y estado. Su estado real se deriva del estado guardado, las fechas y su pago: pendiente de pago, activa (vigente), vencida, suspendida o cancelada. Un cliente tiene un historial de membresías, a lo más una en curso (vigente o pendiente de pago) y a lo más una renovación futura.
-- **Pago**: Pago completo de una membresía: cliente, membresía, monto (igual al precio acordado), método (efectivo, tarjeta o transferencia), fecha y hora, usuario que lo registró. Cada membresía tiene a lo más uno y es inmutable.
-- **Adeudo (derivado)**: Precio acordado de una membresía que aún no tiene su pago registrado. No se guarda como dato propio.
+- **Membresía**: Periodo de acceso de un cliente a un plan: cliente, tipo, fecha de inicio, fecha de fin y estado. Su estado real se deriva del estado guardado, las fechas y su pago: pendiente de pago, activa (vigente), vencida, suspendida o cancelada. Un cliente tiene un historial de membresías, a lo más una en curso (vigente o pendiente de pago) y a lo más una renovación futura.
+- **Pago**: Pago completo de una membresía: cliente, membresía, monto (igual al precio del plan al momento de pagar, que queda como precio cobrado), método (efectivo, tarjeta o transferencia), fecha y hora, usuario que lo registró. Cada membresía tiene a lo más uno y es inmutable.
+- **Adeudo (derivado)**: Precio vigente del plan de una membresía que aún no tiene su pago registrado. No se guarda como dato propio.
 - **Rostro registrado**: Información facial protegida de un cliente, con fecha y estado (activo o inactivo). Nunca se expone; solo se informa si existe.
 - **Intento de acceso**: Cada vez que alguien se presenta en la estación: fecha, hora, tipo (entrada), resultado (autorizado o rechazado), motivo del rechazo y cliente (si se identificó).
 - **Evento de auditoría**: Constancia de una acción importante: usuario, acción, módulo, fecha y hora, resultado y descripción.
@@ -382,14 +384,14 @@ Como administrador, quiero que el sistema deje constancia de las acciones import
 - **SC-012**: Un cliente ve su estado de membresía (vigente, por vencer o vencida) de un vistazo en su Inicio, siempre con color y texto.
 - **SC-013**: Todas las acciones listadas en FR-045 dejan su evento de auditoría en el 100 % de las pruebas.
 - **SC-014**: Todas las pruebas automáticas del backend y del frontend pasan, incluidas las que usan la base `gymaccess_test`, y las pruebas existentes de los sprints anteriores siguen pasando.
-- **SC-015**: Tras 5 rechazos "Rostro no reconocido" consecutivos, la estación se pausa 30 segundos en el 100 % de las pruebas y no registra intentos durante la pausa.
+- **SC-015**: Tras 3 rechazos "Rostro no reconocido" consecutivos, la estación muestra el mensaje de ayuda y se pausa 30 segundos en el 100 % de las pruebas, y no registra intentos durante la pausa.
 
 ## Assumptions
 
 - Se parte de lo construido en el Sprint 1 y en el rediseño de interfaz (especificaciones `001-base-usuarios-clientes` y `002-interfaz-menu-lateral`), incluidos el menú configurable, el Layout, los componentes comunes y los espacios reservados del Inicio.
-- Las tablas necesarias ya existen en `database/migrations/01_esquema_sprint1.sql` y `02_esquema_sprint2.sql`; no se crean tablas nuevas. Para cumplir FR-007 puede hacer falta una **columna** (no una tabla) que conserve el precio acordado de cada membresía; se decidirá y justificará en la planificación con una migración numerada nueva.
+- Las tablas necesarias ya existen en `database/migrations/01_esquema_sprint1.sql` y `02_esquema_sprint2.sql`; no se crean tablas, columnas ni migraciones (decisión del equipo, 2026-10-14). Por eso una membresía pendiente de pago se cobra al precio vigente de su plan y una pagada conserva el monto de su pago.
 - Los métodos de pago son los tres que admite la base de datos: efectivo, tarjeta y transferencia. No hay integración con bancos ni plataformas de pago (fuera del MVP). La moneda se muestra con el símbolo "$".
-- Cada membresía se paga una sola vez, por su precio completo: no hay pagos parciales, recargos ni reembolsos. Una membresía solo queda activa cuando su pago está registrado, y las membresías con precio $0 quedan activas sin pago. La base de datos no tiene un estado propio para "pendiente de pago"; se deriva de la ausencia del pago (la planificación decidirá si se deriva o si se agrega ese estado con una migración numerada).
+- Cada membresía se paga una sola vez, por su precio completo: no hay pagos parciales, recargos ni reembolsos. Una membresía solo queda activa cuando su pago está registrado. La base de datos no tiene un estado propio para "pendiente de pago": se deriva de la ausencia del pago. Los planes deben tener precio mayor a 0.
 - La membresía vencida no tiene tiempo de tolerancia: el acceso se rechaza desde el día siguiente a su fecha de fin. Una membresía suspendida rechaza el acceso y se reactiva con la misma fecha de fin.
 - Se aplica el criterio del acta de entrega: el acceso es solo para clientes al corriente. Un cliente con adeudo (membresía sin pago registrado) NO entra, aunque las fechas de su membresía cubran hoy; confirmado por el equipo el 2026-10-14.
 - "Por vencer" significa 5 días o menos para el vencimiento, coherente con el color amarillo del diseño reservado del Inicio del cliente. "Semana" es la semana en curso de lunes a hoy. "Hoy" y las fechas usan la fecha del servidor.
