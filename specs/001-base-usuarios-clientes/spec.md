@@ -31,15 +31,15 @@ Un usuario registrado (administrador, recepcionista, entrenador o cliente) ingre
 
 **Acceptance Scenarios**:
 
-1. **Given** un usuario activo con credenciales válidas, **When** inicia sesión, **Then** accede al sistema y este reconoce su rol.
-2. **Given** un usuario que ingresa una contraseña o correo incorrectos, **When** intenta iniciar sesión, **Then** se rechaza el acceso con un mensaje de error que no revela si el correo existe.
-3. **Given** una persona sin sesión iniciada, **When** intenta usar una función protegida, **Then** el sistema le exige autenticarse.
-4. **Given** un usuario autenticado con rol sin permiso para una función, **When** intenta usarla, **Then** el sistema la rechaza aunque la solicitud se haga directamente al servidor sin pasar por la interfaz.
-5. **Given** un usuario desactivado, **When** intenta iniciar sesión, **Then** se le niega el acceso.
-6. **Given** una cuenta con 5 intentos fallidos seguidos, **When** se intenta iniciar sesión de nuevo antes de que pasen 15 minutos, **Then** se rechaza aunque la contraseña sea correcta, con un mensaje genérico de bloqueo temporal.
-7. **Given** una cuenta bloqueada temporalmente, **When** pasan 15 minutos, **Then** puede iniciar sesión de nuevo con credenciales válidas.
-8. **Given** un cliente dado de baja (estado inactivo) con cuenta de acceso, **When** intenta iniciar sesión con credenciales correctas, **Then** se le niega el acceso con el mismo mensaje genérico de credenciales incorrectas.
-9. **Given** un cliente con la sesión abierta, **When** el administrador lo da de baja, **Then** su sesión deja de ser válida en la siguiente petición.
+1. **Cuando** un usuario activo envíe un correo y una contraseña válidos, **el sistema debe** iniciar su sesión, identificar su rol y entregarle una credencial de sesión con vigencia de 8 horas.
+2. **Si** el correo o la contraseña son incorrectos, **entonces el sistema debe** rechazar el acceso con código 401 y un mensaje idéntico en ambos casos, de modo que no revele si el correo existe.
+3. **Mientras** una persona no tenga una sesión válida (sin credencial, vencida o manipulada), **el sistema debe** responder 401 a cualquier función protegida.
+4. **Si** un usuario autenticado solicita una función que su rol no permite, **entonces el sistema debe** rechazarla con código 403, incluso cuando la solicitud llegue directamente al servidor sin pasar por la interfaz.
+5. **Si** un usuario desactivado intenta iniciar sesión, **entonces el sistema debe** negarle el acceso con código 401, aunque la contraseña sea correcta.
+6. **Si** una cuenta acumula 5 intentos fallidos seguidos, **entonces el sistema debe** rechazar con código 423 y un mensaje genérico de bloqueo temporal todo inicio de sesión de esa cuenta durante los siguientes 15 minutos, aunque la contraseña sea correcta.
+7. **Cuando** transcurran 15 minutos desde el bloqueo de una cuenta, **el sistema debe** permitirle iniciar sesión con credenciales válidas y reiniciar su conteo de intentos fallidos a 0.
+8. **Si** un cliente dado de baja (estado inactivo) con cuenta de acceso intenta iniciar sesión con credenciales correctas, **entonces el sistema debe** negarle el acceso con código 401 y el mismo mensaje genérico de credenciales incorrectas.
+9. **Mientras** un cliente tenga la sesión abierta y el administrador lo dé de baja, **el sistema debe** responder 401 a su siguiente petición, aunque su credencial de 8 horas aún no haya vencido.
 
 ---
 
