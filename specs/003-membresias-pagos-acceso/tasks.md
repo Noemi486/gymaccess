@@ -205,13 +205,13 @@ description: "Lista de tareas de la funcionalidad 003: membresías, pagos, recon
 
 ### Tests for User Story 6
 
-- [ ] T062 [P] [US6] Crear `backend/tests/integration/accesos-listar.test.js`: `GET /accesos` ordenado del más reciente al más antiguo con paginación; filtros `desde`, `hasta` (fechas válidas, `desde ≤ hasta`), `resultado` y `q` por nombre/apellido; cliente `null` como "No identificado"; administrador y recepcionista reciben el detalle completo (`tipo`, `motivo_rechazo`); el entrenador recibe SOLO nombre, fecha, hora y resultado (sin `tipo`, `motivo_rechazo`, teléfono ni correo); cliente 403; no existen `PUT`/`PATCH`/`DELETE`
-- [ ] T063 [P] [US6] Crear `frontend/tests/accesos.test.jsx`: tabla con fecha y hora, cliente o "No identificado", insignia de resultado y motivo; filtros de fecha o rango, resultado y búsqueda; estado vacío; paginación; vista básica para el entrenador
+- [X] T062 [P] [US6] Crear `backend/tests/integration/accesos-listar.test.js`: `GET /accesos` ordenado del más reciente al más antiguo con paginación; filtros `desde`, `hasta` (fechas válidas, `desde ≤ hasta`), `resultado` y `q` por nombre/apellido; cliente `null` como "No identificado"; administrador y recepcionista reciben el detalle completo (`tipo`, `motivo_rechazo`); el entrenador recibe SOLO nombre, fecha, hora y resultado (sin `tipo`, `motivo_rechazo`, teléfono ni correo); cliente 403; no existen `PUT`/`PATCH`/`DELETE`
+- [X] T063 [P] [US6] Crear `frontend/tests/accesos.test.jsx`: tabla con fecha y hora, cliente o "No identificado", insignia de resultado y motivo; filtros de fecha o rango, resultado y búsqueda; estado vacío; paginación; vista básica para el entrenador
 
 ### Implementation for User Story 6
 
-- [ ] T064 [US6] Ampliar `backend/src/models/acceso.model.js` con `listar({ desde, hasta, resultado, q, limit, offset })` (unión con `clientes`, filtros parametrizados, rangos por `fecha` para aprovechar `idx_accesos_fecha`), `backend/src/services/accesos.service.js` con `listar(filtros, actor)` (proyección por rol con `accesoPublico`), el validador `accesoListarQueryEsquema` en `backend/src/validators/acceso.validator.js` y `GET /` (A,R,E) en `backend/src/routes/accesos.routes.js`
-- [ ] T065 [P] [US6] Crear `frontend/src/pages/Accesos.jsx` (`PageHeader`, filtros con `FormField`, `Table`, `Badge` de resultado, `Pagination`, `EmptyState`) y agregar la sección `accesos` (`/accesos`, ícono `DoorOpen`, bloque `operacion`, roles administrador, recepcionista y entrenador) en `frontend/src/config/menu.js`, la ruta en `frontend/src/App.jsx` y la lista esperada de `frontend/tests/menu.test.jsx`
+- [X] T064 [US6] Ampliar `backend/src/models/acceso.model.js` con `listar({ desde, hasta, resultado, q, limit, offset })` (unión con `clientes`, filtros parametrizados, rangos por `fecha` para aprovechar `idx_accesos_fecha`), `backend/src/services/accesos.service.js` con `listar(filtros, actor)` (proyección por rol con `accesoPublico`), el validador `accesoListarQueryEsquema` en `backend/src/validators/acceso.validator.js` y `GET /` (A,R,E) en `backend/src/routes/accesos.routes.js`
+- [X] T065 [P] [US6] Crear `frontend/src/pages/Accesos.jsx` (`PageHeader`, filtros con `FormField`, `Table`, `Badge` de resultado, `Pagination`, `EmptyState`) y agregar la sección `accesos` (`/accesos`, ícono `DoorOpen`, bloque `operacion`, roles administrador, recepcionista y entrenador) en `frontend/src/config/menu.js`, la ruta en `frontend/src/App.jsx` y la lista esperada de `frontend/tests/menu.test.jsx`
 
 ---
 

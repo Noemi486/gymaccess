@@ -5,6 +5,7 @@ import Layout from './components/ui/Layout.jsx';
 import RutaProtegida from './components/RutaProtegida.jsx';
 import ClienteDetalle from './pages/ClienteDetalle.jsx';
 import ClienteForm from './pages/ClienteForm.jsx';
+import Accesos from './pages/Accesos.jsx';
 import Clientes from './pages/Clientes.jsx';
 import EstacionAcceso from './pages/EstacionAcceso.jsx';
 import Inicio from './pages/Inicio.jsx';
@@ -109,6 +110,15 @@ function Rutas() {
           element={
             <Con roles={ESCRITURA_CLIENTES}>
               <ClienteForm />
+            </Con>
+          }
+        />
+
+        <Route
+          path="/accesos"
+          element={
+            <Con roles={PERSONAL}>
+              <Accesos />
             </Con>
           }
         />

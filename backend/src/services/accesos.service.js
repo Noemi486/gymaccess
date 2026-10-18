@@ -4,6 +4,7 @@ import * as fechaModeloReal from '../models/fecha.model.js';
 import * as membresiaModeloReal from '../models/membresia.model.js';
 import * as rostrosServicioReal from './rostros.service.js';
 import { cubreHoy, diasRestantes, estadoEfectivo } from '../utils/membresia.js';
+import { accesoPublico } from '../utils/serializadores.js';
 
 // Motivos exactos de rechazo (se guardan y se muestran tal cual).
 export const MOTIVOS = {
@@ -80,7 +81,14 @@ export function crearAccesosService({
     };
   }
 
-  return { identificar };
+  // GET /accesos: el entrenador recibe solo nombre, fecha, hora y resultado (sin tipo ni motivo).
+  async function listar({ desde, hasta, resultado, q, page, limit, offset }, actor) {
+    const { filas, total } = await accesoModelo.listar({ desde, hasta, resultado, q, limit, offset });
+    const basico = actor.rol === 'entrenador';
+    return { data: filas.map((fila) => accesoPublico(fila, { basico })), page, limit, total };
+  }
+
+  return { identificar, listar };
 }
 
-export const { identificar } = crearAccesosService();
+export const { identificar, listar } = crearAccesosService();
