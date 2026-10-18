@@ -1915,3 +1915,132 @@ tbody tr:last-child td {
   color: var(--color-advertencia);
   font-weight: 600;
 }
+
+/* Estación de acceso: pantalla completa, fuera del Layout */
+.estacion {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-fondo-login);
+  color: var(--color-texto);
+}
+
+.estacion-barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-4);
+  padding: var(--espacio-4) var(--espacio-8);
+  border-bottom: 1px solid var(--vidrio-borde);
+}
+
+.estacion-marca {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  font-size: var(--texto-xl);
+}
+
+.estacion-subtitulo {
+  color: var(--color-texto-suave);
+  font-size: var(--texto-base);
+}
+
+.estacion-acciones {
+  display: flex;
+  gap: var(--espacio-3);
+}
+
+.estacion-cuerpo {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: var(--espacio-8);
+  align-items: center;
+  padding: var(--espacio-8);
+}
+
+.estacion-camara .camara-marco {
+  border-radius: var(--radio-lg);
+}
+
+.estacion-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+}
+
+.estacion-mensaje {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-4);
+  color: var(--color-texto-suave);
+  font-size: var(--texto-xl);
+  text-align: center;
+}
+
+.estacion-espera {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  font-weight: var(--peso-titulo);
+}
+
+.estacion-resultado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espacio-3);
+  width: 100%;
+  padding: var(--espacio-10) var(--espacio-6);
+  border: 2px solid;
+  border-radius: var(--radio-lg);
+  font-size: var(--texto-xl);
+  text-align: center;
+}
+
+.estacion-resultado h2 {
+  margin: 0;
+  font-size: clamp(1.75rem, 3.4vw, 3rem);
+  line-height: 1.15;
+}
+
+.estacion-resultado p {
+  margin: 0;
+}
+
+.estacion-nombre {
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  font-weight: var(--peso-titulo);
+}
+
+.estacion-motivo {
+  font-size: clamp(1.25rem, 2.2vw, 1.875rem);
+  font-weight: var(--peso-fuerte);
+}
+
+.estacion-autorizado {
+  background: var(--color-exito-fondo);
+  border-color: var(--color-exito);
+  color: var(--color-exito);
+}
+
+.estacion-rechazado {
+  background: var(--color-error-fondo);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+@media (max-width: 900px) {
+  .estacion-barra {
+    flex-wrap: wrap;
+    padding: var(--espacio-4);
+  }
+
+  .estacion-cuerpo {
+    grid-template-columns: 1fr;
+    padding: var(--espacio-4);
+  }
+}

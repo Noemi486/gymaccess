@@ -6,6 +6,7 @@ import RutaProtegida from './components/RutaProtegida.jsx';
 import ClienteDetalle from './pages/ClienteDetalle.jsx';
 import ClienteForm from './pages/ClienteForm.jsx';
 import Clientes from './pages/Clientes.jsx';
+import EstacionAcceso from './pages/EstacionAcceso.jsx';
 import Inicio from './pages/Inicio.jsx';
 import Login from './pages/Login.jsx';
 import NoEncontrado from './pages/NoEncontrado.jsx';
@@ -27,6 +28,16 @@ function Rutas() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+
+      {/* La estación de acceso es pantalla completa: va FUERA del Layout (sin menú ni encabezado) */}
+      <Route
+        path="/estacion"
+        element={
+          <Con roles={['administrador', 'recepcionista']}>
+            <EstacionAcceso />
+          </Con>
+        }
+      />
 
       {/* Todas las pantallas autenticadas comparten el mismo marco: menú lateral + barra superior */}
       <Route

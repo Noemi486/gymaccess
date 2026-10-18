@@ -45,7 +45,14 @@ export async function cambiarEstado(id, estado, conexion = pool) {
 }
 
 // Deja inactivos todos los rostros activos del cliente. Devuelve cuántos eran.
+// Se actualiza por clave primaria (no por `id_cliente`): un UPDATE por el índice bloquea rangos y provoca
+// interbloqueos cuando se registran rostros de clientes distintos a la vez. Quien llama ya tiene bloqueada
+// la fila del cliente, así que nadie más cambia los rostros de ese cliente mientras tanto.
 export async function desactivarActivosDeCliente(idCliente, conexion = pool) {
-  const [r] = await conexion.execute("UPDATE rostros SET estado = 'inactivo' WHERE id_cliente = ? AND estado = 'activo'", [idCliente]);
+  const [activos] = await conexion.execute("SELECT id_rostro FROM rostros WHERE id_cliente = ? AND estado = 'activo'", [idCliente]);
+  if (activos.length === 0) return 0;
+  const ids = activos.map((fila) => fila.id_rostro);
+  const marcas = ids.map(() => '?').join(', ');
+  const [r] = await conexion.execute(`UPDATE rostros SET estado = 'inactivo' WHERE id_rostro IN (${marcas})`, ids);
   return r.affectedRows;
 }

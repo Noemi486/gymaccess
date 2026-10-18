@@ -10,11 +10,15 @@ import Sidebar from '../src/components/ui/Sidebar.jsx';
 const ESPERADO = {
   administrador: {
     General: ['Inicio'],
-    Operación: ['Clientes'],
+    Operación: ['Clientes', 'Estación de acceso'],
     'Membresías y pagos': ['Tipos de membresía'],
     Administración: ['Usuarios y roles'],
   },
-  recepcionista: { General: ['Inicio'], Operación: ['Clientes'], 'Membresías y pagos': ['Tipos de membresía'] },
+  recepcionista: {
+    General: ['Inicio'],
+    Operación: ['Clientes', 'Estación de acceso'],
+    'Membresías y pagos': ['Tipos de membresía'],
+  },
   entrenador: { General: ['Inicio'], Operación: ['Clientes'] },
   cliente: { General: ['Inicio', 'Mi información'] },
 };
@@ -37,7 +41,7 @@ describe('menuParaRol', () => {
   it('agregar una entrada la muestra solo a sus roles', () => {
     const nueva = { id: 'pagos', etiqueta: 'Pagos', ruta: '/pagos', icono: Users, bloque: 'operacion', roles: ['recepcionista'] };
     const secciones = [...SECCIONES, nueva];
-    expect(comoObjeto(menuParaRol('recepcionista', secciones)).Operación).toEqual(['Clientes', 'Pagos']);
+    expect(comoObjeto(menuParaRol('recepcionista', secciones)).Operación).toEqual(['Clientes', 'Estación de acceso', 'Pagos']);
     expect(comoObjeto(menuParaRol('entrenador', secciones)).Operación).toEqual(['Clientes']);
   });
 
@@ -64,7 +68,7 @@ describe('Sidebar', () => {
     expect(screen.getByText('Operación')).toBeInTheDocument();
     expect(screen.getByText('Membresías y pagos')).toBeInTheDocument();
     expect(screen.queryByText('Administración')).not.toBeInTheDocument();
-    expect(within(menu).getAllByRole('link').map((a) => a.textContent)).toEqual(['Inicio', 'Clientes', 'Tipos de membresía']);
+    expect(within(menu).getAllByRole('link').map((a) => a.textContent)).toEqual(['Inicio', 'Clientes', 'Estación de acceso', 'Tipos de membresía']);
   });
 
   it('marca como activa solo la sección actual', () => {
