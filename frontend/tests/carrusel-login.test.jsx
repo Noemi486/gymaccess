@@ -45,7 +45,7 @@ describe('CarruselLogin', () => {
       ]);
     });
 
-    it('la segunda línea de cada frase lleva el degradado verde', () => {
+    it('la segunda línea de cada frase va en el color de acento', () => {
       render(<CarruselLogin />);
       for (const d of diapositivas()) {
         const lineas = d.querySelector('.login-frase').children;
@@ -64,15 +64,16 @@ describe('CarruselLogin', () => {
       }
     });
 
-    it('diapositiva 1: rostro escaneado con esquinas, burbuja de acceso autorizado y "128 accesos hoy"', () => {
+    it('diapositiva 1: tarjeta de vidrio con marco de escaneo facial y badge de acceso autorizado', () => {
       render(<CarruselLogin />);
       const ilu = diapositivas()[0].querySelector('.ilustracion');
-      expect(ilu.querySelector('.ilu-rostro .ilu-escaner svg')).toBeInTheDocument();
+      const tarjeta = ilu.querySelector('.ilu-vidrio');
+      expect(tarjeta).toBeInTheDocument();
+      expect(tarjeta.querySelector('.ilu-escaner svg')).toBeInTheDocument();
       expect(ilu.querySelectorAll('.ilu-esquina')).toHaveLength(4);
-      expect(within(ilu).getByText('Min Cabrera')).toBeInTheDocument();
-      expect(ilu.querySelector('.ilu-burbuja')).toHaveTextContent('Acceso autorizado');
+      expect(tarjeta.querySelector('.ilu-burbuja')).toHaveTextContent('Acceso autorizado');
       expect(ilu.querySelector('.ilu-burbuja svg')).toBeInTheDocument();
-      expect(ilu.querySelector('.stat-card')).toHaveTextContent('128accesos hoy');
+      expect(ilu.querySelector('img')).not.toBeInTheDocument();
     });
 
     it('diapositiva 2: "Plan Mensual" con Vigente, "Pago registrado $450" y "3 membresías por vencer" en amarillo', () => {

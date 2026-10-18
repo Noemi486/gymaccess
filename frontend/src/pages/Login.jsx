@@ -9,8 +9,8 @@ import FormField from '../components/ui/FormField.jsx';
 import Input from '../components/ui/Input.jsx';
 import PasswordInput from '../components/ui/PasswordInput.jsx';
 
-// Inicio de sesión en dos paneles: a la izquierda la marca y un carrusel de tres diapositivas (frase e
-// ilustración, para todos los roles); a la derecha el formulario. En pantallas pequeñas se oculta todo salvo el logo y el formulario.
+// Inicio de sesión en pantalla dividida 50/50: a la izquierda la marca y un carrusel de tres diapositivas
+// (para todos los roles); a la derecha el formulario. Con 768 px o menos se oculta el panel izquierdo.
 // No hay registro de cuenta nueva: solo el administrador crea cuentas.
 export default function Login() {
   const { usuario, iniciarSesion } = useAuth();
@@ -45,7 +45,7 @@ export default function Login() {
 
   return (
     <main className="login">
-      <aside className="login-marca">
+      <aside className="login-hero-section">
         <div className="login-marca-logo">
           <span className="sidebar-logo" aria-hidden="true">
             <Dumbbell size={22} />
@@ -57,7 +57,7 @@ export default function Login() {
         </div>
       </aside>
 
-      <section className="login-formulario" aria-labelledby="titulo-login">
+      <section className="login-form-section" aria-labelledby="titulo-login">
         <div className="login-caja">
           <div className="login-logo-movil" aria-hidden="true">
             <span className="sidebar-logo">
@@ -67,6 +67,7 @@ export default function Login() {
           </div>
 
           <h1 id="titulo-login">Iniciar sesión en GymAccess</h1>
+          <p className="login-subtitulo">Ingresa tus credenciales para continuar.</p>
 
           {error && !hayErroresDeCampo && (
             <div className="mensaje mensaje-error" role="alert">
@@ -99,13 +100,11 @@ export default function Login() {
             </FormField>
 
             <Button type="submit" cargando={enviando} className="login-boton">
-              Iniciar sesión
+              Iniciar sesión →
             </Button>
           </form>
 
-          <p className="login-olvido">
-            ¿Olvidaste tu contraseña? Pide a recepción que la restablezca.
-          </p>
+          <p className="login-olvido">¿Problemas para entrar? Pide ayuda en recepción</p>
         </div>
       </section>
     </main>

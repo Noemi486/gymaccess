@@ -3,7 +3,7 @@ import { IlustracionAcceso, IlustracionCliente, IlustracionPagos } from './Ilust
 
 const INTERVALO_MS = 5000;
 
-// Cada diapositiva: frase en dos líneas (la segunda con degradado verde) y su propia ilustración.
+// Cada diapositiva: frase en dos líneas (la segunda en el color de acento) y su propia ilustración.
 // Hablan a todos los roles, no solo a los clientes.
 export const DIAPOSITIVAS = [
   { id: 'acceso', linea1: 'Controla quién entra,', linea2: 'sin filas.', Ilustracion: IlustracionAcceso },

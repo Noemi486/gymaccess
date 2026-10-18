@@ -1,4 +1,4 @@
-import { CalendarClock, Check, Clock, DoorOpen, ScanFace, Wallet } from 'lucide-react';
+import { CalendarClock, Check, Clock, ScanFace, Wallet } from 'lucide-react';
 import Avatar from './ui/Avatar.jsx';
 import Badge from './ui/Badge.jsx';
 import Card from './ui/Card.jsx';
@@ -8,32 +8,23 @@ import StatCard from './ui/StatCard.jsx';
 // sistema (sin imágenes ni logos de terceros): tarjetas encimadas e inclinadas con una animación sutil de
 // flotación. Son decorativas (aria-hidden) y todos los datos que muestran son de ejemplo.
 
-// Diapositiva 1: control de acceso con el rostro.
+// Diapositiva 1: control de acceso con el rostro (tarjeta de vidrio compacta, sin tarjetas encimadas).
 export function IlustracionAcceso() {
   return (
-    <div className="ilustracion" aria-hidden="true">
-      <StatCard
-        className="ilu-der"
-        etiqueta="accesos hoy"
-        valor="128"
-        icono={<DoorOpen size={20} />}
-      />
-
-      <Card className="ilu-centro ilu-rostro">
+    <div className="ilustracion ilustracion-acceso" aria-hidden="true">
+      <div className="ilu-vidrio ilu-rostro">
         <span className="ilu-escaner">
           <span className="ilu-esquina ilu-esquina-sup-izq" />
           <span className="ilu-esquina ilu-esquina-sup-der" />
           <span className="ilu-esquina ilu-esquina-inf-izq" />
           <span className="ilu-esquina ilu-esquina-inf-der" />
-          <ScanFace size={84} strokeWidth={1.25} />
+          <ScanFace size={72} strokeWidth={1.25} />
         </span>
-        <strong className="ilu-nombre">Min Cabrera</strong>
-      </Card>
-
-      <span className="ilu-burbuja">
-        <Check size={16} strokeWidth={3} />
-        Acceso autorizado
-      </span>
+        <span className="ilu-burbuja">
+          <Check size={16} strokeWidth={3} />
+          Acceso autorizado
+        </span>
+      </div>
     </div>
   );
 }

@@ -60,11 +60,12 @@ describe('Login', () => {
     vi.stubGlobal('fetch', vi.fn());
     renderizar('/login', <Route path="/login" element={<Login />} />);
 
-    const marca = document.querySelector('.login-marca');
+    const marca = document.querySelector('.login-hero-section');
     expect(marca).toHaveTextContent('GymAccess');
     expect(marca.querySelector('.login-marca-logo svg')).toBeInTheDocument();
 
     const formulario = screen.getByRole('region', { name: /iniciar sesión/i });
+    expect(formulario).toHaveClass('login-form-section');
     expect(formulario).toContainElement(screen.getByLabelText('Correo electrónico'));
     expect(formulario).toContainElement(screen.getByLabelText('Contraseña'));
     expect(marca).not.toContainElement(screen.getByLabelText('Correo electrónico'));
@@ -75,7 +76,7 @@ describe('Login', () => {
   it('el panel de marca contiene el carrusel de tres diapositivas (el detalle está en carrusel-login.test.jsx)', () => {
     vi.stubGlobal('fetch', vi.fn());
     renderizar('/login', <Route path="/login" element={<Login />} />);
-    const carrusel = document.querySelector('.login-marca .carrusel');
+    const carrusel = document.querySelector('.login-hero-section .carrusel');
     expect(carrusel).toBeInTheDocument();
     expect(carrusel.querySelectorAll('.carrusel-diapositiva')).toHaveLength(3);
   });
@@ -90,7 +91,7 @@ describe('Login', () => {
       expect(screen.getByPlaceholderText('Correo electrónico')).toBe(screen.getByLabelText('Correo electrónico'));
       expect(screen.getByPlaceholderText('Contraseña')).toBe(screen.getByLabelText('Contraseña'));
       expect(screen.getByLabelText('Correo electrónico')).toHaveClass('entrada-grande');
-      expect(screen.getByRole('button', { name: 'Iniciar sesión' })).toHaveClass('login-boton');
+      expect(screen.getByRole('button', { name: 'Iniciar sesión →' })).toHaveClass('login-boton');
     });
 
     it('las etiquetas están ocultas a la vista pero disponibles para lectores de pantalla', () => {
@@ -101,12 +102,16 @@ describe('Login', () => {
       expect(etiqueta).toHaveTextContent('Correo electrónico');
     });
 
-    it('indica que quien olvidó su contraseña debe pedir a recepción que la restablezca', () => {
+    it('indica que quien tenga problemas para entrar debe pedir ayuda en recepción, sin enlaces', () => {
       vi.stubGlobal('fetch', vi.fn());
       renderizar('/login', <Route path="/login" element={<Login />} />);
-      expect(
-        screen.getByText('¿Olvidaste tu contraseña? Pide a recepción que la restablezca.'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('¿Problemas para entrar? Pide ayuda en recepción')).toBeInTheDocument();
+    });
+
+    it('muestra un subtítulo bajo el título', () => {
+      vi.stubGlobal('fetch', vi.fn());
+      renderizar('/login', <Route path="/login" element={<Login />} />);
+      expect(screen.getByText('Ingresa tus credenciales para continuar.')).toHaveClass('login-subtitulo');
     });
 
     it('no ofrece registro de cuenta nueva ni enlaces de recuperación por correo', () => {
