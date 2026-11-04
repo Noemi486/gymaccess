@@ -38,6 +38,7 @@ Funcionalidad **003 — Sprint 2**, en la rama `feature/sprint-2`.
 - Pendiente del equipo: recorrer `specs/003-membresias-pagos-acceso/quickstart.md` con la cámara real y los 4 roles (T088), y ver un aviso real en la campana con una membresía por vencer.
 - Sprint 3 terminado en `feature/sprint-3` (spec `specs/004-entrenadores-rutinas/`): entrenadores, asignaciones y Mis clientes, rutinas versionadas, objetivos y progreso, Mi entrenamiento, sección Entrenamiento del Dashboard y salida del gimnasio.
 - Pendiente del equipo: recorrido manual del Sprint 2 con la cámara (T088) y del Sprint 3 con los 4 roles (T030); decidir la integración de `feature/sprint-3` a `main` para la entrega.
+- Decisión pendiente: la historia SOL12345-4 pide un **relevador para chapa magnética o torniquete**, que no está en ninguna spec ni se construyó (la estación solo muestra el resultado). En Jira quedó "En curso": integrarlo (requiere hardware y una spec nueva) o declararlo fuera de alcance.
 
 ## Pendientes del equipo
 
@@ -105,3 +106,4 @@ Funcionalidad **003 — Sprint 2**, en la rama `feature/sprint-2`.
   - Fase 8: modo Entrada / Salida en la estación (probado con la cámara real: "Hasta luego, Prueba 1"); filtro de tipo en Accesos; las cifras del Sprint 2 cuentan solo entradas.
   - Fase 9: matriz de permisos del sprint (backend y frontend), sin biometría en los endpoints nuevos y revisión de seguridad (todas las rutas con `autenticar` y `autorizar`; sin DELETE en el código; sin secretos en Git).
   - Pruebas al cierre de la fase 8: backend 543 pasan y 1 omitida (0 fallos); frontend 403 pasan.
+  - Jira: épica SOL12345-15 (Sprint 3) con 8 historias (SOL12345-16 a -23) en Finalizada con su evidencia; las historias del Sprint 2 ya terminadas (-3, -6, -7, -11, -12, -13) pasadas a Finalizada con comentario de evidencia; SOL12345-4 en "En curso" por el relevador.

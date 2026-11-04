@@ -60,7 +60,7 @@
 - [X] T028 Revisión de seguridad (rutas con `autenticar` y `autorizar`, sin DELETE en código de producción, sin secretos) y de accesibilidad de las pantallas nuevas
 - [ ] T029 Ejecutar todas las pruebas (SC-011) y `npm run build`
 - [ ] T030 Recorrido manual del flujo demostrable del sprint con los 4 roles (equipo)
-- [ ] T031 `docs/estado.md`, nota en la spec 002 ("Mis clientes asignados" activo) y Jira
+- [X] T031 `docs/estado.md`, nota en la spec 002 ("Mis clientes asignados" activo) y Jira
 
 ## Dependencias
 
