@@ -26,9 +26,9 @@
 
 ## Phase 4: US3 Rutinas (P1)
 
-- [ ] T012 [P] [US3] `tests/integration/rutinas.test.js`: crear, versionar N veces → N+1 versiones con ejercicios intactos, validaciones, una activa con peticiones simultáneas, entrenador no asignado o anterior → 403, cliente inactivo → 409, administrador solo lectura, recepcionista 403, auditoría
-- [ ] T013 [US3] `models/rutina.model.js`, `services/entrenamiento.service.js` (permisos de entrenador + rutinas), rutas
-- [ ] T014 [P] [US3] Frontend: página `EntrenamientoCliente` con `EditorRutina` (días y ejercicios) y `VistaRutina` + historial; pruebas
+- [X] T012 [P] [US3] `tests/integration/rutinas.test.js`: crear, versionar N veces → N+1 versiones con ejercicios intactos, validaciones, una activa con peticiones simultáneas, entrenador no asignado o anterior → 403, cliente inactivo → 409, administrador solo lectura, recepcionista 403, auditoría
+- [X] T013 [US3] `models/rutina.model.js`, `services/entrenamiento.service.js` (permisos de entrenador + rutinas), rutas
+- [X] T014 [P] [US3] Frontend: página `EntrenamientoCliente` con `EditorRutina` (días y ejercicios) y `VistaRutina` + historial; pruebas
 
 ## Phase 5: US4 Objetivos y progreso (P1)
 

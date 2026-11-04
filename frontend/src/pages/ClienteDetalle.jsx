@@ -50,7 +50,7 @@ export default function ClienteDetalle() {
 
       {puedeEditar && <PanelMembresia idCliente={cliente.id_cliente} clienteActivo={cliente.estado === 'activo'} rol={rol} />}
       {puedeEditar && <PanelRostro cliente={cliente} rol={rol} />}
-      {puedeEditar && <PanelEntrenador cliente={cliente} />}
+      {puedeEditar && <PanelEntrenador cliente={cliente} rol={rol} />}
 
       <div className="acciones perfil-acciones">
         <Button to="/clientes" variante="secundario">

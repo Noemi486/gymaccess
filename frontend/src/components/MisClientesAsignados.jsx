@@ -19,7 +19,7 @@ export default function MisClientesAsignados({ datos }) {
               return (
                 <li key={c.id_cliente} className="cliente-nuevo">
                   <Avatar nombre={nombre} />
-                  <Link to={`/clientes/${c.id_cliente}`} className="cliente-nuevo-nombre enlace-fila">
+                  <Link to={`/mis-clientes/${c.id_cliente}`} className="cliente-nuevo-nombre enlace-fila">
                     {nombre}
                   </Link>
                 </li>

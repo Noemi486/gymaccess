@@ -2339,3 +2339,76 @@ a.campana-aviso:hover {
   align-items: center;
   gap: var(--espacio-2) var(--espacio-3);
 }
+
+/* Rutinas (spec 004) */
+.rutina-dias {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--espacio-4);
+  margin-top: var(--espacio-3);
+}
+
+.rutina-dia {
+  padding: var(--espacio-3) var(--espacio-4);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+}
+
+.rutina-dia h4 {
+  margin: 0 0 var(--espacio-2);
+}
+
+.rutina-dia ol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  margin: 0;
+  padding-left: var(--espacio-5);
+}
+
+.rutina-instrucciones,
+.rutina-indicaciones {
+  margin: 2px 0 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-sm);
+}
+
+.lista-historial li > .vista-rutina {
+  flex-basis: 100%;
+}
+
+.editor-rutina {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+}
+
+.editor-dia {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+  margin: 0;
+  padding: var(--espacio-3) var(--espacio-4);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+}
+
+.editor-dia legend {
+  padding: 0 var(--espacio-2);
+  font-weight: 700;
+}
+
+.editor-ejercicio {
+  display: grid;
+  grid-template-columns: 2fr repeat(4, minmax(90px, 1fr)) 2fr auto;
+  gap: var(--espacio-2);
+  align-items: end;
+  padding-bottom: var(--espacio-3);
+  border-bottom: 1px dashed var(--color-borde);
+}
+
+@media (max-width: 1023px) {
+  .editor-ejercicio {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

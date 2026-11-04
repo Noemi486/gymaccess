@@ -41,7 +41,7 @@ export default function MisClientes() {
   }, [cargar]);
 
   const columnas = [
-    { clave: 'nombre', etiqueta: 'Cliente', render: (c) => <Link to={`/clientes/${c.id_cliente}`}>{`${c.nombre} ${c.apellido}`}</Link> },
+    { clave: 'nombre', etiqueta: 'Cliente', render: (c) => <Link to={`/mis-clientes/${c.id_cliente}`}>{`${c.nombre} ${c.apellido}`}</Link> },
     { clave: 'desde', etiqueta: 'Asignado desde', render: (c) => formatearFechaCorta(c.desde) },
   ];
 

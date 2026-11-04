@@ -13,7 +13,7 @@ import { useToast } from './ui/Toast.jsx';
 
 // Entrenador del cliente en su detalle (spec 004, US2): actual, asignar, cambiar, quitar e historial.
 // Solo administrador y recepcionista; el servidor vuelve a validar el permiso.
-export default function PanelEntrenador({ cliente }) {
+export default function PanelEntrenador({ cliente, rol }) {
   const { mostrar } = useToast();
   const clienteActivo = cliente.estado === 'activo';
   const [datos, setDatos] = useState(null);
@@ -144,6 +144,12 @@ export default function PanelEntrenador({ cliente }) {
             )}
           </div>
         )
+      )}
+
+      {rol === 'administrador' && (
+        <p>
+          <Link to={`/clientes/${cliente.id_cliente}/entrenamiento`}>Ver rutina y progreso</Link>
+        </p>
       )}
 
       {historial.length > 0 && (

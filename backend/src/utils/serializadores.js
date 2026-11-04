@@ -131,3 +131,49 @@ export function entrenadorPublico(fila) {
     fecha_registro: fila.fecha_registro,
   };
 }
+
+const numeroONulo = (v) => (v === null || v === undefined ? null : Number(v));
+
+// Rutina con sus ejercicios agrupados por día (spec 004, FR-009 a FR-011).
+export function rutinaPublica(fila, ejercicios) {
+  const dias = [];
+  for (const e of ejercicios) {
+    let dia = dias.find((d) => d.dia === e.dia);
+    if (!dia) {
+      dia = { dia: e.dia, ejercicios: [] };
+      dias.push(dia);
+    }
+    dia.ejercicios.push({
+      nombre: e.nombre,
+      series: numeroONulo(e.series),
+      repeticiones: e.repeticiones ?? null,
+      peso_kg: numeroONulo(e.peso_kg),
+      descanso_seg: numeroONulo(e.descanso_seg),
+      instrucciones: e.instrucciones ?? null,
+    });
+  }
+  return {
+    id_rutina: fila.id_rutina,
+    nombre: fila.nombre,
+    indicaciones: fila.indicaciones ?? null,
+    estado: fila.estado,
+    fecha_creacion: fila.fecha_creacion,
+    fecha_archivo: fila.fecha_archivo ?? null,
+    entrenador: { id_usuario: fila.id_entrenador, nombre: fila.entrenador_nombre },
+    dias,
+  };
+}
+
+// Fila del historial de rutinas.
+export function rutinaResumen(fila) {
+  return {
+    id_rutina: fila.id_rutina,
+    nombre: fila.nombre,
+    estado: fila.estado,
+    fecha_creacion: fila.fecha_creacion,
+    fecha_archivo: fila.fecha_archivo ?? null,
+    entrenador: fila.entrenador_nombre,
+    dias: Number(fila.dias),
+    ejercicios: Number(fila.ejercicios),
+  };
+}

@@ -302,7 +302,7 @@ describe('Inicio: panel de resumen', () => {
       const lista = await screen.findByRole('list', { name: 'Mis clientes asignados' });
       const filas = within(lista).getAllByRole('listitem');
       expect(filas).toHaveLength(2);
-      expect(within(filas[0]).getByRole('link', { name: 'Mario Luna' })).toHaveAttribute('href', '/clientes/8');
+      expect(within(filas[0]).getByRole('link', { name: 'Mario Luna' })).toHaveAttribute('href', '/mis-clientes/8');
       expect(screen.getByRole('link', { name: 'Ver los 12 clientes' })).toHaveAttribute('href', '/mis-clientes');
     });
 
