@@ -106,6 +106,9 @@ describe('Ninguna respuesta ni registro de consola contiene datos biométricos',
     revisar(autorizado, 'identificar (autorizado)');
     const desconocido = await api('POST', '/accesos/identificar', recepcion.token, { descriptor: crearDescriptorSintetico(81_999) });
     revisar(desconocido, 'identificar (rechazado)');
+    const salida = await api('POST', '/accesos/identificar', recepcion.token, { descriptor, tipo: 'salida' });
+    assert.equal(salida.cuerpo.tipo, 'salida');
+    revisar(salida, 'identificar (salida)');
   });
 
   it('consultas del Sprint 2 por cada rol', async () => {
@@ -124,6 +127,12 @@ describe('Ninguna respuesta ni registro de consola contiene datos biométricos',
       ['GET', '/tipos-membresia', admin.token],
       ['GET', '/avisos', recepcion.token],
       ['GET', '/avisos', tokenCliente],
+      // Sprint 3
+      ['GET', '/entrenadores', admin.token],
+      ['GET', `/clientes/${cliente.id_cliente}/entrenador`, recepcion.token],
+      ['GET', `/clientes/${cliente.id_cliente}/entrenamiento`, admin.token],
+      ['GET', '/clientes/me/entrenamiento', tokenCliente],
+      ['GET', `/accesos?desde=${hoy}&hasta=${hoy}&tipo=salida`, admin.token],
     ];
     for (const [metodo, ruta, token] of consultas) {
       const r = await api(metodo, ruta, token);

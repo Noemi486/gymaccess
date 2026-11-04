@@ -1,6 +1,6 @@
 # Estado del proyecto — GymAccess
 
-Última actualización: 3 de noviembre de 2026 (Sprint 2: fases 1 a 16 hechas, incluidas US12 y US13; MVP completo)
+Última actualización: 4 de noviembre de 2026 (Sprint 2 y Sprint 3 terminados; faltan los recorridos manuales T088 y T030)
 
 ## Resumen
 
@@ -9,7 +9,7 @@
 | 001 | Sprint 1: autenticación, usuarios, roles y clientes | `001-base-usuarios-clientes` | ✅ Terminado |
 | 002 | Rediseño de interfaz: menú lateral y sistema visual | `002-interfaz-menu-lateral` | ✅ Terminado (rama `feature/interfaz`) |
 | 003 | Sprint 2: membresías, pagos, reconocimiento facial y acceso (**completa el MVP**) | `003-membresias-pagos-acceso` | ✅ Fases 1 a 16 hechas, con US12 (avisos) y US13 (respaldo) (rama `feature/sprint-2`). Falta el recorrido manual con la cámara (T088) |
-| 004 | Sprint 3: entrenadores, rutinas, progreso, dashboard y salida | `004-entrenadores-rutinas` | 🟡 Fases 1 a 4 de 9 (rama `feature/sprint-3`) |
+| 004 | Sprint 3: entrenadores, rutinas, progreso, dashboard y salida | `004-entrenadores-rutinas` | ✅ Fases 1 a 9 (rama `feature/sprint-3`). Falta el recorrido manual con los 4 roles (T030) |
 
 ## MVP
 
@@ -27,7 +27,8 @@ El MVP queda completo al terminar la funcionalidad **003 (Sprint 2)**. Criterio 
 - `feature/sprint-1` — Sprint 1 terminado (commit `b129cf8`).
 - `feature/interfaz` — Funcionalidad 002 terminada (rediseño de interfaz), integrada a `main`.
 - `main` — Igual a `feature/interfaz` (commit `0dbbc30`): Sprint 1 y rediseño de interfaz.
-- `feature/sprint-2` — **Rama de trabajo actual**, creada a partir de `main`. Aquí se desarrolla la funcionalidad 003 (Sprint 2). Ya tiene remoto (`origin`, GitHub) y se sube con `git push` al cerrar cada fase.
+- `feature/sprint-3` — **Rama de trabajo actual**, creada a partir de `feature/sprint-2` (incluye todo el Sprint 2). Funcionalidad 004.
+- `feature/sprint-2` — Funcionalidad 003, creada a partir de `main`. Aquí se desarrolla la funcionalidad 003 (Sprint 2). Ya tiene remoto (`origin`, GitHub) y se sube con `git push` al cerrar cada fase.
 
 ## Siguiente paso
 
@@ -35,8 +36,8 @@ Funcionalidad **003 — Sprint 2**, en la rama `feature/sprint-2`.
 
 - Hecho: fases 1 a 16 (tipos de membresía, asignar/renovar, pagos, registro de rostro, estación de acceso, consulta de accesos, pagos y adeudos, dashboard, Inicio por rol, menú y permisos, auditoría, cierre, avisos US12 y respaldo US13).
 - Pendiente del equipo: recorrer `specs/003-membresias-pagos-acceso/quickstart.md` con la cámara real y los 4 roles (T088), y ver un aviso real en la campana con una membresía por vencer.
-- Sprint 3 en `feature/sprint-3` (spec `specs/004-entrenadores-rutinas/`): fases 1 a 4 hechas (migración 03, entrenadores, asignaciones y Mis clientes, rutinas). Fase 4 pendiente de pruebas del equipo.
-- Siguiente: Fase 5 (objetivos y progreso), 6 (Mi entrenamiento), 7 (Dashboard de entrenamiento), 8 (salida) y 9 (cierre).
+- Sprint 3 terminado en `feature/sprint-3` (spec `specs/004-entrenadores-rutinas/`): entrenadores, asignaciones y Mis clientes, rutinas versionadas, objetivos y progreso, Mi entrenamiento, sección Entrenamiento del Dashboard y salida del gimnasio.
+- Pendiente del equipo: recorrido manual del Sprint 2 con la cámara (T088) y del Sprint 3 con los 4 roles (T030); decidir la integración de `feature/sprint-3` a `main` para la entrega.
 
 ## Pendientes del equipo
 
@@ -96,3 +97,11 @@ Funcionalidad **003 — Sprint 2**, en la rama `feature/sprint-2`.
   - Migración `database/migrations/03_esquema_sprint3.sql` (6 tablas, no destructiva) ejecutada en `gymaccess_test` (14 tablas).
   - Fase 2: entrenadores (alta en transacción, edición, baja bloqueada con clientes asignados también desde Usuarios). Fase 3: asignación de entrenador, Mis clientes e indicador del Inicio del entrenador. Fase 4: rutinas versionadas con editor por días.
   - Pruebas al cierre de la fase 3: backend 517 pasan y 1 omitida (0 fallos); frontend 373 pasan. Espera común de 4 s en las pruebas del frontend (`tests/setup.js`).
+
+- **2026-11-04** — Sprint 3, fases 5 a 9 en `feature/sprint-3`:
+  - Fase 5: objetivos (crear, editar en curso, cumplir, cancelar) y avances con peso, grasa y cintura (rangos, sin fechas futuras, corrección solo del autor el mismo día, diferencias con el avance anterior).
+  - Fase 6: "Mi entrenamiento" del cliente (solo lectura, por sesión, sin contacto del entrenador).
+  - Fase 7: sección Entrenamiento del Dashboard (7 cifras y carga por entrenador; con + sin entrenador = clientes activos).
+  - Fase 8: modo Entrada / Salida en la estación (probado con la cámara real: "Hasta luego, Prueba 1"); filtro de tipo en Accesos; las cifras del Sprint 2 cuentan solo entradas.
+  - Fase 9: matriz de permisos del sprint (backend y frontend), sin biometría en los endpoints nuevos y revisión de seguridad (todas las rutas con `autenticar` y `autorizar`; sin DELETE en el código; sin secretos en Git).
+  - Pruebas al cierre de la fase 8: backend 543 pasan y 1 omitida (0 fallos); frontend 403 pasan.

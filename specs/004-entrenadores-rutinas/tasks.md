@@ -56,8 +56,8 @@
 
 ## Phase 9: Cierre
 
-- [ ] T027 [P] `tests/integration/permisos-sprint3.test.js` y `frontend/tests/permisos-sprint3.test.jsx` (matriz del Anexo), y ampliar `sin-biometria.test.js` con los endpoints nuevos
-- [ ] T028 Revisión de seguridad (rutas con `autenticar` y `autorizar`, sin DELETE en código de producción, sin secretos) y de accesibilidad de las pantallas nuevas
+- [X] T027 [P] `tests/integration/permisos-sprint3.test.js` y `frontend/tests/permisos-sprint3.test.jsx` (matriz del Anexo), y ampliar `sin-biometria.test.js` con los endpoints nuevos
+- [X] T028 Revisión de seguridad (rutas con `autenticar` y `autorizar`, sin DELETE en código de producción, sin secretos) y de accesibilidad de las pantallas nuevas
 - [ ] T029 Ejecutar todas las pruebas (SC-011) y `npm run build`
 - [ ] T030 Recorrido manual del flujo demostrable del sprint con los 4 roles (equipo)
 - [ ] T031 `docs/estado.md`, nota en la spec 002 ("Mis clientes asignados" activo) y Jira
