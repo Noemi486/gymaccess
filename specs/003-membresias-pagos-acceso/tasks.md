@@ -334,7 +334,7 @@ description: "Lista de tareas de la funcionalidad 003: membresías, pagos, recon
 - [X] T097 [US13] `backend/src/utils/respaldo.js` (lógica) y `backend/scripts/respaldo.js` (entrada); script `respaldo` en `backend/package.json`; variables nuevas sin valor en `backend/.env.example`; `.gitignore`
 - [X] T098 [P] [US13] `database/scripts/crear-usuario-respaldo.sql` (solo lectura sobre `gymaccess`, sin DROP)
 - [X] T099 [P] [US13] `docs/respaldo.md`: crear usuario, configurar `.env`, programar la tarea a las 23:00 en Windows, verificar y restaurar en una base de prueba
-- [ ] T100 [US13] Comprobación manual del equipo: crear el usuario, ejecutar `npm run respaldo`, programar la tarea y restaurar en una base de prueba (SC-020 a SC-022)
+- [X] T100 [US13] Comprobación manual del equipo: crear el usuario, ejecutar `npm run respaldo`, programar la tarea y restaurar en una base de prueba (SC-020 a SC-022)
 
 ---
 

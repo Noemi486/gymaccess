@@ -1,6 +1,6 @@
 # Estado del proyecto — GymAccess
 
-Última actualización: 3 de noviembre de 2026 (Sprint 2: fases 1 a 14 hechas; MVP completo)
+Última actualización: 3 de noviembre de 2026 (Sprint 2: fases 1 a 16 hechas, incluidas US12 y US13; MVP completo)
 
 ## Resumen
 
@@ -8,8 +8,8 @@
 |---|---|---|---|
 | 001 | Sprint 1: autenticación, usuarios, roles y clientes | `001-base-usuarios-clientes` | ✅ Terminado |
 | 002 | Rediseño de interfaz: menú lateral y sistema visual | `002-interfaz-menu-lateral` | ✅ Terminado (rama `feature/interfaz`) |
-| 003 | Sprint 2: membresías, pagos, reconocimiento facial y acceso (**completa el MVP**) | `003-membresias-pagos-acceso` | ✅ Fases 1 a 14 hechas (rama `feature/sprint-2`). Falta el recorrido manual con la cámara (T088). Siguen US12 (avisos) y US13 (respaldo) |
-| 004 | Sprint 3: entrenadores, rutinas y dashboard (extra) | `004-...` | ⬜ Opcional |
+| 003 | Sprint 2: membresías, pagos, reconocimiento facial y acceso (**completa el MVP**) | `003-membresias-pagos-acceso` | ✅ Fases 1 a 16 hechas, con US12 (avisos) y US13 (respaldo) (rama `feature/sprint-2`). Falta el recorrido manual con la cámara (T088) |
+| 004 | Sprint 3: entrenadores, rutinas y dashboard | `004-...` | ⬜ Siguiente |
 
 ## MVP
 
@@ -19,6 +19,7 @@ El MVP queda completo al terminar la funcionalidad **003 (Sprint 2)**. Criterio 
 
 - `gymaccess` (real) — 8 tablas. Usuario `gymaccess_app`: SELECT, INSERT, UPDATE.
 - `gymaccess_test` (pruebas) — 8 tablas. Usuario `gymaccess_app`: además DELETE.
+- Usuario `gymaccess_respaldo` (solo lectura en `gymaccess`) para el respaldo diario: `npm run respaldo`, tarea de Windows "GymAccess - Respaldo diario" a las 23:00, carpeta `C:\RespaldosGymAccess`, se guardan 7. Guía: `docs/respaldo.md`.
 - Scripts originales con contraseñas: fuera del repositorio (`gymaccess-bd/`).
 
 ## Ramas de Git
@@ -32,9 +33,9 @@ El MVP queda completo al terminar la funcionalidad **003 (Sprint 2)**. Criterio 
 
 Funcionalidad **003 — Sprint 2**, en la rama `feature/sprint-2`.
 
-- Hecho: fases 1 a 14 (tipos de membresía, asignar/renovar, pagos, registro de rostro, estación de acceso, consulta de accesos, pagos y adeudos, dashboard, Inicio por rol, menú y permisos, auditoría y cierre).
-- Pendiente del equipo: recorrer `specs/003-membresias-pagos-acceso/quickstart.md` con la cámara real y los 4 roles (T088).
-- Siguiente: **US12** (avisos de membresías por vencer y vencidas, Jira SOL12345-14) y **US13** (respaldo automático, Jira SOL12345-5), que salieron del aseguramiento de calidad del 2026-11-03. Después, el Sprint 3 (`docs/sprint-3.md`), que requiere una migración nueva.
+- Hecho: fases 1 a 16 (tipos de membresía, asignar/renovar, pagos, registro de rostro, estación de acceso, consulta de accesos, pagos y adeudos, dashboard, Inicio por rol, menú y permisos, auditoría, cierre, avisos US12 y respaldo US13).
+- Pendiente del equipo: recorrer `specs/003-membresias-pagos-acceso/quickstart.md` con la cámara real y los 4 roles (T088), y ver un aviso real en la campana con una membresía por vencer.
+- Siguiente: el **Sprint 3** (`docs/sprint-3.md`): especificación 004 con aseguramiento de calidad y una migración nueva.
 
 ## Pendientes del equipo
 
@@ -82,3 +83,9 @@ Funcionalidad **003 — Sprint 2**, en la rama `feature/sprint-2`.
   - Fase 12: matriz de permisos de las pantallas nuevas. Fase 13: pruebas de auditoría; los rechazos al registrar o cambiar un rostro ahora dejan evento de error.
   - Fase 14: revisión de seguridad (sin `.env` en Git, `FACE_KEY` sin valor en los ejemplos, sin `DELETE`, todas las rutas con `autenticar` y `autorizar`) y prueba de que ninguna respuesta ni la consola contienen datos biométricos.
   - Pruebas: las del backend corren un archivo a la vez (`--test-concurrency=1`) porque varias comparten `gymaccess_test`; antes fallaban de forma intermitente. Backend 469 pasan y 1 omitida (0 fallos); frontend 341 pasan.
+
+- **2026-11-03 (noche)** — US12 y US13 agregadas a la spec 003 (FR-054 a FR-066, SC-016 a SC-022) y construidas:
+  - Fase 15 (US12): `GET /api/avisos` derivado de membresías y pagos, sin tablas nuevas (por vencer: 5 días o menos; vencidas: hace 7 días o menos sin una nueva vigente); campana en el encabezado para administrador, recepcionista y cliente; el entrenador no la ve (403). Probada en navegador ("No hay avisos", coincide con "Membresías por vencer: 0").
+  - Fase 16 (US13): `npm run respaldo` con `mysqldump` y el usuario de solo lectura `gymaccess_respaldo` (contraseña en un archivo de opciones temporal, nunca en la línea de comandos); se escribe a `.parcial` y solo se renombra si terminó bien; rotación a 7; bitácora `respaldos.log` sin secretos. Tarea de Windows registrada (`backend/scripts/respaldo.cmd`, 23:00, se ejecuta al encender si se omitió); su salida queda en `backend/respaldo-tarea.log`.
+  - Comprobación manual (T100): respaldo a mano y desde la tarea correctos (25 514 bytes); restauración en `gymaccess_restaurada` con cantidades iguales a la original: 9 clientes, 7 pagos y 42 accesos (SC-022); la base de prueba se eliminó después.
+  - Pruebas: backend 481 pasan y 1 omitida (0 fallos); frontend 349 pasan; pruebas unitarias del respaldo 8 de 8.
