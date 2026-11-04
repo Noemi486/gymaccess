@@ -9,7 +9,7 @@
 | 001 | Sprint 1: autenticación, usuarios, roles y clientes | `001-base-usuarios-clientes` | ✅ Terminado |
 | 002 | Rediseño de interfaz: menú lateral y sistema visual | `002-interfaz-menu-lateral` | ✅ Terminado (rama `feature/interfaz`) |
 | 003 | Sprint 2: membresías, pagos, reconocimiento facial y acceso (**completa el MVP**) | `003-membresias-pagos-acceso` | ✅ Fases 1 a 16 hechas, con US12 (avisos) y US13 (respaldo) (rama `feature/sprint-2`). Falta el recorrido manual con la cámara (T088) |
-| 004 | Sprint 3: entrenadores, rutinas y dashboard | `004-...` | ⬜ Siguiente |
+| 004 | Sprint 3: entrenadores, rutinas, progreso, dashboard y salida | `004-entrenadores-rutinas` | 🟡 Fases 1 a 4 de 9 (rama `feature/sprint-3`) |
 
 ## MVP
 
@@ -35,7 +35,8 @@ Funcionalidad **003 — Sprint 2**, en la rama `feature/sprint-2`.
 
 - Hecho: fases 1 a 16 (tipos de membresía, asignar/renovar, pagos, registro de rostro, estación de acceso, consulta de accesos, pagos y adeudos, dashboard, Inicio por rol, menú y permisos, auditoría, cierre, avisos US12 y respaldo US13).
 - Pendiente del equipo: recorrer `specs/003-membresias-pagos-acceso/quickstart.md` con la cámara real y los 4 roles (T088), y ver un aviso real en la campana con una membresía por vencer.
-- Siguiente: el **Sprint 3** (`docs/sprint-3.md`): especificación 004 con aseguramiento de calidad y una migración nueva.
+- Sprint 3 en `feature/sprint-3` (spec `specs/004-entrenadores-rutinas/`): fases 1 a 4 hechas (migración 03, entrenadores, asignaciones y Mis clientes, rutinas). Fase 4 pendiente de pruebas del equipo.
+- Siguiente: Fase 5 (objetivos y progreso), 6 (Mi entrenamiento), 7 (Dashboard de entrenamiento), 8 (salida) y 9 (cierre).
 
 ## Pendientes del equipo
 
@@ -89,3 +90,9 @@ Funcionalidad **003 — Sprint 2**, en la rama `feature/sprint-2`.
   - Fase 16 (US13): `npm run respaldo` con `mysqldump` y el usuario de solo lectura `gymaccess_respaldo` (contraseña en un archivo de opciones temporal, nunca en la línea de comandos); se escribe a `.parcial` y solo se renombra si terminó bien; rotación a 7; bitácora `respaldos.log` sin secretos. Tarea de Windows registrada (`backend/scripts/respaldo.cmd`, 23:00, se ejecuta al encender si se omitió); su salida queda en `backend/respaldo-tarea.log`.
   - Comprobación manual (T100): respaldo a mano y desde la tarea correctos (25 514 bytes); restauración en `gymaccess_restaurada` con cantidades iguales a la original: 9 clientes, 7 pagos y 42 accesos (SC-022); la base de prueba se eliminó después.
   - Pruebas: backend 481 pasan y 1 omitida (0 fallos); frontend 349 pasan; pruebas unitarias del respaldo 8 de 8.
+
+- **2026-11-03/04 (noche)** — Sprint 3 iniciado en `feature/sprint-3`:
+  - Aseguramiento de calidad: spec 004 con 4 aclaraciones del equipo (alta de entrenador en un solo formulario; objetivos y avances con medidas; una rutina activa por día con historial; salida sencilla) y decisiones del análisis (modificar = nueva versión, sin DELETE; avance corregible solo el mismo día; sin tabla `estadisticas_dashboard`).
+  - Migración `database/migrations/03_esquema_sprint3.sql` (6 tablas, no destructiva) ejecutada en `gymaccess_test` (14 tablas).
+  - Fase 2: entrenadores (alta en transacción, edición, baja bloqueada con clientes asignados también desde Usuarios). Fase 3: asignación de entrenador, Mis clientes e indicador del Inicio del entrenador. Fase 4: rutinas versionadas con editor por días.
+  - Pruebas al cierre de la fase 3: backend 517 pasan y 1 omitida (0 fallos); frontend 373 pasan. Espera común de 4 s en las pruebas del frontend (`tests/setup.js`).
