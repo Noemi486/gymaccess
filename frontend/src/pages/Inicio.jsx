@@ -7,6 +7,7 @@ import { indicadoresParaRol } from '../config/indicadores.js';
 import { tarjetasClienteVisibles } from '../config/tarjetasCliente.js';
 import BuscadorClientes from '../components/BuscadorClientes.jsx';
 import ClientesNuevos from '../components/ClientesNuevos.jsx';
+import ClientesQueEntraronHoy from '../components/ClientesQueEntraronHoy.jsx';
 import Badge from '../components/ui/Badge.jsx';
 import Button from '../components/ui/Button.jsx';
 import Card from '../components/ui/Card.jsx';
@@ -55,6 +56,8 @@ export default function Inicio() {
 
   const [datos, setDatos] = useState(null);
   const [error, setError] = useState(null);
+  const [resumenCliente, setResumenCliente] = useState(null);
+  const [errorTarjetas, setErrorTarjetas] = useState(null);
 
   useEffect(() => {
     let activo = true;
@@ -64,6 +67,12 @@ export default function Inicio() {
         (e) =>
           activo && setError(e instanceof ErrorApi ? e.message : 'No se pudo cargar el resumen. Intenta de nuevo.'),
       );
+    // Cliente: sus tarjetas del Sprint 2 salen de su resumen propio. Si falla, el resto del Inicio sigue disponible.
+    if (esCliente) {
+      solicitar('/clientes/me/resumen')
+        .then((respuesta) => activo && setResumenCliente(respuesta))
+        .catch(() => activo && setErrorTarjetas('No se pudo cargar tu membresía, visitas y pagos. Intenta de nuevo más tarde.'));
+    }
     return () => {
       activo = false;
     };
@@ -91,13 +100,13 @@ export default function Inicio() {
       )}
       {!datos && !error && <Spinner etiqueta="Cargando resumen…" />}
 
-      {datos && esCliente && <MiInformacion cliente={datos} />}
+      {datos && esCliente && <MiInformacion cliente={datos} resumen={resumenCliente} errorTarjetas={errorTarjetas} />}
       {datos && !esCliente && <ResumenPersonal rol={rol} resumen={datos} />}
     </section>
   );
 }
 
-function MiInformacion({ cliente }) {
+function MiInformacion({ cliente, resumen, errorTarjetas }) {
   const tarjetas = tarjetasClienteVisibles();
   return (
     <>
@@ -114,12 +123,17 @@ function MiInformacion({ cliente }) {
         </Button>
       </Card>
 
-      {/* Panel reservado para las tarjetas de Sprint 2 (membresía, acceso facial, visitas y pagos).
-          No muestra nada hasta que se declaren disponibles en config/tarjetasCliente.js */}
-      {tarjetas.length > 0 && (
+      {/* Tarjetas del Sprint 2 (membresía, acceso facial, visitas y pagos), declaradas en config/tarjetasCliente.js */}
+      {errorTarjetas && (
+        <div className="mensaje mensaje-error" role="alert">
+          {errorTarjetas}
+        </div>
+      )}
+      {tarjetas.length > 0 && !errorTarjetas && !resumen && <Spinner etiqueta="Cargando tu membresía…" />}
+      {tarjetas.length > 0 && resumen && (
         <div className="inicio-cliente-panel">
           {tarjetas.map(({ id, componente: Tarjeta }) => (
-            <Tarjeta key={id} cliente={cliente} />
+            <Tarjeta key={id} cliente={cliente} resumen={resumen} />
           ))}
         </div>
       )}
@@ -151,8 +165,11 @@ function ResumenPersonal({ rol, resumen }) {
 
       <div className="inicio-paneles">
         {/* Entrenador: lista de clientes nuevos con la proyección básica (sin datos de contacto) */}
+        {rol === 'entrenador' && resumen.accesos?.ultimos && (
+          <ClientesQueEntraronHoy clientes={resumen.accesos.ultimos} />
+        )}
         {ultimos && rol === 'entrenador' && (
-          <div className="inicio-panel-ancho">
+          <div className={resumen.accesos?.ultimos ? '' : 'inicio-panel-ancho'}>
             <ClientesNuevos clientes={ultimos} />
           </div>
         )}

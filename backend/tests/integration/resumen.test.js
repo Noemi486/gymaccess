@@ -105,7 +105,8 @@ describe('API de resumen del inicio', () => {
       const { status, cuerpo } = await api('GET', '/resumen', tokenAdmin);
 
       assert.equal(status, 200);
-      assert.deepEqual(Object.keys(cuerpo).sort(), ['clientes', 'ultimos_clientes', 'usuarios']);
+      // Sprint 2 suma `accesos` y `membresias` (resumen-sprint2.test.js); las claves anteriores no cambian.
+      assert.deepEqual(Object.keys(cuerpo).sort(), ['accesos', 'clientes', 'membresias', 'ultimos_clientes', 'usuarios']);
       assert.deepEqual(Object.keys(cuerpo.clientes).sort(), ['activos', 'inactivos', 'registrados_mes']);
       for (const valor of Object.values(cuerpo.clientes)) assert.ok(Number.isInteger(valor) && valor >= 0);
       assert.ok(cuerpo.clientes.registrados_mes >= 1);
@@ -162,7 +163,7 @@ describe('API de resumen del inicio', () => {
       const { status, cuerpo } = await api('GET', '/resumen', tokenRecepcion);
 
       assert.equal(status, 200);
-      assert.deepEqual(Object.keys(cuerpo).sort(), ['clientes', 'ultimos_clientes']);
+      assert.deepEqual(Object.keys(cuerpo).sort(), ['accesos', 'clientes', 'membresias', 'ultimos_clientes']);
       assert.deepEqual(Object.keys(cuerpo.clientes).sort(), ['activos', 'registrados_hoy']);
       assert.ok(cuerpo.clientes.registrados_hoy >= 1);
       assert.ok(cuerpo.clientes.activos >= 1);
@@ -189,7 +190,7 @@ describe('API de resumen del inicio', () => {
       const { status, cuerpo } = await api('GET', '/resumen', tokenEntrenador);
 
       assert.equal(status, 200);
-      assert.deepEqual(Object.keys(cuerpo).sort(), ['clientes', 'ultimos_clientes']);
+      assert.deepEqual(Object.keys(cuerpo).sort(), ['accesos', 'clientes', 'ultimos_clientes']);
       assert.deepEqual(Object.keys(cuerpo.clientes).sort(), ['activos', 'nuevos_7_dias']);
       assert.ok(Number.isInteger(cuerpo.clientes.activos) && cuerpo.clientes.activos >= 1);
       assert.ok(Number.isInteger(cuerpo.clientes.nuevos_7_dias) && cuerpo.clientes.nuevos_7_dias >= 1);

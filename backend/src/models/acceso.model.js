@@ -50,3 +50,13 @@ export async function listar({ desde, hasta, resultado, q, limit, offset }) {
   );
   return { filas, total: Number(conteo[0].total) };
 }
+
+// Últimos intentos de acceso de un cliente (para su Inicio): fecha, hora, resultado y motivo.
+export async function ultimosDeCliente(idCliente, limite) {
+  const [filas] = await pool.execute(
+    `SELECT fecha, hora, resultado, motivo_rechazo FROM accesos
+     WHERE id_cliente = ? ORDER BY fecha DESC, hora DESC, id_acceso DESC LIMIT ?`,
+    [idCliente, String(limite)],
+  );
+  return filas;
+}

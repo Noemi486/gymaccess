@@ -2108,3 +2108,74 @@ tbody tr:last-child td {
   color: var(--color-texto-suave);
   font-size: var(--texto-sm);
 }
+
+/* ---- Inicio del cliente: tarjetas del Sprint 2 (US9) ---- */
+.tarjeta-cliente-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--espacio-2);
+  margin-bottom: var(--espacio-2);
+}
+.tarjeta-cliente-dato {
+  margin: var(--espacio-2) 0 0;
+  color: var(--color-texto-suave);
+  font-size: var(--texto-sm);
+}
+.tarjeta-aviso {
+  margin: var(--espacio-2) 0 0;
+  padding: var(--espacio-2) var(--espacio-3);
+  border-radius: 8px;
+  font-size: var(--texto-sm);
+}
+.tarjeta-aviso-advertencia {
+  background: var(--color-advertencia-fondo);
+  color: var(--color-advertencia);
+}
+.barra-progreso {
+  height: 8px;
+  margin-top: var(--espacio-3);
+  border-radius: 999px;
+  background: var(--color-superficie-hover);
+  overflow: hidden;
+}
+.barra-progreso span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+.barra-exito span {
+  background: var(--color-exito);
+}
+.barra-advertencia span {
+  background: var(--color-advertencia);
+}
+.barra-error span {
+  background: var(--color-error);
+}
+.texto-exito {
+  color: var(--color-exito);
+}
+.texto-advertencia {
+  color: var(--color-advertencia);
+}
+.texto-error {
+  color: var(--color-error);
+}
+.tarjeta-lista {
+  list-style: none;
+  margin: var(--espacio-2) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--espacio-2);
+}
+.tarjeta-lista li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espacio-2);
+  font-size: var(--texto-sm);
+}
+.tarjeta-lista-detalle {
+  color: var(--color-texto-suave);
+}

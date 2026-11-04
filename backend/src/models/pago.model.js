@@ -88,3 +88,17 @@ export async function listarAdeudos({ q, limit, offset }) {
   );
   return { filas, total: Number(resumen[0].total), total_adeudo: resumen[0].total_adeudo };
 }
+
+// Últimos pagos registrados de un cliente (para su Inicio).
+export async function ultimosDeCliente(idCliente, limite) {
+  const [filas] = await pool.execute(
+    `SELECT p.fecha_pago, p.monto, p.metodo_pago, t.nombre AS plan
+     FROM pagos p
+     JOIN membresias m ON m.id_membresia = p.id_membresia
+     JOIN tipos_membresia t ON t.id_tipo_membresia = m.id_tipo_membresia
+     WHERE p.id_cliente = ? AND p.estado = 'registrado'
+     ORDER BY p.fecha_pago DESC, p.id_pago DESC LIMIT ?`,
+    [idCliente, String(limite)],
+  );
+  return filas;
+}

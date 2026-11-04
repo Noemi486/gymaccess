@@ -3,9 +3,8 @@ import { CalendarClock, DoorOpen, ShieldCheck, UserCheck, UserPlus, UserX, Users
 // Indicadores (StatCard) del inicio. Cada uno dice qué rol lo ve y de dónde sale su valor en la
 // respuesta de GET /api/resumen. El servidor solo envía a cada rol lo que le corresponde.
 //
-// Espacio para Sprint 2: "Accesos de hoy" y "Membresías por vencer" ya están declarados con
-// `disponible: false` y no se muestran. Para activarlos basta con que el servidor devuelva la clave
-// en el resumen y cambiar `disponible` a true; el inicio no necesita más cambios.
+// Sprint 2 (US9): "Accesos de hoy" y "Membresías por vencer" (administrador y recepcionista) y
+// "Clientes que entraron hoy" (entrenador) ya están activos. Un indicador con `disponible: false` no se muestra.
 export const INDICADORES = [
   {
     id: 'clientes-activos',
@@ -49,14 +48,14 @@ export const INDICADORES = [
     roles: ['recepcionista'],
     valor: (resumen) => resumen.clientes?.registrados_hoy,
   },
-  // --- Reservados para Sprint 2 (no se muestran todavía) ---
+  // --- Sprint 2 (US9, FR-043 y FR-044) ---
   {
     id: 'accesos-hoy',
     etiqueta: 'Accesos de hoy',
     icono: DoorOpen,
     roles: ['administrador', 'recepcionista'],
     valor: (resumen) => resumen.accesos?.hoy,
-    disponible: false,
+    disponible: true,
   },
   {
     id: 'membresias-por-vencer',
@@ -64,7 +63,15 @@ export const INDICADORES = [
     icono: CalendarClock,
     roles: ['administrador', 'recepcionista'],
     valor: (resumen) => resumen.membresias?.por_vencer,
-    disponible: false,
+    disponible: true,
+  },
+  {
+    id: 'clientes-entraron-hoy',
+    etiqueta: 'Clientes que entraron hoy',
+    icono: DoorOpen,
+    roles: ['entrenador'],
+    valor: (resumen) => resumen.accesos?.clientes_hoy,
+    disponible: true,
   },
 ];
 

@@ -46,3 +46,47 @@ export async function contarUsuariosPorRol() {
   const [filas] = await pool.execute('SELECT rol, COUNT(*) AS total FROM usuarios GROUP BY rol');
   return Object.fromEntries(filas.map((fila) => [fila.rol, Number(fila.total)]));
 }
+
+// ---- Sprint 2 (US9): indicadores de accesos y membresías ----
+
+// Accesos autorizados de hoy.
+export async function contarAccesosAutorizadosHoy() {
+  const [filas] = await pool.execute("SELECT COUNT(*) AS total FROM accesos WHERE fecha = CURDATE() AND resultado = 'autorizado'");
+  return Number(filas[0].total);
+}
+
+// Membresías por vencer: vigentes (activa, pagada y cubren hoy) de clientes activos a las que les quedan 0 a 5 días.
+// Misma regla que utils/membresia.js (porVencer) y que el Dashboard.
+export async function contarMembresiasPorVencer() {
+  const [filas] = await pool.execute(
+    `SELECT COUNT(*) AS total
+     FROM membresias m JOIN clientes c ON c.id_cliente = m.id_cliente
+     WHERE c.estado = 'activo' AND m.estado = 'activa'
+       AND m.fecha_inicio <= CURDATE() AND m.fecha_fin >= CURDATE()
+       AND DATEDIFF(m.fecha_fin, CURDATE()) <= 5
+       AND EXISTS (SELECT 1 FROM pagos p WHERE p.id_membresia = m.id_membresia AND p.estado = 'registrado')`,
+  );
+  return Number(filas[0].total);
+}
+
+// Entrenador: clientes distintos con acceso autorizado hoy.
+export async function contarClientesQueEntraronHoy() {
+  const [filas] = await pool.execute(
+    "SELECT COUNT(DISTINCT id_cliente) AS total FROM accesos WHERE fecha = CURDATE() AND resultado = 'autorizado' AND id_cliente IS NOT NULL",
+  );
+  return Number(filas[0].total);
+}
+
+// Entrenador: últimos clientes que entraron hoy (una fila por cliente, con su última hora de entrada).
+// Proyección básica: solo id, nombre, apellido y hora.
+export async function ultimosClientesQueEntraronHoy(limite) {
+  const [filas] = await pool.execute(
+    `SELECT c.id_cliente, c.nombre, c.apellido, MAX(a.hora) AS hora
+     FROM accesos a JOIN clientes c ON c.id_cliente = a.id_cliente
+     WHERE a.fecha = CURDATE() AND a.resultado = 'autorizado'
+     GROUP BY c.id_cliente, c.nombre, c.apellido
+     ORDER BY hora DESC, c.id_cliente DESC LIMIT ?`,
+    [String(limite)],
+  );
+  return filas.map((fila) => ({ id_cliente: fila.id_cliente, nombre: fila.nombre, apellido: fila.apellido, hora: fila.hora }));
+}

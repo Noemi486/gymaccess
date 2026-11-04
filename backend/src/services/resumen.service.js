@@ -51,6 +51,29 @@ export function crearResumenService({ modelo }) {
         return filas.map((fila) => vistaCliente(fila, rol));
       },
     },
+    // ---- Sprint 2 (US9, FR-043 y FR-044) ----
+    {
+      clave: 'accesos',
+      roles: ['administrador', 'recepcionista', 'entrenador'],
+      async obtener(rol) {
+        if (rol === 'entrenador') {
+          // Proyección básica: sin motivos de rechazo, contacto ni datos financieros.
+          const [clientes_hoy, ultimos] = await Promise.all([
+            modelo.contarClientesQueEntraronHoy(),
+            modelo.ultimosClientesQueEntraronHoy(CANTIDAD_ULTIMOS),
+          ]);
+          return { clientes_hoy, ultimos };
+        }
+        return { hoy: await modelo.contarAccesosAutorizadosHoy() };
+      },
+    },
+    {
+      clave: 'membresias',
+      roles: ['administrador', 'recepcionista'],
+      async obtener() {
+        return { por_vencer: await modelo.contarMembresiasPorVencer() };
+      },
+    },
   ];
 
   // Resumen del inicio para el personal. El rol cliente no tiene resumen (usa su información propia).

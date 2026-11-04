@@ -34,15 +34,26 @@ const basico = (id, nombre, estado) => ({
 const RESUMENES = {
   administrador: {
     clientes: { activos: 40, inactivos: 7, registrados_mes: 12 },
+    accesos: { hoy: 25 },
+    membresias: { por_vencer: 4 },
     usuarios: { total: 9, por_rol: { administrador: 1, recepcionista: 3, entrenador: 2, cliente: 3 } },
     ultimos_clientes: [cliente(5, 'Elena'), cliente(4, 'Diego', 'inactivo'), cliente(3, 'Carla')],
   },
   recepcionista: {
     clientes: { activos: 40, registrados_hoy: 2 },
+    accesos: { hoy: 25 },
+    membresias: { por_vencer: 4 },
     ultimos_clientes: [cliente(5, 'Elena'), cliente(4, 'Diego')],
   },
   entrenador: {
     clientes: { activos: 40, nuevos_7_dias: 6 },
+    accesos: {
+      clientes_hoy: 2,
+      ultimos: [
+        { id_cliente: 3, nombre: 'Carla', apellido: 'Pérez', hora: '18:05:00' },
+        { id_cliente: 5, nombre: 'Elena', apellido: 'Pérez', hora: '07:40:00' },
+      ],
+    },
     ultimos_clientes: [
       basico(5, 'Elena', 'activo'),
       basico(4, 'Diego', 'inactivo'),
@@ -52,6 +63,31 @@ const RESUMENES = {
 };
 
 const propio = { ...cliente(7, 'Ana'), correo: 'ana@example.com' };
+
+// Resumen propio del cliente (GET /api/clientes/me/resumen) para sus tarjetas del Sprint 2.
+const RESUMEN_CLIENTE = {
+  membresia: {
+    id_membresia: 12,
+    id_cliente: 7,
+    tipo: { id_tipo_membresia: 2, nombre: 'Plan Mensual', duracion: 30 },
+    fecha_inicio: '2026-10-08',
+    fecha_fin: '2026-11-06',
+    estado: 'vigente',
+    dias_restantes: 3,
+    por_vencer: true,
+    precio: 450,
+    adeudo: 0,
+    pago: { id_pago: 31, fecha_pago: '2026-10-08T16:02:11.000Z', metodo_pago: 'efectivo', monto: 450 },
+  },
+  rostro: { registrado: true, fecha_registro: '2026-10-08T15:00:00.000Z' },
+  visitas: [
+    { fecha: '2026-11-03', hora: '07:15:02', resultado: 'autorizado', motivo_rechazo: null },
+    { fecha: '2026-11-02', hora: '18:40:00', resultado: 'rechazado', motivo_rechazo: 'Rostro no reconocido' },
+  ],
+  pagos: [{ fecha_pago: '2026-10-08T16:02:11.000Z', monto: 450, metodo_pago: 'efectivo', plan: 'Plan Mensual' }],
+  adeudo: null,
+};
+const RESUMEN_CLIENTE_VACIO = { membresia: null, rostro: { registrado: false, fecha_registro: null }, visitas: [], pagos: [], adeudo: null };
 
 function cuentaDe(rol) {
   return {
@@ -70,7 +106,7 @@ function Ubicacion() {
   return <p data-testid="ubicacion">{`${pathname}${search}`}</p>;
 }
 
-function abrir(rol, { resumen, falla = false } = {}) {
+function abrir(rol, { resumen, falla = false, resumenCliente = RESUMEN_CLIENTE, fallaTarjetas = false } = {}) {
   const cuenta = cuentaDe(rol);
   sessionStorage.setItem('gym_token', 'token-de-prueba');
   sessionStorage.setItem('gym_usuario', JSON.stringify(cuenta));
@@ -83,6 +119,9 @@ function abrir(rol, { resumen, falla = false } = {}) {
       if (falla) return respuesta(500, { error: { code: 'INTERNAL', message: 'Algo salió mal. Intenta de nuevo.' } });
       if (url === '/api/resumen') return respuesta(200, resumen ?? RESUMENES[rol]);
       if (url === '/api/clientes/me') return respuesta(200, propio);
+      if (url === '/api/clientes/me/resumen') {
+        return fallaTarjetas ? respuesta(500, { error: { code: 'INTERNAL', message: 'Error.' } }) : respuesta(200, resumenCliente);
+      }
       return respuesta(200, { data: [], page: 1, limit: 20, total: 0 });
     }),
   );
@@ -116,7 +155,7 @@ describe('Inicio: panel de resumen', () => {
   });
 
   describe('administrador', () => {
-    it('ve el botón principal, 4 indicadores, los últimos clientes y los usuarios por rol', async () => {
+    it('ve el botón principal, 6 indicadores (con los de Sprint 2), los últimos clientes y los usuarios por rol', async () => {
       const urls = abrir('administrador');
       const contenido = within(principal());
 
@@ -128,6 +167,8 @@ describe('Inicio: panel de resumen', () => {
         'Clientes inactivos': '7',
         'Registrados este mes': '12',
         'Usuarios del sistema': '9',
+        'Accesos de hoy': '25',
+        'Membresías por vencer': '4',
       };
       for (const [etiqueta, valor] of Object.entries(valores)) {
         expect(contenido.getByText(etiqueta).closest('.stat-card')).toHaveTextContent(valor);
@@ -169,6 +210,8 @@ describe('Inicio: panel de resumen', () => {
       expect(contenido.getByRole('link', { name: /registrar cliente/i })).toBeInTheDocument();
       expect(contenido.getByRole('search', { name: /buscar clientes/i })).toBeInTheDocument();
       expect(contenido.getByText('Registrados hoy').closest('.stat-card')).toHaveTextContent('2');
+      expect(contenido.getByText('Accesos de hoy').closest('.stat-card')).toHaveTextContent('25');
+      expect(contenido.getByText('Membresías por vencer').closest('.stat-card')).toHaveTextContent('4');
       expect(contenido.getByRole('table', { name: /últimos clientes registrados/i })).toBeInTheDocument();
       expect(contenido.queryByText('Usuarios del sistema')).not.toBeInTheDocument();
       expect(contenido.queryByRole('table', { name: /usuarios por rol/i })).not.toBeInTheDocument();
@@ -192,7 +235,7 @@ describe('Inicio: panel de resumen', () => {
   });
 
   describe('entrenador', () => {
-    it('ve el saludo con fecha, el buscador, dos indicadores y la lista de clientes nuevos', async () => {
+    it('ve el saludo con fecha, el buscador, tres indicadores y la lista de clientes nuevos', async () => {
       const urls = abrir('entrenador');
       const contenido = within(principal());
 
@@ -201,7 +244,8 @@ describe('Inicio: panel de resumen', () => {
       expect(contenido.getByPlaceholderText('Nombre o apellido')).toBeInTheDocument();
       expect(contenido.getByText('Clientes activos').closest('.stat-card')).toHaveTextContent('40');
       expect(contenido.getByText('Clientes nuevos (7 días)').closest('.stat-card')).toHaveTextContent('6');
-      expect(principal().querySelectorAll('.stat-card')).toHaveLength(2);
+      expect(contenido.getByText('Clientes que entraron hoy', { selector: '.stat-etiqueta' }).closest('.stat-card')).toHaveTextContent('2');
+      expect(principal().querySelectorAll('.stat-card')).toHaveLength(3);
       expect(contenido.getByText(fechaDeHoy())).toBeInTheDocument();
 
       expect(contenido.queryByRole('link', { name: /registrar cliente/i })).not.toBeInTheDocument();
@@ -245,6 +289,16 @@ describe('Inicio: panel de resumen', () => {
       expect(await screen.findByTestId('ubicacion')).toHaveTextContent('/clientes?q=P%C3%A9rez');
     });
 
+    it('lista "Clientes que entraron hoy": avatar, nombre completo y hora, sin datos de contacto', async () => {
+      abrir('entrenador');
+      const lista = await screen.findByRole('list', { name: 'Clientes que entraron hoy' });
+      const filas = within(lista).getAllByRole('listitem');
+      expect(filas).toHaveLength(2);
+      expect(within(filas[0]).getByText('CP')).toHaveClass('avatar');
+      expect(within(filas[0]).getByRole('link', { name: 'Carla Pérez' })).toHaveAttribute('href', '/clientes/3');
+      expect(filas[0]).toHaveTextContent('18:05');
+    });
+
     it('sin clientes nuevos muestra un estado vacío', async () => {
       abrir('entrenador', { resumen: { clientes: { activos: 0, nuevos_7_dias: 0 }, ultimos_clientes: [] } });
       expect(await screen.findByText('Aún no hay clientes nuevos')).toBeInTheDocument();
@@ -280,12 +334,77 @@ describe('Inicio: panel de resumen', () => {
       Object.assign(propio, { correo: 'ana@example.com' });
     });
 
-    it('no muestra todavía las tarjetas de Sprint 2', async () => {
-      abrir('cliente');
-      await screen.findByRole('heading', { name: 'Mi información' });
-      for (const titulo of ['Mi membresía', 'Acceso facial', 'Mis últimas visitas', 'Mis pagos']) {
-        expect(screen.queryByText(titulo)).not.toBeInTheDocument();
-      }
+    it('ve sus 4 tarjetas del Sprint 2 en orden, con datos propios', async () => {
+      const urls = abrir('cliente');
+      expect(await screen.findByRole('heading', { name: 'Mi membresía' })).toBeInTheDocument();
+      const titulos = [...principal().querySelectorAll('.inicio-cliente-panel .card-titulo')].map((h) => h.textContent);
+      expect(titulos).toEqual(['Mi membresía', 'Acceso facial', 'Mis últimas visitas', 'Mis pagos']);
+      expect(urls).toContain('/api/clientes/me/resumen');
+
+      const membresia = screen.getByRole('heading', { name: 'Mi membresía' }).closest('.card');
+      expect(membresia).toHaveTextContent('Plan Mensual');
+      expect(within(membresia).getByText('Por vencer')).toHaveClass('badge');
+      expect(membresia).toHaveTextContent('Vence en 3 días');
+      expect(within(membresia).getByRole('progressbar')).toHaveClass('barra-advertencia');
+
+      const facial = screen.getByRole('heading', { name: 'Acceso facial' }).closest('.card');
+      expect(within(facial).getByText('Registrado')).toHaveClass('badge');
+      expect(facial.textContent).not.toMatch(/descriptor/i);
+
+      const visitas = within(screen.getByRole('list', { name: 'Mis últimas visitas' })).getAllByRole('listitem');
+      expect(visitas).toHaveLength(2);
+      expect(visitas[1]).toHaveTextContent('Rostro no reconocido');
+
+      const pagos = screen.getByRole('heading', { name: 'Mis pagos' }).closest('.card');
+      expect(within(pagos).getByText('Sin adeudo')).toHaveClass('badge');
+      expect(pagos).toHaveTextContent('$450.00');
+    });
+
+    it('barra verde con más de 5 días y roja cuando ya venció', async () => {
+      abrir('cliente', {
+        resumenCliente: { ...RESUMEN_CLIENTE, membresia: { ...RESUMEN_CLIENTE.membresia, dias_restantes: 20, por_vencer: false } },
+      });
+      expect(await screen.findByRole('progressbar')).toHaveClass('barra-exito');
+      expect(screen.getByText('Vence en 20 días')).toBeInTheDocument();
+    });
+
+    it('membresía vencida: barra roja y "Vencida hace N días"', async () => {
+      abrir('cliente', {
+        resumenCliente: { ...RESUMEN_CLIENTE, membresia: { ...RESUMEN_CLIENTE.membresia, estado: 'vencida', dias_restantes: -2, por_vencer: false } },
+      });
+      expect(await screen.findByRole('progressbar')).toHaveClass('barra-error');
+      expect(screen.getByText('Vencida hace 2 días')).toBeInTheDocument();
+    });
+
+    it('pendiente de pago: aviso amarillo con el monto y sin barra', async () => {
+      abrir('cliente', {
+        resumenCliente: {
+          ...RESUMEN_CLIENTE,
+          membresia: { ...RESUMEN_CLIENTE.membresia, estado: 'pendiente_de_pago', por_vencer: false, adeudo: 450, pago: null },
+          adeudo: { monto: 450, plan: 'Plan Mensual' },
+        },
+      });
+      const membresia = (await screen.findByRole('heading', { name: 'Mi membresía' })).closest('.card');
+      expect(within(membresia).getByText('Pendiente de pago')).toHaveClass('badge');
+      expect(membresia).toHaveTextContent('debes $450.00');
+      expect(within(membresia).queryByRole('progressbar')).not.toBeInTheDocument();
+      const pagos = screen.getByRole('heading', { name: 'Mis pagos' }).closest('.card');
+      expect(pagos).toHaveTextContent('Debes $450.00');
+    });
+
+    it('sin membresía, rostro, visitas ni pagos: estados vacíos claros', async () => {
+      abrir('cliente', { resumenCliente: RESUMEN_CLIENTE_VACIO });
+      expect(await screen.findByText('Aún no tienes una membresía')).toBeInTheDocument();
+      expect(screen.getByText('No registrado')).toBeInTheDocument();
+      expect(screen.getByText('Pide a recepción que registre tu rostro.')).toBeInTheDocument();
+      expect(screen.getByText('Aún no tienes visitas registradas')).toBeInTheDocument();
+      expect(screen.getByText('Aún no tienes pagos registrados')).toBeInTheDocument();
+    });
+
+    it('si falla el resumen de las tarjetas, avisa y conserva "Mi información"', async () => {
+      abrir('cliente', { fallaTarjetas: true });
+      expect(await screen.findByText(/No se pudo cargar tu membresía/)).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Mi información' })).toBeInTheDocument();
     });
   });
 
@@ -304,38 +423,40 @@ describe('Configuración de indicadores', () => {
       'clientes-inactivos',
       'clientes-mes',
       'usuarios-sistema',
+      'accesos-hoy',
+      'membresias-por-vencer',
     ]);
-    expect(indicadoresParaRol('recepcionista').map((i) => i.id)).toEqual(['clientes-activos', 'clientes-hoy']);
-    expect(indicadoresParaRol('entrenador').map((i) => i.id)).toEqual(['clientes-activos', 'clientes-7-dias']);
+    expect(indicadoresParaRol('recepcionista').map((i) => i.id)).toEqual([
+      'clientes-activos',
+      'clientes-hoy',
+      'accesos-hoy',
+      'membresias-por-vencer',
+    ]);
+    expect(indicadoresParaRol('entrenador').map((i) => i.id)).toEqual(['clientes-activos', 'clientes-7-dias', 'clientes-entraron-hoy']);
     expect(indicadoresParaRol('cliente')).toEqual([]);
   });
 
-  it('deja reservados, sin mostrar, los indicadores de Sprint 2', () => {
-    const reservados = INDICADORES.filter((i) => i.disponible === false).map((i) => i.id);
-    expect(reservados).toEqual(['accesos-hoy', 'membresias-por-vencer']);
-    for (const rol of ['administrador', 'recepcionista', 'entrenador', 'cliente']) {
-      const visibles = indicadoresParaRol(rol).map((i) => i.id);
-      expect(visibles).not.toContain('accesos-hoy');
-      expect(visibles).not.toContain('membresias-por-vencer');
-    }
+  it('los indicadores del Sprint 2 ya están disponibles (ninguno queda reservado)', () => {
+    expect(INDICADORES.filter((i) => i.disponible === false)).toEqual([]);
+    expect(indicadoresParaRol('cliente')).toEqual([]);
   });
 
-  it('activar un indicador reservado lo muestra sin más cambios', () => {
-    const activados = INDICADORES.map((i) => (i.id === 'accesos-hoy' ? { ...i, disponible: true } : i));
-    expect(indicadoresParaRol('recepcionista', activados).map((i) => i.id)).toContain('accesos-hoy');
+  it('un indicador con disponible: false no se muestra', () => {
+    const ocultos = INDICADORES.map((i) => (i.id === 'accesos-hoy' ? { ...i, disponible: false } : i));
+    expect(indicadoresParaRol('recepcionista', ocultos).map((i) => i.id)).not.toContain('accesos-hoy');
   });
 });
 
-describe('Tarjetas del cliente reservadas para Sprint 2', () => {
-  it('están declaradas pero ninguna se muestra todavía', () => {
+describe('Tarjetas del cliente del Sprint 2', () => {
+  it('las 4 están disponibles, con componente y en orden', () => {
     expect(TARJETAS_CLIENTE.map((t) => t.titulo)).toEqual([
       'Mi membresía',
       'Acceso facial',
       'Mis últimas visitas',
       'Mis pagos',
     ]);
-    expect(TARJETAS_CLIENTE.every((t) => t.disponible === false && t.componente === null)).toBe(true);
-    expect(tarjetasClienteVisibles()).toEqual([]);
+    expect(TARJETAS_CLIENTE.every((t) => t.disponible === true && typeof t.componente === 'function')).toBe(true);
+    expect(tarjetasClienteVisibles().map((t) => t.id)).toEqual(['mi-membresia', 'acceso-facial', 'mis-visitas', 'mis-pagos']);
   });
 
   it('una tarjeta se muestra solo si está disponible y tiene componente', () => {

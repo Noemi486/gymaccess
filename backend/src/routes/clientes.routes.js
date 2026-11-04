@@ -10,6 +10,7 @@ import {
   clienteListarQueryEsquema,
 } from '../validators/cliente.validator.js';
 import { idParamEsquema } from '../validators/comunes.js';
+import { obtener as miResumen } from '../controllers/miResumen.controller.js';
 
 const router = Router();
 
@@ -18,6 +19,8 @@ router.use(autenticar);
 // Información propia: solo el rol cliente (FR-020). No recibe ningún id: el servicio usa el
 // id_cliente de la sesión. IMPORTANTE: va ANTES de GET /:id para que "me" no se lea como un id.
 router.get('/me', autorizar('cliente'), propio);
+// Resumen propio del Inicio del cliente (Sprint 2, US9): membresía, rostro (sin biometría), visitas y pagos.
+router.get('/me/resumen', autorizar('cliente'), miResumen);
 
 // Consultar: administrador, recepcionista y entrenador (FR-019). El entrenador recibe solo la
 // información básica (lo resuelve el servicio). El rol cliente recibe 403 aquí.
