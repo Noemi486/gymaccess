@@ -130,8 +130,14 @@ describe('API de resumen del inicio', () => {
           listas: [activos.cuerpo.total, inactivos.cuerpo.total, usuarios.cuerpo.total],
         };
       };
-      const { resumen, listas } = await leerEstable(tokenAdmin, leer);
-      assert.deepEqual(resumen, listas);
+      // Otras pruebas crean clientes y usuarios al mismo tiempo: se repite la lectura hasta que el resumen y las
+      // listas se tomen en el mismo instante (si nunca coinciden, la aserción muestra la última diferencia).
+      let lectura = await leerEstable(tokenAdmin, leer);
+      for (let intento = 0; intento < 20 && JSON.stringify(lectura.resumen) !== JSON.stringify(lectura.listas); intento += 1) {
+        await new Promise((resolver) => setTimeout(resolver, 100));
+        lectura = await leer(tokenAdmin);
+      }
+      assert.deepEqual(lectura.resumen, lectura.listas);
     });
 
     it('los últimos 5 clientes vienen del más reciente al más antiguo, con todos los datos', async () => {
