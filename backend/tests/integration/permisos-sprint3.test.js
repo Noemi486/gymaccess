@@ -95,7 +95,9 @@ describe('Permisos del Sprint 3', () => {
           assert.equal(r.cuerpo?.data, undefined, etiqueta);
         }
         sinBiometria(r.cuerpo);
-        assert.ok(!JSON.stringify(r.cuerpo ?? null).includes('"password"'), `${etiqueta}: sin contraseñas`);
+        // Ninguna respuesta devuelve una contraseña como dato ("password": …). Un error de validación sí puede
+        // NOMBRAR el campo ({ "field": "password" }): eso no expone nada.
+        assert.ok(!/"password"\s*:/.test(JSON.stringify(r.cuerpo ?? null)), `${etiqueta}: sin contraseñas`);
       }
     }
   });
