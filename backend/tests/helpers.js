@@ -180,6 +180,7 @@ export function sinBiometria(cuerpo) {
 export async function limpiarDatosDePrueba({ usuarios = [], clientes = [], tipos = [] } = {}) {
   for (const id of usuarios) await desactivarUsuarioDePrueba(id);
   for (const id of clientes) {
+    await cerrarEntrenamientoDePrueba(id);
     await pool.execute("UPDATE rostros SET estado = 'inactivo' WHERE id_cliente = ?", [id]);
     await pool.execute("UPDATE membresias SET estado = 'cancelada' WHERE id_cliente = ?", [id]);
     await pool.execute("UPDATE clientes SET estado = 'inactivo' WHERE id_cliente = ? AND correo LIKE 'test+%'", [id]);
@@ -189,3 +190,46 @@ export async function limpiarDatosDePrueba({ usuarios = [], clientes = [], tipos
   }
 }
 
+
+// ---------------------------------------------------------------------------------------------
+// Ayudantes del Sprint 3 (entrenadores, asignaciones y entrenamiento). Mismo criterio: nada se borra.
+// ---------------------------------------------------------------------------------------------
+
+// Cierra la asignación activa y archiva la rutina activa de un cliente de prueba, para que no estorben
+// a otras pruebas. Si la base de pruebas aún no tiene las tablas del Sprint 3, no hace nada.
+async function cerrarEntrenamientoDePrueba(idCliente) {
+  try {
+    await pool.execute(
+      "UPDATE asignaciones_entrenador SET estado = 'finalizada', fecha_fin = NOW() WHERE id_cliente = ? AND estado = 'activa'",
+      [idCliente],
+    );
+    await pool.execute(
+      "UPDATE rutinas SET estado = 'archivada', fecha_archivo = NOW() WHERE id_cliente = ? AND estado = 'activa'",
+      [idCliente],
+    );
+  } catch (error) {
+    if (error.code !== 'ER_NO_SUCH_TABLE') throw error;
+  }
+}
+
+// Cuenta con rol entrenador y (si `ficha`) su ficha. Devuelve { id_usuario, correo, password, rol, token }.
+export async function crearEntrenadorDePrueba({ nombre = 'Entrenador de prueba', estado = 'activo', ficha = true, especialidad = 'Funcional' } = {}) {
+  const cuenta = await crearUsuarioDePrueba({ rol: 'entrenador', nombre, estado });
+  if (ficha) {
+    await pool.execute('INSERT INTO entrenadores (id_usuario, telefono, especialidad) VALUES (?, ?, ?)', [cuenta.id_usuario, '5550001111', especialidad]);
+  }
+  return { ...cuenta, token: crearToken(cuenta.id_usuario) };
+}
+
+// Asignación activa directa en la base (cierra la anterior si existe). Devuelve el id de la asignación.
+export async function asignarEntrenadorDePrueba(idCliente, idEntrenador, idUsuario = null) {
+  await pool.execute(
+    "UPDATE asignaciones_entrenador SET estado = 'finalizada', fecha_fin = NOW() WHERE id_cliente = ? AND estado = 'activa'",
+    [idCliente],
+  );
+  const [r] = await pool.execute(
+    'INSERT INTO asignaciones_entrenador (id_cliente, id_entrenador, id_usuario) VALUES (?, ?, ?)',
+    [idCliente, idEntrenador, idUsuario],
+  );
+  return r.insertId;
+}
