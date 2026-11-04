@@ -206,7 +206,7 @@ describe('GET /pagos y GET /adeudos', () => {
     });
 
     it('busca por cliente y estado vacío cuando no hay coincidencias', async () => {
-      const ana2 = await listarAdeudos(`q=${marca}Alfa`);
+      const ana2 = await api('GET', `/adeudos?q=${marca}Alfa`, admin.token);
       assert.deepEqual(ana2.cuerpo.data.map((a) => a.id_membresia), [membresias.anaPendiente]);
       const nadie = await api('GET', `/adeudos?q=${marca}NoExiste`, admin.token);
       assert.deepEqual(nadie.cuerpo.data, []);

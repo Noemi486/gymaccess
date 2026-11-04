@@ -139,8 +139,11 @@ describe('Pagos y Adeudos', () => {
     it('avisa del rango invertido sin pedir datos', async () => {
       const pedidas = abrir('/pagos', 'administrador');
       await screen.findByText('Min Cabrera');
-      const antes = pedidas.length;
+      // Solo "Desde" es un filtro válido y sí pide datos; al poner un "Hasta" anterior ya no se pide nada.
+      const inicial = pedidas.length;
       fireEvent.change(screen.getByLabelText('Desde'), { target: { value: '2026-10-31' } });
+      await waitFor(() => expect(pedidas.length).toBe(inicial + 1));
+      const antes = pedidas.length;
       fireEvent.change(screen.getByLabelText('Hasta'), { target: { value: '2026-10-01' } });
       expect(await screen.findByText('La fecha final no puede ser anterior a la inicial.')).toBeInTheDocument();
       expect(pedidas.length).toBe(antes);
