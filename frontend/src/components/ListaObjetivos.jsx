@@ -40,7 +40,7 @@ function FormularioObjetivo({ inicial = VACIO, onGuardar, onCancelar, textoBoton
   const errorDe = (campo) => error?.mensajeDeCampo(campo);
   const general = error && !['descripcion', 'meta', 'fecha_limite'].some((c) => errorDe(c));
   return (
-    <form className="formulario-en-linea" onSubmit={alEnviar} noValidate aria-label="Objetivo">
+    <form className="formulario-en-linea" onSubmit={alEnviar} noValidate aria-label="Formulario de objetivo">
       {general && (
         <div className="mensaje mensaje-error" role="alert">
           {error.message}

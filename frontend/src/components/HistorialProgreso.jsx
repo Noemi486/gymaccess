@@ -58,7 +58,7 @@ function FormularioAvance({ inicial, onGuardar, onCancelar, textoBoton }) {
   const errorDe = (campo) => error?.mensajeDeCampo(campo);
   const general = error && !['fecha', 'peso_kg', 'grasa_pct', 'cintura_cm', 'comentario'].some((c) => errorDe(c));
   return (
-    <form className="formulario-en-linea formulario-avance" onSubmit={alEnviar} noValidate aria-label="Avance">
+    <form className="formulario-en-linea formulario-avance" onSubmit={alEnviar} noValidate aria-label="Formulario de avance">
       {general && (
         <div className="mensaje mensaje-error" role="alert">
           {error.message}
