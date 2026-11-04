@@ -29,6 +29,14 @@ export const SECCIONES = [
     roles: ['cliente'],
   },
   {
+    id: 'mi-entrenamiento',
+    etiqueta: 'Mi entrenamiento',
+    ruta: '/mi-entrenamiento',
+    icono: Dumbbell,
+    bloque: 'general',
+    roles: ['cliente'],
+  },
+  {
     id: 'dashboard',
     etiqueta: 'Dashboard',
     ruta: '/dashboard',

@@ -20,7 +20,7 @@ const ESPERADO = {
     'Membresías y pagos': ['Tipos de membresía', 'Pagos', 'Adeudos'],
   },
   entrenador: { General: ['Inicio'], Operación: ['Clientes', 'Mis clientes', 'Accesos'] },
-  cliente: { General: ['Inicio', 'Mi información'] },
+  cliente: { General: ['Inicio', 'Mi información', 'Mi entrenamiento'] },
 };
 
 function comoObjeto(grupos) {

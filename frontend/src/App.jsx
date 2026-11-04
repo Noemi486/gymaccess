@@ -24,6 +24,7 @@ import EntrenadorForm from './pages/EntrenadorForm.jsx';
 import EntrenadorDetalle from './pages/EntrenadorDetalle.jsx';
 import MisClientes from './pages/MisClientes.jsx';
 import EntrenamientoCliente from './pages/EntrenamientoCliente.jsx';
+import MiEntrenamiento from './pages/MiEntrenamiento.jsx';
 
 const PERSONAL = ['administrador', 'recepcionista', 'entrenador'];
 const ESCRITURA_CLIENTES = ['administrador', 'recepcionista'];
@@ -218,6 +219,14 @@ function Rutas() {
           element={
             <Con roles={['administrador']}>
               <EntrenamientoCliente />
+            </Con>
+          }
+        />
+        <Route
+          path="/mi-entrenamiento"
+          element={
+            <Con roles={['cliente']}>
+              <MiEntrenamiento />
             </Con>
           }
         />

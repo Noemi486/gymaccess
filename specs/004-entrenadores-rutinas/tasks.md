@@ -38,9 +38,9 @@
 
 ## Phase 6: US5 Mi entrenamiento (P2)
 
-- [ ] T018 [P] [US5] `tests/integration/mi-entrenamiento.test.js`: lo propio, sin contacto del entrenador, estados vacíos, solo rol cliente
-- [ ] T019 [US5] `services/miEntrenamiento.service.js`, ruta `GET /clientes/me/entrenamiento`
-- [ ] T020 [P] [US5] Frontend: menú "Mi entrenamiento" y página; pruebas
+- [X] T018 [P] [US5] `tests/integration/mi-entrenamiento.test.js`: lo propio, sin contacto del entrenador, estados vacíos, solo rol cliente
+- [X] T019 [US5] `services/miEntrenamiento.service.js`, ruta `GET /clientes/me/entrenamiento`
+- [X] T020 [P] [US5] Frontend: menú "Mi entrenamiento" y página; pruebas
 
 ## Phase 7: US6 Dashboard de entrenamiento (P2)
 
