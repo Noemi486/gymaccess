@@ -51,7 +51,7 @@ Debe decir `Respaldo creado: ...gymaccess_2026-11-03_2300.sql (... bytes).` y en
 La tarea ejecuta `backend\scripts\respaldo.cmd`, que entra a `backend` y corre `npm run respaldo`. En PowerShell, **una línea a la vez** (ajusta la ruta si tu proyecto está en otro lugar):
 
 ```powershell
-$accion = New-ScheduledTaskAction -Execute 'cmd.exe' -Argument '/c "C:\Gestion de Proyectos\gym-system\backend\scripts\respaldo.cmd"'
+$accion = New-ScheduledTaskAction -Execute '"C:\Gestion de Proyectos\gym-system\backend\scripts\respaldo.cmd"' -WorkingDirectory 'C:\Gestion de Proyectos\gym-system\backend'
 $hora = New-ScheduledTaskTrigger -Daily -At 11:00PM
 $config = New-ScheduledTaskSettingsSet -StartWhenAvailable
 Register-ScheduledTask -TaskName 'GymAccess - Respaldo diario' -Action $accion -Trigger $hora -Settings $config
@@ -65,7 +65,7 @@ Para probar la tarea sin esperar:
 Start-ScheduledTask -TaskName 'GymAccess - Respaldo diario'
 ```
 
-y revisa `respaldos.log` en la carpeta de respaldo. También la ves en el **Programador de tareas** → *Biblioteca del Programador de tareas*.
+y revisa `respaldos.log` en la carpeta de respaldo. Si la tarea no deja ninguna línea nueva, revisa `backend\respaldo-tarea.log`: ahí queda todo lo que imprimió `npm run respaldo` al ejecutarse desde la tarea. También la ves en el **Programador de tareas** → *Biblioteca del Programador de tareas*.
 
 ## 5. Restaurar un respaldo (en una base de prueba)
 
