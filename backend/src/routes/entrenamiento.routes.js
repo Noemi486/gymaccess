@@ -1,10 +1,24 @@
 import { Router } from 'express';
-import { crearRutina, obtener, obtenerRutina } from '../controllers/entrenamiento.controller.js';
+import {
+  actualizarObjetivo,
+  corregirProgreso,
+  crearObjetivo,
+  crearProgreso,
+  crearRutina,
+  obtener,
+  obtenerRutina,
+} from '../controllers/entrenamiento.controller.js';
 import { autenticar } from '../middlewares/autenticar.js';
 import { autorizar } from '../middlewares/autorizar.js';
 import { validar } from '../middlewares/validar.js';
 import { idParamEsquema } from '../validators/comunes.js';
-import { rutinaCrearEsquema } from '../validators/entrenamiento.validator.js';
+import {
+  objetivoActualizarEsquema,
+  objetivoCrearEsquema,
+  progresoActualizarEsquema,
+  progresoCrearEsquema,
+  rutinaCrearEsquema,
+} from '../validators/entrenamiento.validator.js';
 
 // Entrenamiento (spec 004, US3 y US4). Se monta en "/". El servicio revisa además que el entrenador
 // tenga asignado al cliente (FR-017) y que el administrador solo consulte (FR-018).
@@ -16,5 +30,9 @@ const registra = autorizar('entrenador');
 router.get('/clientes/:id/entrenamiento', autenticar, consultan, id, obtener);
 router.post('/clientes/:id/rutinas', autenticar, registra, id, validar(rutinaCrearEsquema), crearRutina);
 router.get('/rutinas/:id', autenticar, consultan, id, obtenerRutina);
+router.post('/clientes/:id/objetivos', autenticar, registra, id, validar(objetivoCrearEsquema), crearObjetivo);
+router.patch('/objetivos/:id', autenticar, registra, id, validar(objetivoActualizarEsquema), actualizarObjetivo);
+router.post('/clientes/:id/progresos', autenticar, registra, id, validar(progresoCrearEsquema), crearProgreso);
+router.patch('/progresos/:id', autenticar, registra, id, validar(progresoActualizarEsquema), corregirProgreso);
 
 export default router;

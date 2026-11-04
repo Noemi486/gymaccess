@@ -177,3 +177,32 @@ export function rutinaResumen(fila) {
     ejercicios: Number(fila.ejercicios),
   };
 }
+
+export function objetivoPublico(f) {
+  return {
+    id_objetivo: f.id_objetivo,
+    descripcion: f.descripcion,
+    meta: f.meta ?? null,
+    fecha_limite: f.fecha_limite ?? null,
+    estado: f.estado,
+    fecha_creacion: f.fecha_creacion,
+    fecha_cierre: f.fecha_cierre ?? null,
+    entrenador: f.entrenador_nombre,
+  };
+}
+
+// `actor` decide si puede corregirlo: solo su autor, el mismo día (FR-014).
+export function progresoPublico(f, actor) {
+  return {
+    id_progreso: f.id_progreso,
+    fecha: f.fecha,
+    peso_kg: numeroONulo(f.peso_kg),
+    grasa_pct: numeroONulo(f.grasa_pct),
+    cintura_cm: numeroONulo(f.cintura_cm),
+    comentario: f.comentario ?? null,
+    entrenador: f.entrenador_nombre,
+    fecha_registro: f.fecha_registro,
+    corregido: f.fecha_actualizacion != null,
+    puede_corregir: actor?.rol === 'entrenador' && actor.id_usuario === f.id_entrenador && Boolean(Number(f.del_dia)),
+  };
+}

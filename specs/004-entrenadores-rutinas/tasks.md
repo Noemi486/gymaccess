@@ -32,9 +32,9 @@
 
 ## Phase 5: US4 Objetivos y progreso (P1)
 
-- [ ] T015 [P] [US4] `tests/integration/objetivos-progresos.test.js`: objetivos (crear, editar en curso, cumplir, cancelar, no editar cerrado), avances (rangos, fecha futura, al menos un dato, corrección solo autor y mismo día), orden y diferencias, permisos, auditoría sin medidas
-- [ ] T016 [US4] `models/objetivo.model.js`, `models/progreso.model.js`, ampliar `entrenamiento.service.js`, rutas
-- [ ] T017 [P] [US4] Frontend: `ListaObjetivos` y `HistorialProgreso` en `EntrenamientoCliente`; pruebas
+- [X] T015 [P] [US4] `tests/integration/objetivos-progresos.test.js`: objetivos (crear, editar en curso, cumplir, cancelar, no editar cerrado), avances (rangos, fecha futura, al menos un dato, corrección solo autor y mismo día), orden y diferencias, permisos, auditoría sin medidas
+- [X] T016 [US4] `models/objetivo.model.js`, `models/progreso.model.js`, ampliar `entrenamiento.service.js`, rutas
+- [X] T017 [P] [US4] Frontend: `ListaObjetivos` y `HistorialProgreso` en `EntrenamientoCliente`; pruebas
 
 ## Phase 6: US5 Mi entrenamiento (P2)
 

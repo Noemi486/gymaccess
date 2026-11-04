@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { ErrorApi, solicitar } from '../api/cliente.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import EditorRutina from '../components/EditorRutina.jsx';
+import HistorialProgreso from '../components/HistorialProgreso.jsx';
+import ListaObjetivos from '../components/ListaObjetivos.jsx';
 import VistaRutina from '../components/VistaRutina.jsx';
 import Badge from '../components/ui/Badge.jsx';
 import Button from '../components/ui/Button.jsx';
@@ -12,6 +14,8 @@ import PageHeader from '../components/ui/PageHeader.jsx';
 import Spinner from '../components/ui/Spinner.jsx';
 import { useToast } from '../components/ui/Toast.jsx';
 import { formatearFechaCorta } from '../utils/formato.js';
+
+const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
 
 // Entrenamiento de un cliente (spec 004, US3 y US4). El entrenador asignado consulta y registra
 // (/mis-clientes/:id); el administrador solo consulta (/clientes/:id/entrenamiento). El servidor decide.
@@ -67,7 +71,11 @@ export default function EntrenamientoCliente() {
     );
   }
 
-  const { cliente, entrenador, rutina_activa: activa, rutinas, puede_editar: puedeEditar } = datos;
+  const { cliente, entrenador, rutina_activa: activa, rutinas, objetivos = [], progresos = [], puede_editar: puedeEditar } = datos;
+  const alCambiar = (texto) => {
+    mostrar({ tipo: 'exito', texto });
+    cargar();
+  };
   const archivadas = rutinas.filter((r) => r.estado === 'archivada');
 
   return (
@@ -111,6 +119,14 @@ export default function EntrenamientoCliente() {
         )}
       </Card>
 
+      <Card titulo="Objetivos">
+        <ListaObjetivos idCliente={cliente.id_cliente} objetivos={objetivos} puedeEditar={puedeEditar} onCambio={alCambiar} />
+      </Card>
+
+      <Card titulo="Progreso">
+        <HistorialProgreso idCliente={cliente.id_cliente} progresos={progresos} puedeEditar={puedeEditar} onCambio={alCambiar} />
+      </Card>
+
       <Card titulo="Historial de rutinas">
         {archivadas.length === 0 ? (
           <p className="texto-suave">Sin versiones anteriores.</p>
@@ -120,7 +136,7 @@ export default function EntrenamientoCliente() {
               <li key={r.id_rutina}>
                 <strong>{r.nombre}</strong>
                 <span className="texto-suave">
-                  {formatearFechaCorta(r.fecha_creacion)} – {formatearFechaCorta(r.fecha_archivo)} · {r.dias} días, {r.ejercicios} ejercicios · {r.entrenador}
+                  {formatearFechaCorta(r.fecha_creacion)} – {formatearFechaCorta(r.fecha_archivo)} · {plural(r.dias, 'día', 'días')}, {plural(r.ejercicios, 'ejercicio', 'ejercicios')} · {r.entrenador}
                 </span>
                 <Badge variante="neutral">Archivada</Badge>
                 <Button variante="fantasma" onClick={() => verRutina(r.id_rutina)} aria-expanded={abierta?.id_rutina === r.id_rutina}>

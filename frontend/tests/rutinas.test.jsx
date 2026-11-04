@@ -122,7 +122,7 @@ describe('Rutinas', () => {
       datos: base({ rutina_activa: RUTINA, rutinas: [{ id_rutina: 30, nombre: 'Fuerza A', estado: 'activa' }, { id_rutina: 29, nombre: 'Inicio', estado: 'archivada', fecha_creacion: ARCHIVADA.fecha_creacion, fecha_archivo: ARCHIVADA.fecha_archivo, entrenador: 'Luis Ramos', dias: 1, ejercicios: 1 }] }),
     });
     const historial = await tarjeta('Historial de rutinas');
-    expect(historial.getByText(/1 días, 1 ejercicios/)).toBeInTheDocument();
+    expect(historial.getByText(/1 día, 1 ejercicio ·/)).toBeInTheDocument();
     fireEvent.click(historial.getByRole('button', { name: 'Ver' }));
     expect(await historial.findByText('Caminata')).toBeInTheDocument();
     expect(historial.getByRole('button', { name: 'Ocultar' })).toHaveAttribute('aria-expanded', 'true');
