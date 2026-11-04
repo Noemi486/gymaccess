@@ -22,6 +22,18 @@ export function crearRostrosService({
     await auditoria.registrarExito(conexion, { id_usuario: actor.id_usuario, accion, modulo: MODULOS.ROSTROS, descripcion });
   }
 
+  // Evento de error (fuera de la transacción) cuando una regla de negocio rechaza la operación (409).
+  async function conFallo(actor, accion, descripcion, operacion) {
+    try {
+      return await operacion();
+    } catch (error) {
+      if (error.status === 409) {
+        await auditoria.registrarError({ id_usuario: actor.id_usuario, accion, modulo: MODULOS.ROSTROS, descripcion });
+      }
+      throw error;
+    }
+  }
+
   // GET /clientes/:id/rostro
   async function consultar(idCliente) {
     if (!(await clienteModelo.buscarPorId(idCliente))) throw errorNoEncontrado('El cliente no existe.');
@@ -36,7 +48,7 @@ export function crearRostrosService({
 
   // POST /clientes/:id/rostro: el registro nuevo deja inactivo al anterior (a lo más un rostro activo).
   async function registrar(idCliente, { descriptor }, actor) {
-    return conTransaccion(async (conexion) => {
+    return conFallo(actor, 'registrar', `Registro de rostro rechazado para el cliente ${idCliente}.`, () => conTransaccion(async (conexion) => {
       const cliente = await clienteModelo.buscarPorId(idCliente, conexion, { bloquear: true });
       if (!cliente) throw errorNoEncontrado('El cliente no existe.');
       if (cliente.estado !== 'activo') throw errorConflicto('El cliente está dado de baja: no se le puede registrar el rostro.');
@@ -50,12 +62,13 @@ export function crearRostrosService({
         `Rostro ${id} ${reemplazados > 0 ? 'reemplazado' : 'registrado'} para el cliente ${idCliente}.`,
       );
       return rostroPublico(await modelo.buscarPorId(id, conexion));
-    });
+    }));
   }
 
   // PATCH /rostros/:id/estado (solo administrador). Reactivar deja inactivo el que estuviera activo.
   async function cambiarEstado(idRostro, estado, actor) {
-    return conTransaccion(async (conexion) => {
+    const accion = estado === 'activo' ? 'reactivar' : 'desactivar';
+    return conFallo(actor, accion, `Cambio de estado rechazado para el rostro ${idRostro}.`, () => conTransaccion(async (conexion) => {
       // Lectura fuera de la transacción: no fija la instantánea antes del bloqueo del cliente.
       const previa = await modelo.buscarPorId(idRostro);
       if (!previa) throw errorNoEncontrado('El rostro no existe.');
@@ -77,7 +90,7 @@ export function crearRostrosService({
       }
       const actualizado = await modelo.buscarPorId(idRostro, conexion);
       return { ...rostroPublico(actualizado), id_cliente: actualizado.id_cliente };
-    });
+    }));
   }
 
   // Compara el descriptor recibido con los rostros activos. Devuelve { tipo: 'clara' | 'ninguna' | 'ambigua', id_cliente? }.
