@@ -37,7 +37,8 @@ describe('GET /pagos y GET /adeudos', () => {
   const membresias = {};
 
   const api = (metodo, ruta, token, cuerpo) => solicitar(servidor.url, metodo, ruta, { token, cuerpo });
-  const listarPagos = (consulta = '', token = admin.token) => api('GET', `/pagos?${RANGO}${consulta ? `&${consulta}` : ''}`, token);
+  // Siempre con la marca de esta corrida (q) para no mezclar pagos de otras pruebas ni de corridas anteriores.
+  const listarPagos = (consulta = '', token = admin.token, q = marca) => api('GET', `/pagos?${RANGO}&q=${q}${consulta ? `&${consulta}` : ''}`, token);
   const listarAdeudos = (consulta = '', token = admin.token) => api('GET', `/adeudos?q=${marca}${consulta ? `&${consulta}` : ''}`, token);
 
   // Pago con fecha exacta (inserción directa) para probar los filtros por rango.
@@ -87,6 +88,8 @@ describe('GET /pagos y GET /adeudos', () => {
 
   after(async () => {
     try {
+      // Los pagos de 2001 de esta corrida se retiran (esta base es solo de pruebas), como en accesos-listar.
+      for (const id of Object.values(pagos)) await pool.execute('DELETE FROM pagos WHERE id_pago = ?', [id]);
       await limpiarDatosDePrueba({ usuarios, clientes, tipos });
     } finally {
       await servidor.cerrar();
@@ -123,9 +126,9 @@ describe('GET /pagos y GET /adeudos', () => {
     });
 
     it('filtra por rango de una sola fecha y busca por cliente', async () => {
-      const dia = await api('GET', '/pagos?desde=2001-04-11&hasta=2001-04-11', admin.token);
+      const dia = await api('GET', `/pagos?desde=2001-04-11&hasta=2001-04-11&q=${marca}`, admin.token);
       assert.deepEqual(dia.cuerpo.data.map((p) => p.id_pago), [pagos.b]);
-      const busqueda = await listarPagos(`q=${marca}Gama`);
+      const busqueda = await listarPagos('', admin.token, `${marca}Gama`);
       assert.deepEqual(busqueda.cuerpo.data.map((p) => p.id_pago), [pagos.c]);
     });
 
@@ -145,7 +148,7 @@ describe('GET /pagos y GET /adeudos', () => {
     it('el recepcionista consulta; entrenador 403; sin sesión 401', async () => {
       assert.equal((await listarPagos('', recepcion.token)).status, 200);
       assert.equal((await listarPagos('', entrenador.token)).status, 403);
-      assert.equal((await solicitar(servidor.url, 'GET', `/pagos?${RANGO}`)).status, 401);
+      assert.equal((await solicitar(servidor.url, 'GET', `/pagos?${RANGO}&q=${marca}`)).status, 401);
     });
 
     it('no existen rutas para editar ni eliminar pagos', async () => {
