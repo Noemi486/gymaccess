@@ -25,6 +25,9 @@
 --     DROP DATABASE gymaccess_test;
 -- y volver a ejecutar este script.
 --
+-- Sprint 3: después de este script, ejecutar también migrations/03_esquema_sprint3.sql
+-- sobre gymaccess_test (USE gymaccess_test; y luego SOURCE de ese archivo).
+--
 -- Mantenimiento: si cambia el esquema oficial (nuevo script en migrations/),
 -- hay que reflejar el cambio aquí para que las pruebas usen la misma estructura.
 --
