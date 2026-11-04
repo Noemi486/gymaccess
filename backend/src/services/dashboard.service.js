@@ -31,11 +31,12 @@ export function crearDashboardService({ modelo = dashboardModeloReal, fechaModel
   async function obtener(consulta) {
     const hoy = await fechaModelo.obtenerHoy();
     const periodo = resolverPeriodo(consulta, hoy);
-    const [estado_actual, ingresos, accesos, recientes] = await Promise.all([
+    const [estado_actual, ingresos, accesos, recientes, entrenamiento] = await Promise.all([
       modelo.estadoActual(),
       modelo.ingresos(periodo),
       modelo.accesosPorResultado(periodo),
       modelo.accesosRecientes(periodo),
+      modelo.entrenamiento(periodo),
     ]);
     return {
       periodo,
@@ -46,6 +47,12 @@ export function crearDashboardService({ modelo = dashboardModeloReal, fechaModel
         accesos_rechazados: accesos.rechazados,
       },
       accesos_recientes: recientes.map((fila) => accesoPublico(fila)),
+      // Sprint 3 (FR-021, FR-022): porcentaje = clientes asignados con avance en 30 días / clientes con entrenador.
+      entrenamiento: {
+        ...entrenamiento,
+        porcentaje_con_avance:
+          entrenamiento.clientes_con_entrenador === 0 ? 0 : Math.round((entrenamiento.con_avance_30_dias * 100) / entrenamiento.clientes_con_entrenador),
+      },
     };
   }
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { CalendarClock, DoorOpen, RefreshCw, ShieldAlert, UserCheck, UserX, Users, Wallet } from 'lucide-react';
+import { CalendarClock, ClipboardList, DoorOpen, Dumbbell, RefreshCw, ShieldAlert, Target, TrendingUp, Trophy, UserCheck, UserX, Users, Wallet } from 'lucide-react';
 import { ErrorApi, solicitar } from '../api/cliente.js';
 import Badge from '../components/ui/Badge.jsx';
 import Button from '../components/ui/Button.jsx';
@@ -163,9 +163,48 @@ export default function Dashboard() {
               filas={datos.accesos_recientes.map((a) => ({ ...a, id: a.id_acceso }))}
               vacio={<EmptyState titulo="No hay accesos en este periodo." texto="Cambia el periodo para ver otros días." />}
             />
+
+            {datos.entrenamiento && <SeccionEntrenamiento e={datos.entrenamiento} periodo={textoPeriodo(datos.periodo)} />}
           </>
         )
       )}
     </section>
+  );
+}
+
+// Sprint 3 (spec 004, US6, FR-021 y FR-022): resumen de entrenadores, asignaciones y progreso, sin datos personales.
+const COLUMNAS_CARGA = [
+  { clave: 'nombre', etiqueta: 'Entrenador' },
+  { clave: 'clientes_asignados', etiqueta: 'Clientes asignados' },
+  { clave: 'rutinas_activas', etiqueta: 'Rutinas' },
+  { clave: 'avances_periodo', etiqueta: 'Avances del periodo' },
+];
+
+function SeccionEntrenamiento({ e, periodo }) {
+  return (
+    <>
+      <h2 className="dashboard-titulo">Entrenamiento</h2>
+      <p className="dashboard-nota">Estado actual, salvo "Objetivos cumplidos" y "Avances del periodo" ({periodo}).</p>
+      <div className="inicio-indicadores">
+        <StatCard etiqueta="Entrenadores activos" valor={e.entrenadores_activos} icono={<Dumbbell size={20} aria-hidden="true" />} />
+        <StatCard etiqueta="Clientes con entrenador" valor={e.clientes_con_entrenador} icono={<UserCheck size={20} aria-hidden="true" />} />
+        <StatCard etiqueta="Clientes sin entrenador" valor={e.clientes_sin_entrenador} icono={<UserX size={20} aria-hidden="true" />} />
+        <StatCard etiqueta="Rutinas activas" valor={e.rutinas_activas} icono={<ClipboardList size={20} aria-hidden="true" />} />
+        <StatCard etiqueta="Objetivos en curso" valor={e.objetivos_en_curso} icono={<Target size={20} aria-hidden="true" />} />
+        <StatCard etiqueta="Objetivos cumplidos" valor={e.objetivos_cumplidos_periodo} icono={<Trophy size={20} aria-hidden="true" />} />
+        <StatCard
+          etiqueta="Con avance en 30 días"
+          valor={`${e.con_avance_30_dias} (${e.porcentaje_con_avance} %)`}
+          icono={<TrendingUp size={20} aria-hidden="true" />}
+        />
+      </div>
+      <h3 className="dashboard-titulo">Carga por entrenador</h3>
+      <Table
+        etiquetaTabla="Carga por entrenador"
+        columnas={COLUMNAS_CARGA}
+        filas={e.carga.map((f) => ({ ...f, id: f.id_usuario }))}
+        vacio={<EmptyState titulo="No hay entrenadores activos." texto="Regístralos en la sección Entrenadores." />}
+      />
+    </>
   );
 }

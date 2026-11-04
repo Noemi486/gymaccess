@@ -44,9 +44,9 @@
 
 ## Phase 7: US6 Dashboard de entrenamiento (P2)
 
-- [ ] T021 [P] [US6] `tests/integration/dashboard-entrenamiento.test.js`: cada cifra contra su origen (con `soloEntrenadores` para aislar), periodo solo afecta lo del periodo, 403 a otros roles
-- [ ] T022 [US6] Ampliar `dashboard.model.js` y `dashboard.service.js` con el bloque `entrenamiento`
-- [ ] T023 [P] [US6] Frontend: sección "Entrenamiento" y tabla "Carga por entrenador" en `Dashboard.jsx`; pruebas
+- [X] T021 [P] [US6] `tests/integration/dashboard-entrenamiento.test.js`: cada cifra contra su origen (con `soloEntrenadores` para aislar), periodo solo afecta lo del periodo, 403 a otros roles
+- [X] T022 [US6] Ampliar `dashboard.model.js` y `dashboard.service.js` con el bloque `entrenamiento`
+- [X] T023 [P] [US6] Frontend: sección "Entrenamiento" y tabla "Carga por entrenador" en `Dashboard.jsx`; pruebas
 
 ## Phase 8: US8 Salida (P3)
 

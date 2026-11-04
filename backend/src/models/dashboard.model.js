@@ -78,3 +78,91 @@ export async function accesosRecientes({ desde, hasta }) {
   );
   return filas;
 }
+
+// ---------------------------------------------------------------------------------------------
+// Sprint 3 (spec 004, US6, FR-021 a FR-023): entrenamiento. Todo se calcula en el momento (sin tablas de estadísticas).
+// `soloEntrenadores` limita a esos entrenadores y a sus clientes; lo usan las pruebas para no depender de otros datos.
+// ---------------------------------------------------------------------------------------------
+
+function filtroLista(columna, ids, valores) {
+  if (!ids) return '';
+  if (ids.length === 0) return ' AND 1 = 0';
+  valores.push(...ids);
+  return ` AND ${columna} IN (${ids.map(() => '?').join(', ')})`;
+}
+
+// Asignación activa de un cliente activo (base de "clientes con entrenador").
+const ASIGNADOS = `FROM asignaciones_entrenador a JOIN clientes c ON c.id_cliente = a.id_cliente
+                   WHERE a.estado = 'activa' AND c.estado = 'activo'`;
+
+export async function entrenamiento({ desde, hasta, soloEntrenadores } = {}) {
+  const v1 = [];
+  const fEnt = filtroLista('u.id_usuario', soloEntrenadores, v1);
+  const [[entrenadores]] = await pool.execute(
+    `SELECT COUNT(*) AS n FROM usuarios u WHERE u.rol = 'entrenador' AND u.estado = 'activo'${fEnt}`,
+    v1,
+  );
+
+  const v2 = [];
+  const fAsig = filtroLista('a.id_entrenador', soloEntrenadores, v2);
+  const v3 = [desde, hasta];
+  const fAsig3 = filtroLista('a.id_entrenador', soloEntrenadores, v3);
+  const [[r]] = await pool.execute(
+    `SELECT
+       (SELECT COUNT(*) ${ASIGNADOS}${fAsig}) AS con_entrenador,
+       (SELECT COUNT(*) FROM rutinas r JOIN asignaciones_entrenador a ON a.id_cliente = r.id_cliente AND a.estado = 'activa'
+          JOIN clientes c ON c.id_cliente = r.id_cliente
+         WHERE r.estado = 'activa' AND c.estado = 'activo'${fAsig}) AS rutinas_activas,
+       (SELECT COUNT(*) FROM objetivos_entrenamiento o JOIN asignaciones_entrenador a ON a.id_cliente = o.id_cliente AND a.estado = 'activa'
+          JOIN clientes c ON c.id_cliente = o.id_cliente
+         WHERE o.estado = 'en_curso' AND c.estado = 'activo'${fAsig}) AS objetivos_en_curso,
+       (SELECT COUNT(*) ${ASIGNADOS}${fAsig}
+           AND EXISTS (SELECT 1 FROM progresos_clientes p WHERE p.id_cliente = a.id_cliente
+                        AND p.fecha >= DATE_SUB(CURDATE(), INTERVAL 29 DAY))) AS con_avance_30_dias`,
+    [...v2, ...v2, ...v2, ...v2],
+  );
+  const [[cumplidos]] = await pool.execute(
+    `SELECT COUNT(*) AS n FROM objetivos_entrenamiento o JOIN asignaciones_entrenador a ON a.id_cliente = o.id_cliente AND a.estado = 'activa'
+      WHERE o.estado = 'cumplido' AND o.fecha_cierre >= ? AND o.fecha_cierre < DATE_ADD(?, INTERVAL 1 DAY)${fAsig3}`,
+    [v3[0] + ' 00:00:00', ...v3.slice(1)],
+  );
+
+  // Clientes activos sin asignación activa (no depende de soloEntrenadores: es del gimnasio completo).
+  const [[sin]] = await pool.execute(
+    `SELECT COUNT(*) AS n FROM clientes c WHERE c.estado = 'activo'
+       AND NOT EXISTS (SELECT 1 FROM asignaciones_entrenador a WHERE a.id_cliente = c.id_cliente AND a.estado = 'activa')`,
+  );
+
+  const v4 = [desde, hasta];
+  const fCarga = filtroLista('u.id_usuario', soloEntrenadores, v4);
+  const [carga] = await pool.execute(
+    `SELECT u.id_usuario, u.nombre,
+            (SELECT COUNT(*) ${ASIGNADOS} AND a.id_entrenador = u.id_usuario) AS clientes_asignados,
+            (SELECT COUNT(*) FROM rutinas r JOIN asignaciones_entrenador a ON a.id_cliente = r.id_cliente AND a.estado = 'activa'
+               JOIN clientes c ON c.id_cliente = r.id_cliente
+              WHERE r.estado = 'activa' AND c.estado = 'activo' AND a.id_entrenador = u.id_usuario) AS rutinas_activas,
+            (SELECT COUNT(*) FROM progresos_clientes p WHERE p.id_entrenador = u.id_usuario
+                AND p.fecha_registro >= ? AND p.fecha_registro < DATE_ADD(?, INTERVAL 1 DAY)) AS avances_periodo
+       FROM usuarios u
+      WHERE u.rol = 'entrenador' AND u.estado = 'activo'${fCarga}
+      ORDER BY clientes_asignados DESC, u.nombre, u.id_usuario`,
+    [v4[0] + ' 00:00:00', ...v4.slice(1)],
+  );
+
+  return {
+    entrenadores_activos: Number(entrenadores.n),
+    clientes_con_entrenador: Number(r.con_entrenador),
+    clientes_sin_entrenador: Number(sin.n),
+    rutinas_activas: Number(r.rutinas_activas),
+    objetivos_en_curso: Number(r.objetivos_en_curso),
+    objetivos_cumplidos_periodo: Number(cumplidos.n),
+    con_avance_30_dias: Number(r.con_avance_30_dias),
+    carga: carga.map((f) => ({
+      id_usuario: f.id_usuario,
+      nombre: f.nombre,
+      clientes_asignados: Number(f.clientes_asignados),
+      rutinas_activas: Number(f.rutinas_activas),
+      avances_periodo: Number(f.avances_periodo),
+    })),
+  };
+}

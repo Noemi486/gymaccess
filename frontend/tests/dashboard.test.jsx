@@ -27,6 +27,20 @@ function datosDe(url) {
     periodo,
     estado_actual: ESTADO,
     periodo_datos: { ingresos: tipo === 'hoy' ? 5400 : 12500.5, accesos_autorizados: 212, accesos_rechazados: 9 },
+    entrenamiento: {
+      entrenadores_activos: 3,
+      clientes_con_entrenador: 18,
+      clientes_sin_entrenador: 22,
+      rutinas_activas: 15,
+      objetivos_en_curso: 11,
+      objetivos_cumplidos_periodo: tipo === 'hoy' ? 1 : 4,
+      con_avance_30_dias: 9,
+      porcentaje_con_avance: 50,
+      carga: [
+        { id_usuario: 11, nombre: 'Luis Ramos', clientes_asignados: 12, rutinas_activas: 10, avances_periodo: 3 },
+        { id_usuario: 12, nombre: 'Eva Paz', clientes_asignados: 6, rutinas_activas: 5, avances_periodo: 0 },
+      ],
+    },
     accesos_recientes:
       tipo === 'mes'
         ? []
@@ -136,6 +150,25 @@ describe('Dashboard', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Aplicar' }));
     expect(await screen.findByText('El rango no puede incluir fechas futuras.')).toBeInTheDocument();
     expect(tarjeta('Clientes activos')).toHaveTextContent('40');
+  });
+
+  it('sección Entrenamiento (Sprint 3): 7 cifras y carga por entrenador; el periodo cambia los cumplidos', async () => {
+    abrir('administrador');
+    await screen.findByText('Hoy: 4 nov 2026');
+    expect(screen.getByRole('heading', { name: 'Entrenamiento' })).toBeInTheDocument();
+    expect(tarjeta('Entrenadores activos')).toHaveTextContent('3');
+    expect(tarjeta('Clientes con entrenador')).toHaveTextContent('18');
+    expect(tarjeta('Clientes sin entrenador')).toHaveTextContent('22');
+    expect(tarjeta('Rutinas activas')).toHaveTextContent('15');
+    expect(tarjeta('Objetivos en curso')).toHaveTextContent('11');
+    expect(tarjeta('Objetivos cumplidos')).toHaveTextContent('1');
+    expect(tarjeta('Con avance en 30 días')).toHaveTextContent('9 (50 %)');
+    const filas = within(screen.getByRole('table', { name: 'Carga por entrenador' })).getAllByRole('row').slice(1);
+    expect(filas[0]).toHaveTextContent('Luis Ramos');
+    expect(filas[0]).toHaveTextContent('12');
+    fireEvent.click(screen.getByRole('button', { name: 'Mes en curso' }));
+    await screen.findByText('Mes en curso: del 1 nov 2026 al 4 nov 2026');
+    expect(tarjeta('Objetivos cumplidos')).toHaveTextContent('4');
   });
 
   it('"Actualizar" vuelve a pedir los datos', async () => {
