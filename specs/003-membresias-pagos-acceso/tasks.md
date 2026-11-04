@@ -304,6 +304,46 @@ description: "Lista de tareas de la funcionalidad 003: membresías, pagos, recon
 
 ---
 
+## Phase 15: User Story 12 - Avisos de membresías por vencer y vencidas (Priority: P2)
+
+**Goal**: campana con avisos en el encabezado para administrador, recepcionista y cliente (FR-054 a FR-058).
+
+**Independent Test**: clientes con membresías que vencen en 0, 3, 5 y 6 días y que vencieron hace 1, 7 y 8 días; la campana muestra exactamente los esperados por rol.
+
+### Tests for User Story 12
+
+- [ ] T090 [P] [US12] Crear `backend/tests/integration/avisos.test.js` (`gymaccess_test`): aparecen vence en 0, 3 y 5 días y venció hace 1 y 7; no aparecen vence en 6, venció hace 8, suspendida, cancelada, pendiente de pago, cliente inactivo ni la que tiene renovación pagada (sí la que tiene renovación sin pagar); `total` = largo de la lista; orden vencidas primero; el cliente ve solo el suyo aunque mande `id_cliente`; entrenador 403; sin sesión 401; responde en menos de 2 s; sin biometría
+- [ ] T091 [P] [US12] Crear `frontend/tests/avisos.test.jsx`: campana con número para administrador, recepcionista y cliente; el entrenador no la ve; textos "Vence en N días", "Vence hoy", "Venció hace N días" con insignia; enlace al detalle del cliente para el personal; "No hay avisos" sin número; error de carga sin romper el encabezado
+
+### Implementation for User Story 12
+
+- [ ] T092 [US12] `backend/src/models/aviso.model.js` con la consulta derivada del plan (parametrizada, filtro opcional por cliente)
+- [ ] T093 [US12] `backend/src/services/avisos.service.js`, `controllers/avisos.controller.js`, `routes/avisos.routes.js` y montaje en `routes/index.js`
+- [ ] T094 [US12] `frontend/src/utils/formato.js` (`textoAviso`), `components/CampanaAvisos.jsx`, integración en `components/ui/Topbar.jsx` y estilos en `styles/estilos.css` (360 a 1920 px, foco visible)
+- [ ] T095 [US12] Ejecutar `npm test` en `backend/` y `frontend/`; detenerse para que el equipo pruebe
+
+---
+
+## Phase 16: User Story 13 - Base de datos local y respaldo automático diario (Priority: P3)
+
+**Goal**: respaldo diario automático, rotado y sin secretos (FR-059 a FR-066).
+
+**Independent Test**: `npm run respaldo` 8 veces con una carpeta de prueba deja 7 archivos; un fallo no borra nada.
+
+- [ ] T096 [P] [US13] Crear `backend/tests/unit/respaldo.test.js` con dependencias simuladas: nombre `gymaccess_AAAA-MM-DD_HHMM.sql`; la contraseña va en `MYSQL_PWD` y no en los argumentos; rotación a 7 solo tras éxito; un fallo elimina el `.parcial`, no borra respaldos y anota el error; la bitácora no contiene la contraseña; variables faltantes dan un mensaje claro
+- [ ] T097 [US13] `backend/src/utils/respaldo.js` (lógica) y `backend/scripts/respaldo.js` (entrada); script `respaldo` en `backend/package.json`; variables nuevas sin valor en `backend/.env.example`; `.gitignore`
+- [ ] T098 [P] [US13] `database/scripts/crear-usuario-respaldo.sql` (solo lectura sobre `gymaccess`, sin DROP)
+- [ ] T099 [P] [US13] `docs/respaldo.md`: crear usuario, configurar `.env`, programar la tarea a las 23:00 en Windows, verificar y restaurar en una base de prueba
+- [ ] T100 [US13] Comprobación manual del equipo: crear el usuario, ejecutar `npm run respaldo`, programar la tarea y restaurar en una base de prueba (SC-020 a SC-022)
+
+---
+
+## Phase 17: Cierre de US12 y US13
+
+- [ ] T101 Ejecutar todas las pruebas (SC-014), revisar seguridad (sin contraseñas ni `FACE_KEY` en Git, rutas con `autenticar` y `autorizar`), actualizar `docs/estado.md` y las historias SOL12345-14 y SOL12345-5 en Jira
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase dependencies
@@ -324,6 +364,8 @@ description: "Lista de tareas de la funcionalidad 003: membresías, pagos, recon
 - **US9 (inicios)**: depende de US2, US3, US4, US5.
 - **US10 (menú)**: se construye con cada historia y se verifica al final.
 - **US11 (auditoría)**: los eventos se escriben en US1–US4; esta fase los verifica y completa.
+- **US12 (avisos)**: depende de US2 y US3 (membresías y pagos).
+- **US13 (respaldo)**: independiente; usa la base completa.
 
 ### Within each story
 

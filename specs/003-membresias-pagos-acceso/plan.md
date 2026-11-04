@@ -127,6 +127,27 @@ docs/estado.md                              # se actualiza al terminar cada fase
 4. **Consultas e Inicios** (historias 6, 8–10): Accesos, Dashboard, ampliación de `GET /resumen`, resumen del cliente y menú.
 5. **Auditoría y cierre** (historia 11): eventos en todas las acciones, revisión de que ninguna respuesta exponga biometría, `docs/estado.md`.
 
+## Ampliación 2026-11-03: US12 (avisos) y US13 (respaldo)
+
+Agregadas por el aseguramiento de calidad de SOL12345-6 y SOL12345-5. No cambian el stack ni agregan dependencias.
+
+**US12 — Avisos (FR-054 a FR-058)**
+
+- Backend: `models/aviso.model.js` con una sola consulta parametrizada que deriva los avisos de `membresias`, `pagos`, `clientes` y `tipos_membresia` (sin tablas nuevas). Por vencer: `estado = 'activa'`, con pago, `CURDATE()` entre inicio y fin, `DATEDIFF(fecha_fin, CURDATE()) <= 5` y sin una renovación futura pagada. Vencida: última membresía pagada (`activa`) con `fecha_fin` entre `CURDATE() - 7` y `CURDATE() - 1`, sin otra vigente ni futura pagada. Cliente `activo`. Filtro opcional por `id_cliente` para el rol cliente.
+- `services/avisos.service.js`: administrador y recepcionista sin filtro; cliente con su `id_cliente` de la sesión (nunca de la petición); entrenador 403. Respuesta `{ total, avisos: [{ id_membresia, tipo: 'por_vencer'|'vencida', dias, fecha_fin, plan, cliente: { id_cliente, nombre, apellido } }] }`, `dias` negativo para vencidas; orden: vencidas primero y luego por `fecha_fin`.
+- `routes/avisos.routes.js`: `GET /avisos` con `autenticar` + `autorizar('administrador','recepcionista','cliente')`.
+- Frontend: `components/CampanaAvisos.jsx` en `ui/Topbar.jsx` (no se monta para el entrenador), botón con `aria-label` "Avisos (N)", panel desplegable con estado vacío "No hay avisos", insignias (`Badge`) y enlace a `/clientes/:id` para el personal. Se recarga al cambiar de ruta. `utils/formato.js` agrega `textoAviso(dias)`.
+- Pruebas: `tests/integration/avisos.test.js` (casos límite 0/5/6 días y −1/−7/−8, renovación pagada y no pagada, suspendida, cancelada, pendiente, cliente inactivo, permisos, cliente solo lo suyo, conteo = lista, tiempo < 2 s) y `frontend/tests/avisos.test.jsx`.
+
+**US13 — Respaldo (FR-059 a FR-066)**
+
+- `backend/scripts/respaldo.js` (ES Modules, `node:child_process` y `node:fs`, sin dependencias): lee `RESPALDO_DB_USER`, `RESPALDO_DB_PASSWORD`, `RESPALDO_DIR` y `MYSQLDUMP_PATH` (opcional) de `.env`; ejecuta `mysqldump --single-transaction --no-tablespaces --routines=false gymaccess` pasando la contraseña en la variable `MYSQL_PWD` del proceso hijo (nunca en argumentos); escribe a `*.sql.parcial` y lo renombra al terminar bien; rota a 7 solo tras un éxito; anota en `respaldos.log`. La lógica vive en `src/utils/respaldo.js` con dependencias inyectadas para probarla sin MySQL real.
+- `package.json`: `"respaldo": "node --env-file=.env scripts/respaldo.js"`.
+- `database/scripts/crear-usuario-respaldo.sql`: `CREATE USER IF NOT EXISTS 'gymaccess_respaldo'@'localhost'` con `SELECT, SHOW VIEW, TRIGGER, LOCK TABLES` solo en `gymaccess` (no es tabla ni migración; se ejecuta una vez como root).
+- `docs/respaldo.md`: crear el usuario, configurar `.env`, programar la tarea (`schtasks /Create /SC DAILY /ST 23:00 ...` y la opción "Ejecutar la tarea lo antes posible si se omitió"), comprobar y restaurar en una base de prueba.
+- `.gitignore`: `*.sql.parcial`, `respaldos/`.
+- Pruebas: `tests/unit/respaldo.test.js` (nombre del archivo, contraseña fuera de los argumentos, rotación a 7, fallo sin borrar ni dejar archivo parcial, bitácora sin contraseña). La restauración (SC-022) se comprueba a mano.
+
 ## Complexity Tracking
 
 Sin violaciones de la constitución que justificar.

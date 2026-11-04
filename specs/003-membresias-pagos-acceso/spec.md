@@ -18,6 +18,14 @@
 - Q: Si en la Estación de acceso varias personas seguidas no son reconocidas, ¿el sistema solo registra cada intento o hace algo más? → A: Registra cada intento y, tras 5 rechazos "Rostro no reconocido" seguidos, pausa la estación 30 segundos con un mensaje que invita a pedir ayuda en recepción.
 - Planificación (2026-10-14): los intentos fallidos seguidos en la estación pasan a **3** con el mensaje "No te reconocemos. Pide ayuda en recepción" (se conserva la pausa de 30 s); el estado "pendiente de pago" se deriva sin migraciones y el precio pagado queda en el pago, por lo que los planes deben tener precio mayor a 0 y una membresía pendiente de pago se cobra al precio vigente del plan.
 
+### Session 2026-11-03 (aseguramiento de calidad de lo pendiente después del MVP)
+
+- Q: ¿Quién recibe los avisos de membresías por vencer y vencidas? → A: Administrador y recepcionista (los de todos los clientes) y el cliente (solo el suyo); el entrenador no recibe avisos. El dueño del gimnasio usa la cuenta de administrador.
+- Q: ¿Por qué medio se avisa? → A: Con un aviso dentro del sistema (campana con número en el encabezado); no se envían correos, SMS ni WhatsApp.
+- Q: ¿Se avisa de las que están por vencer, de las vencidas o de ambas? → A: De ambas: por vencer (5 días o menos, FR-013) y vencidas hace 7 días o menos sin una nueva vigente.
+- Q: En la historia SOL12345-5, ¿qué significa "base de datos local" y "monitorear entradas y salidas"? → A: MySQL instalado en la laptop del gimnasio, sin depender de internet; "monitorear" es consultar en Accesos, Pagos y Dashboard con un botón "Actualizar". La salida del gimnasio queda fuera del Sprint 2 (pasa al Sprint 3).
+- Q: ¿Cómo se protege la información de la base local? → A: Con un respaldo automático diario a las 23:00 (Programador de tareas de Windows) en una segunda ubicación, conservando los últimos 7, con un usuario de MySQL exclusivo de solo lectura y sin incluir la llave `FACE_KEY` ni archivos `.env`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Tipos de membresía (Priority: P1)
@@ -243,6 +251,46 @@ Como administrador, quiero que el sistema deje constancia de las acciones import
 
 ---
 
+### User Story 12 - Avisos de membresías por vencer y vencidas (Priority: P2)
+
+Como administrador, recepcionista o cliente, quiero ver dentro del sistema un aviso de las membresías por vencer y de las recién vencidas para renovarlas a tiempo y no perder clientes.
+
+**Why this priority**: Surgió del aseguramiento de calidad de SOL12345-6: el requisito original decía "avisar" sin decir a quién, cómo ni cuándo. Ayuda a cobrar a tiempo, pero el control de acceso funciona sin él.
+
+**Independent Test**: Con clientes de prueba cuyas membresías vencen en 0, 3, 5 y 6 días, y que vencieron hace 1, 7 y 8 días, comprobar que la campana muestra exactamente los avisos esperados para cada rol y que desaparecen al renovar y pagar.
+
+**Acceptance Scenarios**:
+
+1. **Given** un cliente con membresía vigente que vence en 3 días, **When** el administrador o el recepcionista abren cualquier pantalla, **Then** la campana del encabezado cuenta ese aviso y la lista lo muestra con el cliente, el plan, la fecha de fin y "Vence en 3 días".
+2. **Given** una membresía vigente que vence hoy, **When** se ve la lista de avisos, **Then** dice "Vence hoy"; una que vence en 6 días no aparece.
+3. **Given** un cliente cuya membresía venció hace 2 días y no tiene otra vigente, **When** se ve la lista, **Then** aparece con "Venció hace 2 días"; una que venció hace 8 días ya no aparece.
+4. **Given** un aviso en la lista, **When** el personal lo selecciona, **Then** se abre el detalle de ese cliente para renovar o cobrar.
+5. **Given** un cliente con su membresía por vencer, **When** inicia sesión, **Then** ve en su campana solo su propio aviso, y nunca los de otros clientes.
+6. **Given** un aviso de membresía por vencer, **When** se registra una renovación y su pago, **Then** el aviso desaparece; si la renovación no está pagada, el aviso sigue.
+7. **Given** un entrenador, **When** inicia sesión, **Then** no ve la campana y el servidor rechaza su consulta de avisos.
+8. **Given** que no hay ningún aviso, **When** se abre la campana, **Then** se ve "No hay avisos" y el número no se muestra.
+
+---
+
+### User Story 13 - Base de datos local y respaldo automático diario (Priority: P3)
+
+Como administrador, quiero que la información de clientes, pagos y accesos esté en la base de datos local del gimnasio y se respalde sola cada día, para no perderla si falla la laptop.
+
+**Why this priority**: Corresponde a SOL12345-5. Las consultas (Accesos, Pagos, Adeudos y Dashboard) ya se construyeron en US6 a US8; aquí solo falta el respaldo, que no cambia lo que ve el usuario.
+
+**Independent Test**: Ejecutar `npm run respaldo` con una carpeta de respaldo de prueba y comprobar que se crea un archivo con fecha y hora, que solo quedan los 7 más recientes, que el archivo no contiene la llave `FACE_KEY` ni contraseñas, y que un fallo deja constancia sin borrar los respaldos anteriores.
+
+**Acceptance Scenarios**:
+
+1. **Given** la tarea programada a las 23:00, **When** llega la hora, **Then** se crea en la carpeta de respaldo un archivo `gymaccess_AAAA-MM-DD_HHMM.sql` con todas las tablas de `gymaccess`.
+2. **Given** que ya existen 7 respaldos, **When** se crea uno nuevo correctamente, **Then** se elimina el más antiguo y quedan los 7 más recientes.
+3. **Given** que el respaldo falla (MySQL apagado, carpeta inexistente o sin permiso), **When** termina, **Then** no se borra ningún respaldo anterior, no queda un archivo incompleto y el error se anota en la bitácora de respaldos con fecha y hora.
+4. **Given** un archivo de respaldo, **When** se revisa su contenido, **Then** la información facial va cifrada (como en la base), y no contiene la llave `FACE_KEY` ni la contraseña de MySQL.
+5. **Given** un respaldo, **When** el administrador sigue el procedimiento documentado de restauración sobre una base de prueba, **Then** recupera los clientes, pagos y accesos.
+6. **Given** que no hay internet, **When** se usa el sistema o se ejecuta el respaldo, **Then** todo funciona igual porque la base y el respaldo son locales.
+
+---
+
 ### Edge Cases
 
 - ¿Qué pasa si dos personas del personal intentan asignar una membresía al mismo cliente a la vez? Solo se crea una; la segunda recibe un aviso de que el cliente ya tiene una vigente.
@@ -263,6 +311,12 @@ Como administrador, quiero que el sistema deje constancia de las acciones import
 - ¿Qué pasa si una lista (pagos, adeudos o accesos) tiene miles de registros? Se pagina y se puede filtrar; el rendimiento no se degrada de forma perceptible.
 - ¿Qué pasa si falla la carga del Dashboard o de las tarjetas del Inicio? Se muestra un aviso de error claro y el resto de la pantalla sigue disponible.
 - ¿Qué pasa si la sesión del personal vence con la estación abierta? La estación deja de aceptar intentos y pide iniciar sesión.
+
+- ¿Qué pasa si un cliente tiene su membresía por vencer y una renovación ya pagada? No recibe aviso: ya renovó. Si la renovación no está pagada, el aviso sigue.
+- ¿Qué pasa con una membresía suspendida, cancelada o pendiente de pago? No genera aviso de vencimiento; las pendientes de pago se atienden en Adeudos.
+- ¿Qué pasa si un cliente dado de baja tenía su membresía por vencer? No aparece en los avisos.
+- ¿Qué pasa si la laptop está apagada a las 23:00? Ese día no hay respaldo; la tarea está configurada para ejecutarse en cuanto la laptop se encienda, y la bitácora muestra la fecha del último respaldo correcto.
+- ¿Qué pasa si se llena el disco de la carpeta de respaldo? El respaldo falla, se anota el error y se conservan los anteriores.
 
 ## Requirements *(mandatory)*
 
@@ -354,6 +408,26 @@ Como administrador, quiero que el sistema deje constancia de las acciones import
 - **FR-051**: Las pruebas automáticas de esta funcionalidad DEBEN ejecutarse únicamente contra la base de pruebas `gymaccess_test` y cubrir permisos por rol, reglas de negocio, el registro de todos los intentos de acceso y que ninguna respuesta exponga datos biométricos.
 - **FR-052**: La biblioteca de reconocimiento facial NO DEBE elegirse ni instalarse sin una investigación y justificación documentadas en la planificación, con compatibilidad con el stack, funcionamiento local, cámara, licencia y seguridad.
 
+
+**Avisos de membresías (US12)**
+
+- **FR-054**: El encabezado DEBE mostrar una campana con el número de avisos para administrador, recepcionista y cliente; el entrenador NO DEBE verla. Sin avisos, la campana no muestra número.
+- **FR-055**: DEBE haber un aviso por cada membresía vigente que vence en 5 días o menos (FR-013), salvo que el cliente ya tenga una renovación pagada, y por cada cliente cuya última membresía pagada venció hace 7 días o menos y que no tiene otra vigente. Las membresías suspendidas, canceladas o pendientes de pago y los clientes dados de baja NO DEBEN generar avisos.
+- **FR-056**: Administrador y recepcionista DEBEN ver los avisos de todos los clientes; el cliente, solo el suyo. El servidor DEBE rechazar la consulta del entrenador (403) y nunca DEBE devolver a un cliente avisos ajenos.
+- **FR-057**: Cada aviso DEBE mostrar el cliente, el plan, la fecha de fin y el texto "Vence en N días", "Vence hoy" o "Venció hace N días", con insignia de color y texto; para el personal DEBE llevar al detalle del cliente. Se ordenan del más urgente al menos urgente (primero los vencidos, luego por fecha de fin).
+- **FR-058**: Los avisos DEBEN calcularse en el momento a partir de las fechas, estados y pagos existentes, sin tablas, columnas ni migraciones nuevas (FR-048), y desaparecer solos al renovar y pagar. No se envían correos, SMS ni mensajes externos.
+
+**Base de datos local y respaldo (US13)**
+
+- **FR-059**: El sistema DEBE incluir un comando `npm run respaldo` (en `backend/`) que genere un respaldo completo de la base `gymaccess` con `mysqldump`, en un archivo `gymaccess_AAAA-MM-DD_HHMM.sql` dentro de la carpeta indicada por `RESPALDO_DIR`.
+- **FR-060**: El respaldo DEBE usar un usuario de MySQL exclusivo, `gymaccess_respaldo`, con permisos de solo lectura sobre `gymaccess` (sin INSERT, UPDATE ni DELETE); su contraseña DEBE leerse de `.env` y NO DEBE aparecer en la línea de comandos ni en la bitácora.
+- **FR-061**: Tras un respaldo correcto DEBEN conservarse solo los 7 más recientes de la carpeta; si el respaldo falla, NO DEBE borrarse ningún respaldo anterior ni quedar un archivo incompleto.
+- **FR-062**: Cada ejecución DEBE anotar en `respaldos.log`, dentro de la carpeta de respaldo, la fecha y hora, el resultado (éxito o error), el nombre y tamaño del archivo o un mensaje de error claro, sin contraseñas.
+- **FR-063**: El respaldo NO DEBE incluir la llave `FACE_KEY` ni archivos `.env`; la información facial queda cifrada igual que en la base. Los respaldos NO DEBEN subirse a Git.
+- **FR-064**: La documentación DEBE explicar cómo crear el usuario `gymaccess_respaldo`, programar la tarea diaria a las 23:00 en el Programador de tareas de Windows (ejecutar en cuanto sea posible si se omitió) y restaurar un respaldo en una base de prueba.
+- **FR-065**: La base de datos DEBE ser MySQL local en la laptop del gimnasio; el sistema y el respaldo NO DEBEN depender de internet.
+- **FR-066**: El monitoreo de entradas, pagos y clientes DEBE hacerse con las pantallas Accesos, Pagos, Adeudos y Dashboard, cada una con un botón "Actualizar" que recargue los datos en menos de 3 segundos. El registro de salida queda fuera de este sprint.
+
 ### Key Entities *(include if feature involves data)*
 
 - **Tipo de membresía**: Plan que ofrece el gimnasio: nombre único, descripción, duración en días, precio y estado (activo o inactivo).
@@ -385,6 +459,13 @@ Como administrador, quiero que el sistema deje constancia de las acciones import
 - **SC-013**: Todas las acciones listadas en FR-045 dejan su evento de auditoría en el 100 % de las pruebas.
 - **SC-014**: Todas las pruebas automáticas del backend y del frontend pasan, incluidas las que usan la base `gymaccess_test`, y las pruebas existentes de los sprints anteriores siguen pasando.
 - **SC-015**: Tras 3 rechazos "Rostro no reconocido" consecutivos, la estación muestra el mensaje de ayuda y se pausa 30 segundos en el 100 % de las pruebas, y no registra intentos durante la pausa.
+- **SC-016**: El 100 % de las membresías en los rangos de FR-055 aparece como aviso, y ninguna fuera de ellos (casos límite: vence en 0, 5 y 6 días; venció hace 1, 7 y 8 días).
+- **SC-017**: El número de la campana coincide al 100 % con la cantidad de avisos de la lista.
+- **SC-018**: Un cliente ve 0 avisos ajenos y el entrenador recibe 403 en el 100 % de las pruebas.
+- **SC-019**: La lista de avisos carga en menos de 2 segundos.
+- **SC-020**: `npm run respaldo` crea un archivo de respaldo válido en menos de 1 minuto con la base de demostración, y tras 8 ejecuciones quedan exactamente 7 archivos.
+- **SC-021**: Ningún archivo de respaldo ni la bitácora contiene `FACE_KEY`, la contraseña de MySQL ni vectores faciales sin cifrar.
+- **SC-022**: Un respaldo se restaura en una base de prueba siguiendo la documentación, y las cantidades de clientes, pagos y accesos coinciden con las de la base original.
 
 ## Assumptions
 
@@ -399,11 +480,12 @@ Como administrador, quiero que el sistema deje constancia de las acciones import
 - El registro del rostro requiere confirmar el consentimiento del cliente y guarda solo la información necesaria para identificar, no fotografías; no se conserva ninguna imagen de la cámara de la estación.
 - Las decisiones técnicas del reconocimiento facial (biblioteca, dónde se procesa, forma de capturar y proteger la información, umbral de coincidencia, condiciones de iluminación, cámara de pruebas) se investigan y justifican en la planificación; el umbral debe favorecer rechazar ante la duda (nunca autorizar por parecido dudoso).
 - La detección de vida (distinguir un rostro real de una fotografía) no se incluye en esta versión; es una limitación conocida que se documenta.
-- Solo se atiende la entrada; la salida del gimnasio, múltiples puntos de acceso, múltiples sucursales, reportes avanzados, la pantalla de consulta de auditoría, "Mis clientes asignados" y rutinas (Sprint 3) quedan fuera de este sprint.
+- Solo se atiende la entrada; la salida del gimnasio (pasa al Sprint 3), múltiples puntos de acceso, múltiples sucursales, reportes avanzados, la pantalla de consulta de auditoría, "Mis clientes asignados" y rutinas (Sprint 3) quedan fuera de este sprint.
 - La asignación, renovación y gestión de membresías y el registro del rostro se hacen desde el detalle del cliente; los pagos también pueden registrarse desde la sección Pagos. Los clientes consultan su información de Sprint 2 desde su Inicio, sin menús nuevos.
 - Por decisión del equipo (2026-10-14), la pantalla de la estación muestra el nombre y el motivo exacto del rechazo, incluidos los de carácter financiero ("Pago pendiente"). Como cualquier persona cercana puede verla, se recomienda instalar la pantalla de modo que solo la vea quien se presenta; la estación no conserva ni muestra el historial de intentos anteriores.
 - Por decisión del equipo (2026-10-14), la información facial de un rostro desactivado se conserva (inactiva y protegida) para poder reactivarla; no hay borrado automático ni eliminación desde el sistema. Quitar por completo la información biométrica de un cliente que lo solicite queda fuera de este sprint y requeriría una intervención administrativa aparte.
 - Se trabaja en la rama `feature/sprint-2`. Las pruebas usan únicamente la base `gymaccess_test`; nunca se escriben datos de prueba en `gymaccess`.
+- US12 y US13 se agregaron el 2026-11-03 como resultado del aseguramiento de calidad de las historias SOL12345-6 y SOL12345-5 de Jira. Los avisos se calculan sin tablas nuevas. El usuario `gymaccess_respaldo` no es una tabla ni una migración: se crea con un script aparte en `database/scripts/` que el equipo ejecuta una sola vez con su usuario administrador de MySQL.
 - Las decisiones 2 a 6 de la especificación inicial (recepcionista con acceso a Pagos y Adeudos; "por vencer" = 5 días o menos; sin tolerancia para vencidas; espera de 5 y 10 segundos en la estación; falta de detección de vida) fueron confirmadas por el equipo el 2026-10-14. Las aclaraciones de esta sesión resolvieron además las renovaciones por adelantado, lo que muestra la estación al rechazar, la conservación de la información facial al desactivar un rostro y los intentos repetidos. Las demás decisiones abiertas de `docs/sprint-2.md` sección 9 que sean técnicas se resuelven en la planificación.
 
 ## Anexo: Secciones del menú y permisos por rol
@@ -419,6 +501,7 @@ Como administrador, quiero que el sistema deje constancia de las acciones import
 | Adeudos | Sí | Sí | No | No |
 | Accesos | Sí | Sí | Sí (información básica) | No (ve los suyos en el Inicio) |
 | Estación de acceso | Sí | Sí | No | No |
+| Avisos (campana) | Sí, de todos | Sí, de todos | No | Sí, solo el suyo |
 | Usuarios y roles | Sí | No | No | No |
 
 Distribución propuesta en el menú: **General** (Inicio, Mi información, Dashboard), **Operación** (Clientes, Accesos, Estación de acceso), **Membresías y pagos** (Tipos de membresía, Pagos, Adeudos) y **Administración** (Usuarios y roles).
