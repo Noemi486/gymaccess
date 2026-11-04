@@ -19,6 +19,9 @@ import TiposMembresia from './pages/TiposMembresia.jsx';
 import MiPerfil from './pages/MiPerfil.jsx';
 import UsuarioForm from './pages/UsuarioForm.jsx';
 import Usuarios from './pages/Usuarios.jsx';
+import Entrenadores from './pages/Entrenadores.jsx';
+import EntrenadorForm from './pages/EntrenadorForm.jsx';
+import EntrenadorDetalle from './pages/EntrenadorDetalle.jsx';
 
 const PERSONAL = ['administrador', 'recepcionista', 'entrenador'];
 const ESCRITURA_CLIENTES = ['administrador', 'recepcionista'];
@@ -160,6 +163,38 @@ function Rutas() {
           }
         />
 
+        <Route
+          path="/entrenadores"
+          element={
+            <Con roles={['administrador', 'recepcionista']}>
+              <Entrenadores />
+            </Con>
+          }
+        />
+        <Route
+          path="/entrenadores/nuevo"
+          element={
+            <Con roles={['administrador']}>
+              <EntrenadorForm />
+            </Con>
+          }
+        />
+        <Route
+          path="/entrenadores/:id"
+          element={
+            <Con roles={['administrador', 'recepcionista']}>
+              <EntrenadorDetalle />
+            </Con>
+          }
+        />
+        <Route
+          path="/entrenadores/:id/editar"
+          element={
+            <Con roles={['administrador']}>
+              <EntrenadorForm />
+            </Con>
+          }
+        />
         <Route path="/sin-permiso" element={<SinPermiso />} />
         {/* Cualquier otra dirección: con sesión muestra "No encontrado"; sin sesión lleva a /login */}
         <Route path="*" element={<NoEncontrado />} />

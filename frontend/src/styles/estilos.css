@@ -2300,3 +2300,26 @@ a.campana-aviso:hover {
   color: var(--color-texto-suave);
   font-size: var(--texto-sm);
 }
+
+/* Sprint 3: listas de datos y títulos de sección reutilizables */
+.datos-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--espacio-4) var(--espacio-6);
+  margin: 0;
+}
+
+.datos-lista dt {
+  color: var(--color-texto-suave);
+  font-size: var(--texto-xs);
+}
+
+.datos-lista dd {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.seccion-titulo {
+  margin: var(--espacio-6) 0 var(--espacio-3);
+  font-size: var(--texto-lg);
+}

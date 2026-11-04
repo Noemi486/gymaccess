@@ -5,6 +5,7 @@ import avisosRoutes from './avisos.routes.js';
 import authRoutes from './auth.routes.js';
 import clientesRoutes from './clientes.routes.js';
 import dashboardRoutes from './dashboard.routes.js';
+import entrenadoresRoutes from './entrenadores.routes.js';
 import membresiasRoutes from './membresias.routes.js';
 import pagosRoutes from './pagos.routes.js';
 import rostrosRoutes from './rostros.routes.js';
@@ -30,6 +31,7 @@ router.use('/adeudos', adeudosRoutes);
 router.use('/avisos', avisosRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/accesos', accesosRoutes);
+router.use('/entrenadores', entrenadoresRoutes);
 router.use('/', rostrosRoutes);
 router.use('/', membresiasRoutes); // /clientes/:id/membresias y /membresias/:id/... (después de /clientes)
 

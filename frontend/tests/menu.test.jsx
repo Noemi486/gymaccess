@@ -10,13 +10,13 @@ import Sidebar from '../src/components/ui/Sidebar.jsx';
 const ESPERADO = {
   administrador: {
     General: ['Inicio', 'Dashboard'],
-    Operación: ['Clientes', 'Accesos', 'Estación de acceso'],
+    Operación: ['Clientes', 'Entrenadores', 'Accesos', 'Estación de acceso'],
     'Membresías y pagos': ['Tipos de membresía', 'Pagos', 'Adeudos'],
     Administración: ['Usuarios y roles'],
   },
   recepcionista: {
     General: ['Inicio'],
-    Operación: ['Clientes', 'Accesos', 'Estación de acceso'],
+    Operación: ['Clientes', 'Entrenadores', 'Accesos', 'Estación de acceso'],
     'Membresías y pagos': ['Tipos de membresía', 'Pagos', 'Adeudos'],
   },
   entrenador: { General: ['Inicio'], Operación: ['Clientes', 'Accesos'] },
@@ -41,7 +41,7 @@ describe('menuParaRol', () => {
   it('agregar una entrada la muestra solo a sus roles', () => {
     const nueva = { id: 'pagos', etiqueta: 'Pagos', ruta: '/pagos', icono: Users, bloque: 'operacion', roles: ['recepcionista'] };
     const secciones = [...SECCIONES, nueva];
-    expect(comoObjeto(menuParaRol('recepcionista', secciones)).Operación).toEqual(['Clientes', 'Accesos', 'Estación de acceso', 'Pagos']);
+    expect(comoObjeto(menuParaRol('recepcionista', secciones)).Operación).toEqual(['Clientes', 'Entrenadores', 'Accesos', 'Estación de acceso', 'Pagos']);
     expect(comoObjeto(menuParaRol('entrenador', secciones)).Operación).toEqual(['Clientes', 'Accesos']);
   });
 
@@ -54,6 +54,8 @@ describe('menuParaRol', () => {
       '/accesos': 'Accesos',
       '/estacion': 'Estación de acceso',
       '/clientes/12': 'Clientes',
+      '/entrenadores': 'Entrenadores',
+      '/entrenadores/7/editar': 'Entrenadores',
     };
     for (const [ruta, titulo] of Object.entries(casos)) expect(seccionDeRuta(ruta)?.etiqueta).toBe(titulo);
   });
@@ -90,7 +92,7 @@ describe('Sidebar', () => {
     expect(screen.getByText('Operación')).toBeInTheDocument();
     expect(screen.getByText('Membresías y pagos')).toBeInTheDocument();
     expect(screen.queryByText('Administración')).not.toBeInTheDocument();
-    expect(within(menu).getAllByRole('link').map((a) => a.textContent)).toEqual(['Inicio', 'Clientes', 'Accesos', 'Estación de acceso', 'Tipos de membresía', 'Pagos', 'Adeudos']);
+    expect(within(menu).getAllByRole('link').map((a) => a.textContent)).toEqual(['Inicio', 'Clientes', 'Entrenadores', 'Accesos', 'Estación de acceso', 'Tipos de membresía', 'Pagos', 'Adeudos']);
   });
 
   it('marca como activa solo la sección actual', () => {

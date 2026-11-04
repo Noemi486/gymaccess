@@ -10,6 +10,12 @@ export const MODULOS = Object.freeze({
   MEMBRESIAS: 'membresias',
   PAGOS: 'pagos',
   ROSTROS: 'rostros',
+  // Sprint 3 (spec 004, FR-029)
+  ENTRENADORES: 'entrenadores',
+  ASIGNACIONES: 'asignaciones',
+  RUTINAS: 'rutinas',
+  OBJETIVOS: 'objetivos',
+  PROGRESOS: 'progresos',
 });
 
 export const ACCIONES = Object.freeze({
@@ -17,6 +23,11 @@ export const ACCIONES = Object.freeze({
   [MODULOS.MEMBRESIAS]: Object.freeze(['asignar', 'renovar', 'suspender', 'reactivar', 'cancelar']),
   [MODULOS.PAGOS]: Object.freeze(['registrar']),
   [MODULOS.ROSTROS]: Object.freeze(['registrar', 'reemplazar', 'desactivar', 'reactivar']),
+  [MODULOS.ENTRENADORES]: Object.freeze(['crear', 'modificar', 'desactivar', 'activar']),
+  [MODULOS.ASIGNACIONES]: Object.freeze(['asignar', 'cambiar', 'quitar']),
+  [MODULOS.RUTINAS]: Object.freeze(['crear', 'versionar']),
+  [MODULOS.OBJETIVOS]: Object.freeze(['crear', 'modificar', 'cumplir', 'cancelar']),
+  [MODULOS.PROGRESOS]: Object.freeze(['registrar', 'corregir']),
 });
 
 const MAX_ACCION = 100;

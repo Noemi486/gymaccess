@@ -7,16 +7,16 @@
 ## Phase 1: Cimientos
 
 - [X] T001 `database/migrations/03_esquema_sprint3.sql` (6 tablas, no destructivo) y nota en `database/scripts/crear-bd-pruebas.sql`
-- [ ] T002 El equipo ejecuta el script 03 en `gymaccess` y en `gymaccess_test` (manual) y confirma 14 tablas
+- [X] T002 El equipo ejecuta el script 03 en `gymaccess` y en `gymaccess_test` (manual) y confirma 14 tablas
 - [X] T003 [P] `backend/tests/helpers.js`: `crearEntrenadorDePrueba`, `asignarEntrenadorDePrueba`, y `limpiarDatosDePrueba` borra (solo en `gymaccess_test`) ejercicios, rutinas, objetivos, progresos, asignaciones y fichas de los clientes y usuarios de la prueba
 - [X] T004 [P] Validadores zod: `entrenador.validator.js`, `asignacion.validator.js`, `entrenamiento.validator.js` (rutina por días, objetivo, avance con rangos y "al menos un dato") + `tests/unit/entrenamiento-validator.test.js`
 - [X] T005 [P] Serializadores y utilidad de diferencias de progreso (`utils/progreso.js`) con pruebas unitarias
 
 ## Phase 2: US1 Entrenadores (P1)
 
-- [ ] T006 [P] [US1] `tests/integration/entrenadores.test.js`: alta en una transacción (correo repetido no deja cuenta ni ficha), edición, lista con número de clientes, cuenta antigua sin ficha aparece, desactivar con clientes → 409 (también vía `PATCH /usuarios/:id`), permisos A/R/E/C, auditoría
-- [ ] T007 [US1] `models/entrenador.model.js`, `services/entrenadores.service.js`, controlador, rutas `/entrenadores`; regla de desactivación en `usuarios.service.js`
-- [ ] T008 [P] [US1] Frontend: menú "Entrenadores", páginas lista, alta/edición y detalle; `tests/entrenadores.test.jsx`
+- [X] T006 [P] [US1] `tests/integration/entrenadores.test.js`: alta en una transacción (correo repetido no deja cuenta ni ficha), edición, lista con número de clientes, cuenta antigua sin ficha aparece, desactivar con clientes → 409 (también vía `PATCH /usuarios/:id`), permisos A/R/E/C, auditoría
+- [X] T007 [US1] `models/entrenador.model.js`, `services/entrenadores.service.js`, controlador, rutas `/entrenadores`; regla de desactivación en `usuarios.service.js`
+- [X] T008 [P] [US1] Frontend: menú "Entrenadores", páginas lista, alta/edición y detalle; `tests/entrenadores.test.jsx`
 
 ## Phase 3: US2 y US7 Asignaciones (P1)
 

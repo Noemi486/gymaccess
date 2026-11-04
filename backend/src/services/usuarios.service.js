@@ -1,6 +1,8 @@
 import { conTransaccion as conTransaccionReal } from '../config/db.js';
 import * as usuarioModel from '../models/usuario.model.js';
 import * as clienteModel from '../models/cliente.model.js';
+import { contarAsignacionesActivas as contarAsignacionesActivasReal } from '../models/entrenador.model.js';
+import { mensajeConClientes } from './entrenadores.service.js';
 import {
   MENSAJE_POLITICA,
   hashearContrasena,
@@ -31,7 +33,7 @@ function traducirDuplicado(error) {
 }
 
 // Las dependencias se inyectan para poder probar el servicio sin base de datos.
-export function crearUsuariosService({ modelo, clientesModelo, conTransaccion, hashear }) {
+export function crearUsuariosService({ modelo, clientesModelo, conTransaccion, hashear, contarAsignacionesActivas = contarAsignacionesActivasReal }) {
   async function listar({ rol, estado, page, limit, offset }) {
     const { filas, total } = await modelo.listar({ rol, estado, limit, offset });
     return { data: filas.map(usuarioPublico), page, limit, total };
@@ -138,6 +140,15 @@ export function crearUsuariosService({ modelo, clientesModelo, conTransaccion, h
           if (activos <= 1) {
             throw errorConflicto('No puedes dejar al sistema sin administradores activos.');
           }
+        }
+
+        // Un entrenador con clientes asignados no se desactiva ni cambia de rol (spec 004, FR-002).
+        const dejaDeSerEntrenadorActivo =
+          actual.rol === 'entrenador' &&
+          ((cambiaRol && cambios.rol !== 'entrenador') || (actual.estado === 'activo' && cambios.estado === 'inactivo'));
+        if (dejaDeSerEntrenadorActivo) {
+          const n = await contarAsignacionesActivas(id, conexion);
+          if (n > 0) throw errorConflicto(mensajeConClientes(n));
         }
 
         await modelo.actualizar(

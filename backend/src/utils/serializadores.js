@@ -112,3 +112,22 @@ export function rostroPublico(fila) {
   return { id_rostro: fila.id_rostro, fecha_registro: fila.fecha_registro, estado: fila.estado };
 }
 
+
+// ---------------------------------------------------------------------------------------------
+// Sprint 3 (spec 004)
+// ---------------------------------------------------------------------------------------------
+
+// Entrenador: cuenta + ficha (sin contraseña). `tiene_ficha` es false para cuentas creadas en Usuarios y roles.
+export function entrenadorPublico(fila) {
+  return {
+    id_usuario: fila.id_usuario,
+    nombre: fila.nombre,
+    correo: fila.correo,
+    estado: fila.estado,
+    telefono: fila.telefono ?? null,
+    especialidad: fila.especialidad ?? null,
+    tiene_ficha: fila.id_entrenador != null,
+    clientes_asignados: Number(fila.clientes_asignados ?? 0),
+    fecha_registro: fila.fecha_registro,
+  };
+}

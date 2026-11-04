@@ -1,4 +1,4 @@
-import { DoorOpen, House, LayoutDashboard, ReceiptText, ScanFace, Tags, UserCog, UserRound, Users, Wallet } from 'lucide-react';
+import { Dumbbell, DoorOpen, House, LayoutDashboard, ReceiptText, ScanFace, Tags, UserCog, UserRound, Users, Wallet } from 'lucide-react';
 
 // ÚNICA fuente de las secciones del menú lateral.
 // Para agregar una sección (por ejemplo, las de Sprint 2) basta con añadir una entrada a SECCIONES.
@@ -43,6 +43,14 @@ export const SECCIONES = [
     icono: Users,
     bloque: 'operacion',
     roles: ['administrador', 'recepcionista', 'entrenador'],
+  },
+  {
+    id: 'entrenadores',
+    etiqueta: 'Entrenadores',
+    ruta: '/entrenadores',
+    icono: Dumbbell,
+    bloque: 'operacion',
+    roles: ['administrador', 'recepcionista'],
   },
   {
     id: 'accesos',
