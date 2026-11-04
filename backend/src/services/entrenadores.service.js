@@ -82,7 +82,7 @@ export function crearEntrenadoresService({
         await auditar(conexion, actor, accion, `Entrenador ${idUsuario} ${estado === 'inactivo' ? 'desactivado' : 'activado'}.`);
       });
     } catch (error) {
-      if (error.status === 409) await auditarError(actor, accion, `Desactivación rechazada para el entrenador ${idUsuario}.`);
+      if (error.status === 409) await auditarError(actor, accion, `Entrenador ${idUsuario} no desactivado: tiene clientes asignados.`);
       throw error;
     }
     return obtener(idUsuario);
