@@ -30,6 +30,7 @@ export default function Accesos() {
   const [desde, setDesde] = useState('');
   const [hasta, setHasta] = useState('');
   const [resultado, setResultado] = useState('');
+  const [tipo, setTipo] = useState(''); // Sprint 3 (US8): entrada, salida o todos
   const [texto, setTexto] = useState(''); // lo que se escribe
   const [busqueda, setBusqueda] = useState(''); // la búsqueda aplicada
   const [cargando, setCargando] = useState(true);
@@ -44,6 +45,7 @@ export default function Accesos() {
     if (desde) parametros.set('desde', desde);
     if (hasta) parametros.set('hasta', hasta);
     if (resultado) parametros.set('resultado', resultado);
+    if (tipo) parametros.set('tipo', tipo);
     if (busqueda) parametros.set('q', busqueda);
     try {
       setPagina(await solicitar(`/accesos?${parametros}`));
@@ -53,7 +55,7 @@ export default function Accesos() {
     } finally {
       setCargando(false);
     }
-  }, [numeroPagina, desde, hasta, resultado, busqueda, rangoInvertido]);
+  }, [numeroPagina, desde, hasta, resultado, tipo, busqueda, rangoInvertido]);
 
   useEffect(() => {
     cargar();
@@ -74,12 +76,13 @@ export default function Accesos() {
     setDesde('');
     setHasta('');
     setResultado('');
+    setTipo('');
     setTexto('');
     setBusqueda('');
     setNumeroPagina(1);
   }
 
-  const hayFiltros = Boolean(desde || hasta || resultado || busqueda);
+  const hayFiltros = Boolean(desde || hasta || resultado || tipo || busqueda);
 
   const columnas = [
     {
@@ -124,6 +127,13 @@ export default function Accesos() {
             <option value="">Todos</option>
             <option value="autorizado">Autorizado</option>
             <option value="rechazado">Rechazado</option>
+          </Select>
+        </FormField>
+        <FormField id="filtro-tipo" etiqueta="Tipo">
+          <Select value={tipo} onChange={cambiarFiltro(setTipo)}>
+            <option value="">Todos</option>
+            <option value="entrada">Entrada</option>
+            <option value="salida">Salida</option>
           </Select>
         </FormField>
         <FormField id="busqueda" etiqueta="Cliente">

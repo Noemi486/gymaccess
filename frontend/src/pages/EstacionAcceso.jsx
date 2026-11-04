@@ -1,4 +1,5 @@
-import { Dumbbell, LogOut, Maximize } from 'lucide-react';
+import { Dumbbell, LogIn, LogOut, Maximize } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CamaraFacial from '../components/CamaraFacial.jsx';
 import Button from '../components/ui/Button.jsx';
@@ -21,6 +22,15 @@ function textoDias(dias) {
 
 function Resultado({ resultado }) {
   const nombre = resultado.cliente ? `${resultado.cliente.nombre} ${resultado.cliente.apellido}` : null;
+  // Salida (spec 004, US8): solo se registra la hora; no se informa de la membresía.
+  if (resultado.tipo === 'salida' && resultado.resultado === 'autorizado') {
+    return (
+      <div className="estacion-resultado estacion-salida-ok" role="status">
+        <h2>Salida registrada</h2>
+        <p className="estacion-nombre">Hasta luego, {nombre}</p>
+      </div>
+    );
+  }
   if (resultado.resultado === 'autorizado') {
     return (
       <div className="estacion-resultado estacion-autorizado" role="status">
@@ -97,7 +107,9 @@ function Panel({ estado, reintentarModelos }) {
 export default function EstacionAcceso() {
   const navegar = useNavigate();
   const camara = useCamara();
-  const { estado, indicacion, reintentarModelos } = useEstacion({ camara });
+  // El modo empieza siempre en Entrada al abrir la estación (FR-026).
+  const [modo, setModo] = useState('entrada');
+  const { estado, indicacion, reintentarModelos } = useEstacion({ camara, tipo: modo });
 
   function pantallaCompleta() {
     Promise.resolve(document.documentElement.requestFullscreen?.()).catch(() => {});
@@ -119,6 +131,14 @@ export default function EstacionAcceso() {
           <strong>GymAccess</strong>
           <span className="estacion-subtitulo">Estación de acceso</span>
         </div>
+        <div className="estacion-modo" role="group" aria-label="Modo de la estación">
+          <button type="button" className="estacion-modo-boton" aria-pressed={modo === 'entrada'} onClick={() => setModo('entrada')}>
+            <LogIn size={16} aria-hidden="true" /> Entrada
+          </button>
+          <button type="button" className="estacion-modo-boton estacion-modo-salida" aria-pressed={modo === 'salida'} onClick={() => setModo('salida')}>
+            <LogOut size={16} aria-hidden="true" /> Salida
+          </button>
+        </div>
         <div className="estacion-acciones">
           <Button variante="secundario" icono={<Maximize size={16} aria-hidden="true" />} onClick={pantallaCompleta}>
             Pantalla completa
@@ -133,7 +153,8 @@ export default function EstacionAcceso() {
         <div className="estacion-camara">
           <CamaraFacial camara={camara} indicacion={estado.fase === 'espera' ? indicacion : null} />
         </div>
-        <section className="estacion-panel" aria-label="Resultado">
+        <section className={`estacion-panel${modo === 'salida' ? ' estacion-panel-salida' : ''}`} aria-label="Resultado">
+          <p className={`estacion-modo-actual${modo === 'salida' ? ' es-salida' : ''}`}>{modo === 'salida' ? 'Modo: SALIDA' : 'Modo: ENTRADA'}</p>
           <Panel estado={estado} reintentarModelos={reintentarModelos} />
         </section>
       </div>

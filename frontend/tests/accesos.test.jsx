@@ -154,6 +154,13 @@ describe('Accesos', () => {
       await waitFor(() => expect(pedidas.at(-1)).toContain('resultado=rechazado'));
     });
 
+    it('por tipo: entrada o salida (Sprint 3)', async () => {
+      const pedidas = abrir('recepcionista');
+      await tabla();
+      fireEvent.change(screen.getByLabelText('Tipo'), { target: { value: 'salida' } });
+      await waitFor(() => expect(pedidas.at(-1)).toContain('tipo=salida'));
+    });
+
     it('por nombre de cliente al pulsar Buscar', async () => {
       const pedidas = abrir('recepcionista');
       await tabla();

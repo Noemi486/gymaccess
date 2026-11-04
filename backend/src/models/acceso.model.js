@@ -1,12 +1,12 @@
 import { pool } from '../config/db.js';
 
 // Acceso a la tabla `accesos`. Solo INSERT (cada intento se registra y nunca se borra) y siempre con parámetros (?).
-// `fecha` y `hora` usan los valores por defecto de la base y `tipo` queda en 'entrada'.
+// `fecha` y `hora` usan los valores por defecto de la base; `tipo` es 'entrada' salvo en el modo Salida (spec 004, US8).
 // Las restricciones de la base se respetan: autorizado => cliente identificado; rechazado => motivo no vacío.
-export async function insertar({ id_cliente = null, resultado, motivo_rechazo = null }, conexion = pool) {
+export async function insertar({ id_cliente = null, tipo = 'entrada', resultado, motivo_rechazo = null }, conexion = pool) {
   const [r] = await conexion.execute(
-    "INSERT INTO accesos (id_cliente, tipo, resultado, motivo_rechazo) VALUES (?, 'entrada', ?, ?)",
-    [id_cliente, resultado, motivo_rechazo],
+    'INSERT INTO accesos (id_cliente, tipo, resultado, motivo_rechazo) VALUES (?, ?, ?, ?)',
+    [id_cliente, tipo, resultado, motivo_rechazo],
   );
   return r.insertId;
 }
@@ -16,7 +16,7 @@ const escaparLike = (texto) => texto.replace(/[\\%_]/g, '\\$&');
 // Lista paginada del más reciente al más antiguo (fecha, hora e id). Unión con `clientes` (el cliente puede ser NULL).
 // Los rangos van directamente sobre `fecha` para aprovechar el índice idx_accesos_fecha. `q` busca en nombre,
 // apellido y "nombre apellido" del cliente. Todo parametrizado. Devuelve { filas, total }.
-export async function listar({ desde, hasta, resultado, q, limit, offset }) {
+export async function listar({ desde, hasta, resultado, tipo, q, limit, offset }) {
   const condiciones = [];
   const valores = [];
   if (desde) {
@@ -30,6 +30,10 @@ export async function listar({ desde, hasta, resultado, q, limit, offset }) {
   if (resultado) {
     condiciones.push('a.resultado = ?');
     valores.push(resultado);
+  }
+  if (tipo) {
+    condiciones.push('a.tipo = ?');
+    valores.push(tipo);
   }
   if (q) {
     const patron = `%${escaparLike(q)}%`;
@@ -51,11 +55,11 @@ export async function listar({ desde, hasta, resultado, q, limit, offset }) {
   return { filas, total: Number(conteo[0].total) };
 }
 
-// Últimos intentos de acceso de un cliente (para su Inicio): fecha, hora, resultado y motivo.
+// Últimos intentos de ENTRADA de un cliente (para su Inicio): fecha, hora, resultado y motivo. Las salidas no son visitas.
 export async function ultimosDeCliente(idCliente, limite) {
   const [filas] = await pool.execute(
     `SELECT fecha, hora, resultado, motivo_rechazo FROM accesos
-     WHERE id_cliente = ? ORDER BY fecha DESC, hora DESC, id_acceso DESC LIMIT ?`,
+     WHERE id_cliente = ? AND tipo = 'entrada' ORDER BY fecha DESC, hora DESC, id_acceso DESC LIMIT ?`,
     [idCliente, String(limite)],
   );
   return filas;

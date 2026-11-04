@@ -4,8 +4,10 @@ import { descriptorEsquema } from './descriptor.validator.js';
 import { busquedaEsquema, fechaEsquema } from './comunes.js';
 
 // POST /api/accesos/identificar: solo el descriptor (128 números). Nunca imágenes.
+// Sprint 3 (spec 004, US8): `tipo` elige el modo de la estación (entrada por defecto).
 export const identificarEsquema = z.strictObject({
   descriptor: descriptorEsquema,
+  tipo: z.enum(['entrada', 'salida'], { error: 'El tipo debe ser entrada o salida.' }).optional(),
 });
 
 // GET /api/accesos?desde=&hasta=&resultado=&q=&page=&limit=
@@ -15,6 +17,7 @@ export const accesoListarQueryEsquema = z
     desde: fechaEsquema.optional(),
     hasta: fechaEsquema.optional(),
     resultado: z.enum(['autorizado', 'rechazado'], { error: 'El resultado debe ser autorizado o rechazado.' }).optional(),
+    tipo: z.enum(['entrada', 'salida'], { error: 'El tipo debe ser entrada o salida.' }).optional(),
     q: busquedaEsquema,
     page: z.string().optional(),
     limit: z.string().optional(),

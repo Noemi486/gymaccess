@@ -50,9 +50,9 @@
 
 ## Phase 8: US8 Salida (P3)
 
-- [ ] T024 [P] [US8] `tests/integration/salida.test.js`: salida autorizada sin revisar membresía, salida no reconocida rechazada, filtro por tipo, y las cifras del Sprint 2 cuentan solo entradas (accesos de hoy, clientes que entraron hoy, Dashboard, últimas visitas)
-- [ ] T025 [US8] Backend: `tipo` en el validador y en `accesos.service.js`; filtro `tipo` en `GET /accesos`; `tipo = 'entrada'` en las consultas de resumen, dashboard y mi resumen
-- [ ] T026 [P] [US8] Frontend: selector Entrada / Salida en la estación, mensaje "Hasta luego", columna y filtro de tipo en Accesos; pruebas
+- [X] T024 [P] [US8] `tests/integration/salida.test.js`: salida autorizada sin revisar membresía, salida no reconocida rechazada, filtro por tipo, y las cifras del Sprint 2 cuentan solo entradas (accesos de hoy, clientes que entraron hoy, Dashboard, últimas visitas)
+- [X] T025 [US8] Backend: `tipo` en el validador y en `accesos.service.js`; filtro `tipo` en `GET /accesos`; `tipo = 'entrada'` en las consultas de resumen, dashboard y mi resumen
+- [X] T026 [P] [US8] Frontend: selector Entrada / Salida en la estación, mensaje "Hasta luego", columna y filtro de tipo en Accesos; pruebas
 
 ## Phase 9: Cierre
 

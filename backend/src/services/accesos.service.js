@@ -49,17 +49,25 @@ export function crearAccesosService({
     return filas.find((fila) => fila.fecha_inicio <= hoy) ?? null;
   }
 
-  async function rechazar(cliente, motivo) {
-    const id_acceso = await accesoModelo.insertar({ id_cliente: cliente?.id_cliente ?? null, resultado: 'rechazado', motivo_rechazo: motivo });
-    const respuesta = { resultado: 'rechazado', id_acceso, motivo };
+  async function rechazar(cliente, motivo, tipo = 'entrada') {
+    const id_acceso = await accesoModelo.insertar({ id_cliente: cliente?.id_cliente ?? null, tipo, resultado: 'rechazado', motivo_rechazo: motivo });
+    const respuesta = { resultado: 'rechazado', tipo, id_acceso, motivo };
     if (cliente) respuesta.cliente = { id_cliente: cliente.id_cliente, nombre: cliente.nombre, apellido: cliente.apellido };
     return respuesta;
   }
 
   // POST /accesos/identificar. El descriptor ya viene validado; nunca se guarda ni se devuelve.
-  async function identificar(descriptor) {
+  async function identificar(descriptor, tipo = 'entrada') {
     const coincidencia = await rostros.encontrarCoincidencia(descriptor);
-    if (coincidencia.tipo !== 'clara') return rechazar(null, MOTIVOS.NO_RECONOCIDO);
+    if (coincidencia.tipo !== 'clara') return rechazar(null, MOTIVOS.NO_RECONOCIDO, tipo);
+
+    // Modo Salida (spec 004, US8, FR-027): basta con identificar al cliente; no se revisa membresía ni estado.
+    if (tipo === 'salida') {
+      const cliente = await clienteModelo.buscarPorId(coincidencia.id_cliente);
+      if (!cliente) return rechazar(null, MOTIVOS.NO_RECONOCIDO, tipo);
+      const id_acceso = await accesoModelo.insertar({ id_cliente: cliente.id_cliente, tipo, resultado: 'autorizado' });
+      return { resultado: 'autorizado', tipo, id_acceso, cliente: { id_cliente: cliente.id_cliente, nombre: cliente.nombre, apellido: cliente.apellido } };
+    }
 
     const cliente = await clienteModelo.buscarPorId(coincidencia.id_cliente);
     if (!cliente) return rechazar(null, MOTIVOS.NO_RECONOCIDO);
@@ -75,6 +83,7 @@ export function crearAccesosService({
     const id_acceso = await accesoModelo.insertar({ id_cliente: cliente.id_cliente, resultado: 'autorizado' });
     return {
       resultado: 'autorizado',
+      tipo,
       id_acceso,
       cliente: { id_cliente: cliente.id_cliente, nombre: cliente.nombre, apellido: cliente.apellido },
       membresia: { plan: actual.tipo_nombre, fecha_fin: actual.fecha_fin, dias_restantes: diasRestantes(actual.fecha_fin, hoy) },
@@ -82,8 +91,8 @@ export function crearAccesosService({
   }
 
   // GET /accesos: el entrenador recibe solo nombre, fecha, hora y resultado (sin tipo ni motivo).
-  async function listar({ desde, hasta, resultado, q, page, limit, offset }, actor) {
-    const { filas, total } = await accesoModelo.listar({ desde, hasta, resultado, q, limit, offset });
+  async function listar({ desde, hasta, resultado, tipo, q, page, limit, offset }, actor) {
+    const { filas, total } = await accesoModelo.listar({ desde, hasta, resultado, tipo, q, limit, offset });
     const basico = actor.rol === 'entrenador';
     return { data: filas.map((fila) => accesoPublico(fila, { basico })), page, limit, total };
   }

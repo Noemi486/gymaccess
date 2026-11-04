@@ -51,7 +51,7 @@ export async function contarUsuariosPorRol() {
 
 // Accesos autorizados de hoy.
 export async function contarAccesosAutorizadosHoy() {
-  const [filas] = await pool.execute("SELECT COUNT(*) AS total FROM accesos WHERE fecha = CURDATE() AND resultado = 'autorizado'");
+  const [filas] = await pool.execute("SELECT COUNT(*) AS total FROM accesos WHERE fecha = CURDATE() AND tipo = 'entrada' AND resultado = 'autorizado'");
   return Number(filas[0].total);
 }
 
@@ -72,7 +72,7 @@ export async function contarMembresiasPorVencer() {
 // Entrenador: clientes distintos con acceso autorizado hoy.
 export async function contarClientesQueEntraronHoy() {
   const [filas] = await pool.execute(
-    "SELECT COUNT(DISTINCT id_cliente) AS total FROM accesos WHERE fecha = CURDATE() AND resultado = 'autorizado' AND id_cliente IS NOT NULL",
+    "SELECT COUNT(DISTINCT id_cliente) AS total FROM accesos WHERE fecha = CURDATE() AND tipo = 'entrada' AND resultado = 'autorizado' AND id_cliente IS NOT NULL",
   );
   return Number(filas[0].total);
 }
@@ -83,7 +83,7 @@ export async function ultimosClientesQueEntraronHoy(limite) {
   const [filas] = await pool.execute(
     `SELECT c.id_cliente, c.nombre, c.apellido, MAX(a.hora) AS hora
      FROM accesos a JOIN clientes c ON c.id_cliente = a.id_cliente
-     WHERE a.fecha = CURDATE() AND a.resultado = 'autorizado'
+     WHERE a.fecha = CURDATE() AND a.tipo = 'entrada' AND a.resultado = 'autorizado'
      GROUP BY c.id_cliente, c.nombre, c.apellido
      ORDER BY hora DESC, c.id_cliente DESC LIMIT ?`,
     [String(limite)],

@@ -85,8 +85,12 @@ export function promediar(descriptores) {
   return Array.from({ length: descriptores[0].length }, (_, k) => descriptores.reduce((suma, d) => suma + d[k], 0) / descriptores.length);
 }
 
-const enviarDescriptor = (descriptor) =>
-  solicitar('/accesos/identificar', { metodo: 'POST', cuerpo: { descriptor: Array.from(descriptor) } });
+// En modo Salida se envía también `tipo` (spec 004, US8); en Entrada el cuerpo es el mismo de siempre.
+const enviarDescriptor = (descriptor, tipo = 'entrada') =>
+  solicitar('/accesos/identificar', {
+    metodo: 'POST',
+    cuerpo: tipo === 'salida' ? { descriptor: Array.from(descriptor), tipo } : { descriptor: Array.from(descriptor) },
+  });
 
 const ERRORES_CAMARA = ['denegada', 'sin_camara', 'ocupada'];
 
@@ -98,7 +102,11 @@ export function useEstacion({
   enviar = enviarDescriptor,
   ahora = Date.now,
   intervaloMs = INTERVALO_ANALISIS_MS,
+  tipo = 'entrada',
 }) {
+  // El modo (Entrada o Salida) se lee en el momento de enviar, sin reiniciar el ciclo de análisis.
+  const tipoRef = useRef(tipo);
+  tipoRef.current = tipo;
   // El estado vive en una referencia que se actualiza al instante (el reductor es puro) y se copia a React
   // para dibujar. Así las decisiones del ciclo de análisis nunca se basan en un estado atrasado.
   const [estado, setEstado] = useState(estadoInicial);
@@ -180,7 +188,7 @@ export function useEstacion({
         estables = [];
         despachar({ tipo: 'enviar', ahora: momento });
         try {
-          const respuesta = await enviar(descriptor);
+          const respuesta = await enviar(descriptor, tipoRef.current);
           despachar({ tipo: 'respuesta', respuesta, ahora: ahora() });
         } catch {
           despachar({ tipo: 'fallo_envio', ahora: ahora() });

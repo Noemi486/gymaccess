@@ -60,7 +60,7 @@ export async function ingresos({ desde, hasta }) {
 // Accesos autorizados y rechazados del periodo (por `fecha`, índice idx_accesos_fecha).
 export async function accesosPorResultado({ desde, hasta }) {
   const [filas] = await pool.execute(
-    "SELECT COALESCE(SUM(resultado = 'autorizado'), 0) AS autorizados, COALESCE(SUM(resultado = 'rechazado'), 0) AS rechazados FROM accesos WHERE fecha >= ? AND fecha <= ?",
+    "SELECT COALESCE(SUM(resultado = 'autorizado'), 0) AS autorizados, COALESCE(SUM(resultado = 'rechazado'), 0) AS rechazados FROM accesos WHERE tipo = 'entrada' AND fecha >= ? AND fecha <= ?",
     [desde, hasta],
   );
   return { autorizados: Number(filas[0].autorizados), rechazados: Number(filas[0].rechazados) };
@@ -72,7 +72,7 @@ export async function accesosRecientes({ desde, hasta }) {
     `SELECT a.id_acceso, a.id_cliente, a.fecha, a.hora, a.tipo, a.resultado, a.motivo_rechazo,
             c.nombre AS cliente_nombre, c.apellido AS cliente_apellido
      FROM accesos a LEFT JOIN clientes c ON c.id_cliente = a.id_cliente
-     WHERE a.fecha >= ? AND a.fecha <= ?
+     WHERE a.tipo = 'entrada' AND a.fecha >= ? AND a.fecha <= ?
      ORDER BY a.fecha DESC, a.hora DESC, a.id_acceso DESC LIMIT 10`,
     [desde, hasta],
   );

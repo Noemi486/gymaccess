@@ -2496,3 +2496,72 @@ a.campana-aviso:hover {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Estación: modo Entrada / Salida (spec 004, US8). Siempre a la vista, con texto y color distintos. */
+.estacion-modo {
+  display: inline-flex;
+  padding: 4px;
+  border: 1px solid var(--color-borde-fuerte);
+  border-radius: var(--radio-pleno);
+}
+
+.estacion-modo-boton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  padding: var(--espacio-2) var(--espacio-4);
+  border: 0;
+  border-radius: var(--radio-pleno);
+  background: transparent;
+  color: var(--color-texto-suave);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.estacion-modo-boton[aria-pressed='true'] {
+  background: var(--color-exito-fondo);
+  color: var(--color-exito);
+}
+
+.estacion-modo-salida[aria-pressed='true'] {
+  background: var(--color-info-fondo);
+  color: var(--color-info);
+}
+
+.estacion-modo-boton:focus-visible {
+  outline: 2px solid var(--color-acento);
+  outline-offset: 2px;
+}
+
+.estacion-panel {
+  flex-direction: column;
+  gap: var(--espacio-4);
+}
+
+.estacion-modo-actual {
+  margin: 0;
+  padding: var(--espacio-1) var(--espacio-4);
+  border-radius: var(--radio-pleno);
+  background: var(--color-exito-fondo);
+  color: var(--color-exito);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.estacion-modo-actual.es-salida {
+  background: var(--color-info-fondo);
+  color: var(--color-info);
+}
+
+.estacion-salida-ok {
+  background: var(--color-info-fondo);
+  border-color: var(--color-info);
+  color: var(--color-info);
+}
+
+@media (max-width: 760px) {
+  .estacion-barra {
+    flex-wrap: wrap;
+  }
+}
