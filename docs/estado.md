@@ -107,3 +107,4 @@ Funcionalidad **003 — Sprint 2**, en la rama `feature/sprint-2`.
   - Fase 9: matriz de permisos del sprint (backend y frontend), sin biometría en los endpoints nuevos y revisión de seguridad (todas las rutas con `autenticar` y `autorizar`; sin DELETE en el código; sin secretos en Git).
   - Pruebas al cierre de la fase 8: backend 543 pasan y 1 omitida (0 fallos); frontend 403 pasan.
   - Jira: épica SOL12345-15 (Sprint 3) con 8 historias (SOL12345-16 a -23) en Finalizada con su evidencia; las historias del Sprint 2 ya terminadas (-3, -6, -7, -11, -12, -13) pasadas a Finalizada con comentario de evidencia; SOL12345-4 en "En curso" por el relevador.
+  - Pruebas finales (T029): backend 546 pasan y 1 omitida (0 fallos) sobre `gymaccess_test`; frontend 433 pasan (33 archivos); `npm run build` compila.
