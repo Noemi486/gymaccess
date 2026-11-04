@@ -2091,3 +2091,20 @@ tbody tr:last-child td {
   outline: 2px solid var(--color-acento);
   outline-offset: 2px;
 }
+
+/* ---- Dashboard (Sprint 2, US8) ---- */
+.selector-periodo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+  margin-bottom: var(--espacio-4);
+}
+.dashboard-titulo {
+  font-size: var(--texto-base);
+  margin: var(--espacio-4) 0 var(--espacio-1);
+}
+.dashboard-nota {
+  margin: 0 0 var(--espacio-3);
+  color: var(--color-texto-suave);
+  font-size: var(--texto-sm);
+}

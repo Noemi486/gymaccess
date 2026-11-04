@@ -9,7 +9,7 @@ import Sidebar from '../src/components/ui/Sidebar.jsx';
 // Secciones esperadas por rol (Anexo del spec), agrupadas por bloque.
 const ESPERADO = {
   administrador: {
-    General: ['Inicio'],
+    General: ['Inicio', 'Dashboard'],
     Operación: ['Clientes', 'Accesos', 'Estación de acceso'],
     'Membresías y pagos': ['Tipos de membresía', 'Pagos', 'Adeudos'],
     Administración: ['Usuarios y roles'],

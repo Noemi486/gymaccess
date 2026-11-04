@@ -3,6 +3,7 @@ import accesosRoutes from './accesos.routes.js';
 import adeudosRoutes from './adeudos.routes.js';
 import authRoutes from './auth.routes.js';
 import clientesRoutes from './clientes.routes.js';
+import dashboardRoutes from './dashboard.routes.js';
 import membresiasRoutes from './membresias.routes.js';
 import pagosRoutes from './pagos.routes.js';
 import rostrosRoutes from './rostros.routes.js';
@@ -25,6 +26,7 @@ router.use('/resumen', resumenRoutes);
 router.use('/tipos-membresia', tiposMembresiaRoutes);
 router.use('/pagos', pagosRoutes);
 router.use('/adeudos', adeudosRoutes);
+router.use('/dashboard', dashboardRoutes);
 router.use('/accesos', accesosRoutes);
 router.use('/', rostrosRoutes);
 router.use('/', membresiasRoutes); // /clientes/:id/membresias y /membresias/:id/... (después de /clientes)

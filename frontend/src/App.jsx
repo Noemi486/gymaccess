@@ -7,6 +7,7 @@ import ClienteDetalle from './pages/ClienteDetalle.jsx';
 import ClienteForm from './pages/ClienteForm.jsx';
 import Accesos from './pages/Accesos.jsx';
 import Adeudos from './pages/Adeudos.jsx';
+import Dashboard from './pages/Dashboard.jsx';
 import Pagos from './pages/Pagos.jsx';
 import Clientes from './pages/Clientes.jsx';
 import EstacionAcceso from './pages/EstacionAcceso.jsx';
@@ -134,6 +135,14 @@ function Rutas() {
           }
         />
 
+        <Route
+          path="/dashboard"
+          element={
+            <Con roles={['administrador']}>
+              <Dashboard />
+            </Con>
+          }
+        />
         <Route
           path="/pagos"
           element={
