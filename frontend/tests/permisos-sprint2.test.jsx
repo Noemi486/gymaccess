@@ -21,7 +21,7 @@ const PANTALLAS = {
 };
 const ROLES = ['administrador', 'recepcionista', 'entrenador', 'cliente'];
 
-// Abre `ruta` con la cuenta del rol (o sin sesión). Devuelve las URL de datos pedidas (todo menos /auth/me).
+// Abre `ruta` con la cuenta del rol (o sin sesión). Devuelve las URL de datos pedidas (todo menos /auth/me y /avisos).
 function abrir(ruta, rol) {
   const pedidas = [];
   if (rol) {
@@ -32,6 +32,8 @@ function abrir(ruta, rol) {
       'fetch',
       vi.fn(async (url) => {
         if (url === '/api/auth/me') return respuesta(200, cuenta);
+        // La campana del encabezado (US12) pide sus avisos en cualquier pantalla: no son datos de la pantalla.
+        if (url === '/api/avisos') return respuesta(200, { total: 0, avisos: [] });
         pedidas.push(url);
         return respuesta(200, { data: [], page: 1, limit: 20, total: 0 });
       }),

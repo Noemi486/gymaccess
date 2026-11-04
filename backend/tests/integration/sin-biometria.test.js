@@ -122,6 +122,8 @@ describe('Ninguna respuesta ni registro de consola contiene datos biométricos',
       ['GET', '/resumen', entrenador.token],
       ['GET', '/clientes/me/resumen', tokenCliente],
       ['GET', '/tipos-membresia', admin.token],
+      ['GET', '/avisos', recepcion.token],
+      ['GET', '/avisos', tokenCliente],
     ];
     for (const [metodo, ruta, token] of consultas) {
       const r = await api(metodo, ruta, token);

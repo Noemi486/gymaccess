@@ -9,6 +9,9 @@ import Topbar from './Topbar.jsx';
 // Ancho desde el cual el menú es fijo (coincide con el punto de corte del CSS).
 const ANCHO_MENU_FIJO = 1024;
 
+// Roles que ven la campana de avisos de membresías (US12, FR-054); el entrenador no.
+const ROLES_CON_AVISOS = ['administrador', 'recepcionista', 'cliente'];
+
 function MarcoComun() {
   const { usuario, cerrarSesion } = useAuth();
   const { abrir: abrirCambiarPassword } = useCambiarPassword();
@@ -68,6 +71,7 @@ function MarcoComun() {
           onMenu={() => setMenuAbierto((actual) => !actual)}
           menuAbierto={menuAbierto}
           botonMenuRef={botonMenu}
+          avisos={ROLES_CON_AVISOS.includes(usuario.rol)}
         />
         <main className="contenido">
           <Outlet />

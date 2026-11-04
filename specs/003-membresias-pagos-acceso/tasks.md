@@ -312,14 +312,14 @@ description: "Lista de tareas de la funcionalidad 003: membresías, pagos, recon
 
 ### Tests for User Story 12
 
-- [ ] T090 [P] [US12] Crear `backend/tests/integration/avisos.test.js` (`gymaccess_test`): aparecen vence en 0, 3 y 5 días y venció hace 1 y 7; no aparecen vence en 6, venció hace 8, suspendida, cancelada, pendiente de pago, cliente inactivo ni la que tiene renovación pagada (sí la que tiene renovación sin pagar); `total` = largo de la lista; orden vencidas primero; el cliente ve solo el suyo aunque mande `id_cliente`; entrenador 403; sin sesión 401; responde en menos de 2 s; sin biometría
-- [ ] T091 [P] [US12] Crear `frontend/tests/avisos.test.jsx`: campana con número para administrador, recepcionista y cliente; el entrenador no la ve; textos "Vence en N días", "Vence hoy", "Venció hace N días" con insignia; enlace al detalle del cliente para el personal; "No hay avisos" sin número; error de carga sin romper el encabezado
+- [X] T090 [P] [US12] Crear `backend/tests/integration/avisos.test.js` (`gymaccess_test`): aparecen vence en 0, 3 y 5 días y venció hace 1 y 7; no aparecen vence en 6, venció hace 8, suspendida, cancelada, pendiente de pago, cliente inactivo ni la que tiene renovación pagada (sí la que tiene renovación sin pagar); `total` = largo de la lista; orden vencidas primero; el cliente ve solo el suyo aunque mande `id_cliente`; entrenador 403; sin sesión 401; responde en menos de 2 s; sin biometría
+- [X] T091 [P] [US12] Crear `frontend/tests/avisos.test.jsx`: campana con número para administrador, recepcionista y cliente; el entrenador no la ve; textos "Vence en N días", "Vence hoy", "Venció hace N días" con insignia; enlace al detalle del cliente para el personal; "No hay avisos" sin número; error de carga sin romper el encabezado
 
 ### Implementation for User Story 12
 
-- [ ] T092 [US12] `backend/src/models/aviso.model.js` con la consulta derivada del plan (parametrizada, filtro opcional por cliente)
-- [ ] T093 [US12] `backend/src/services/avisos.service.js`, `controllers/avisos.controller.js`, `routes/avisos.routes.js` y montaje en `routes/index.js`
-- [ ] T094 [US12] `frontend/src/utils/formato.js` (`textoAviso`), `components/CampanaAvisos.jsx`, integración en `components/ui/Topbar.jsx` y estilos en `styles/estilos.css` (360 a 1920 px, foco visible)
+- [X] T092 [US12] `backend/src/models/aviso.model.js` con la consulta derivada del plan (parametrizada, filtro opcional por cliente)
+- [X] T093 [US12] `backend/src/services/avisos.service.js`, `controllers/avisos.controller.js`, `routes/avisos.routes.js` y montaje en `routes/index.js`
+- [X] T094 [US12] `frontend/src/utils/formato.js` (`textoAviso`), `components/CampanaAvisos.jsx`, integración en `components/ui/Topbar.jsx` y estilos en `styles/estilos.css` (360 a 1920 px, foco visible)
 - [ ] T095 [US12] Ejecutar `npm test` en `backend/` y `frontend/`; detenerse para que el equipo pruebe
 
 ---

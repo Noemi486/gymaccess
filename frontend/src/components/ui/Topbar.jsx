@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, KeyRound, LogOut, Menu, X } from 'lucide-react';
 import Avatar, { iniciales } from './Avatar.jsx';
+import CampanaAvisos from '../CampanaAvisos.jsx';
 
 export const ETIQUETAS_ROL = {
   administrador: 'Administrador',
@@ -11,7 +12,8 @@ export const ETIQUETAS_ROL = {
 
 export { iniciales };
 
-// Encabezado: título de la sección a la izquierda y menú de usuario (avatar con iniciales) a la derecha.
+// Encabezado: título de la sección a la izquierda; a la derecha, la campana de avisos (si `avisos`) y el
+// menú de usuario (avatar con iniciales).
 // El menú de usuario se cierra con Escape, al pulsar fuera o al elegir una opción.
 export default function Topbar({
   titulo,
@@ -21,6 +23,7 @@ export default function Topbar({
   onMenu,
   menuAbierto = false,
   botonMenuRef,
+  avisos = false,
 }) {
   const [abierto, setAbierto] = useState(false);
   const contenedor = useRef(null);
@@ -63,6 +66,8 @@ export default function Topbar({
         </button>
       )}
       <p className="topbar-titulo">{titulo}</p>
+
+      {avisos && <CampanaAvisos rol={usuario.rol} />}
 
       <div className="menu-usuario" ref={contenedor}>
         <button

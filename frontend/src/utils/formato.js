@@ -60,3 +60,12 @@ export function formatearFechaHora(valor) {
   const [, anio, mes, dia, hora, minuto] = coincide;
   return `${Number(dia)} ${MESES_FECHA_HORA[Number(mes) - 1]} ${anio} · ${hora}:${minuto}`;
 }
+
+// Texto de un aviso de membresía (US12, FR-057): días que faltan (0 = hoy) o, en negativo, días desde que venció.
+export function textoAviso(dias) {
+  const n = Number(dias);
+  if (!Number.isInteger(n)) return '';
+  if (n === 0) return 'Vence hoy';
+  if (n > 0) return n === 1 ? 'Vence en 1 día' : `Vence en ${n} días`;
+  return n === -1 ? 'Venció hace 1 día' : `Venció hace ${-n} días`;
+}
