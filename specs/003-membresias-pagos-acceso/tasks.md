@@ -320,7 +320,7 @@ description: "Lista de tareas de la funcionalidad 003: membresías, pagos, recon
 - [X] T092 [US12] `backend/src/models/aviso.model.js` con la consulta derivada del plan (parametrizada, filtro opcional por cliente)
 - [X] T093 [US12] `backend/src/services/avisos.service.js`, `controllers/avisos.controller.js`, `routes/avisos.routes.js` y montaje en `routes/index.js`
 - [X] T094 [US12] `frontend/src/utils/formato.js` (`textoAviso`), `components/CampanaAvisos.jsx`, integración en `components/ui/Topbar.jsx` y estilos en `styles/estilos.css` (360 a 1920 px, foco visible)
-- [ ] T095 [US12] Ejecutar `npm test` en `backend/` y `frontend/`; detenerse para que el equipo pruebe
+- [X] T095 [US12] Ejecutar `npm test` en `backend/` y `frontend/`; detenerse para que el equipo pruebe
 
 ---
 
@@ -330,10 +330,10 @@ description: "Lista de tareas de la funcionalidad 003: membresías, pagos, recon
 
 **Independent Test**: `npm run respaldo` 8 veces con una carpeta de prueba deja 7 archivos; un fallo no borra nada.
 
-- [ ] T096 [P] [US13] Crear `backend/tests/unit/respaldo.test.js` con dependencias simuladas: nombre `gymaccess_AAAA-MM-DD_HHMM.sql`; la contraseña va en `MYSQL_PWD` y no en los argumentos; rotación a 7 solo tras éxito; un fallo elimina el `.parcial`, no borra respaldos y anota el error; la bitácora no contiene la contraseña; variables faltantes dan un mensaje claro
-- [ ] T097 [US13] `backend/src/utils/respaldo.js` (lógica) y `backend/scripts/respaldo.js` (entrada); script `respaldo` en `backend/package.json`; variables nuevas sin valor en `backend/.env.example`; `.gitignore`
-- [ ] T098 [P] [US13] `database/scripts/crear-usuario-respaldo.sql` (solo lectura sobre `gymaccess`, sin DROP)
-- [ ] T099 [P] [US13] `docs/respaldo.md`: crear usuario, configurar `.env`, programar la tarea a las 23:00 en Windows, verificar y restaurar en una base de prueba
+- [X] T096 [P] [US13] Crear `backend/tests/unit/respaldo.test.js` con dependencias simuladas: nombre `gymaccess_AAAA-MM-DD_HHMM.sql`; la contraseña va en `MYSQL_PWD` y no en los argumentos; rotación a 7 solo tras éxito; un fallo elimina el `.parcial`, no borra respaldos y anota el error; la bitácora no contiene la contraseña; variables faltantes dan un mensaje claro
+- [X] T097 [US13] `backend/src/utils/respaldo.js` (lógica) y `backend/scripts/respaldo.js` (entrada); script `respaldo` en `backend/package.json`; variables nuevas sin valor en `backend/.env.example`; `.gitignore`
+- [X] T098 [P] [US13] `database/scripts/crear-usuario-respaldo.sql` (solo lectura sobre `gymaccess`, sin DROP)
+- [X] T099 [P] [US13] `docs/respaldo.md`: crear usuario, configurar `.env`, programar la tarea a las 23:00 en Windows, verificar y restaurar en una base de prueba
 - [ ] T100 [US13] Comprobación manual del equipo: crear el usuario, ejecutar `npm run respaldo`, programar la tarea y restaurar en una base de prueba (SC-020 a SC-022)
 
 ---

@@ -10,7 +10,8 @@
   "scripts": {
     "dev": "node --env-file=.env --watch src/server.js",
     "start": "node --env-file=.env src/server.js",
-    "test": "node --env-file=.env.test --test --test-concurrency=1 \"tests/**/*.test.js\""
+    "test": "node --env-file=.env.test --test --test-concurrency=1 \"tests/**/*.test.js\"",
+    "respaldo": "node --env-file=.env scripts/respaldo.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

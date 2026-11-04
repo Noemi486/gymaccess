@@ -21,3 +21,8 @@ Thumbs.db
 *.swp
 .vscode/
 .idea/
+
+# Respaldos de la base (nunca se suben)
+respaldos/
+*.sql.parcial
+gymaccess_*.sql
