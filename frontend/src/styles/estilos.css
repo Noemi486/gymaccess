@@ -2560,8 +2560,24 @@ a.campana-aviso:hover {
   color: var(--color-info);
 }
 
-@media (max-width: 760px) {
+/* Con el selector de modo, la barra ya no cabe en una fila en ventanas medianas: se acomoda en dos
+   filas en lugar de ensanchar la página (que obligaba a desplazarse a los lados y cortaba la cámara). */
+.estacion-barra {
+  flex-wrap: wrap;
+  row-gap: var(--espacio-3);
+}
+
+.estacion {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+@media (max-width: 1180px) {
+  .estacion-subtitulo {
+    display: none;
+  }
+
   .estacion-barra {
-    flex-wrap: wrap;
+    padding: var(--espacio-3) var(--espacio-4);
   }
 }
