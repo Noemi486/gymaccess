@@ -340,7 +340,7 @@ description: "Lista de tareas de la funcionalidad 003: membresías, pagos, recon
 
 ## Phase 17: Cierre de US12 y US13
 
-- [ ] T101 Ejecutar todas las pruebas (SC-014), revisar seguridad (sin contraseñas ni `FACE_KEY` en Git, rutas con `autenticar` y `autorizar`), actualizar `docs/estado.md` y las historias SOL12345-14 y SOL12345-5 en Jira
+- [X] T101 Ejecutar todas las pruebas (SC-014), revisar seguridad (sin contraseñas ni `FACE_KEY` en Git, rutas con `autenticar` y `autorizar`), actualizar `docs/estado.md` y las historias SOL12345-14 y SOL12345-5 en Jira
 
 ---
 
