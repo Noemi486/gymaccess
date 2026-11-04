@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { describe, it, expect } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Users } from 'lucide-react';
 import { SECCIONES, menuParaRol, seccionDeRuta } from '../src/config/menu.js';
@@ -45,6 +45,28 @@ describe('menuParaRol', () => {
     expect(comoObjeto(menuParaRol('entrenador', secciones)).Operación).toEqual(['Clientes', 'Accesos']);
   });
 
+  it('el título del encabezado sale de la sección también en las subrutas', () => {
+    const casos = {
+      '/dashboard': 'Dashboard',
+      '/tipos-membresia': 'Tipos de membresía',
+      '/pagos': 'Pagos',
+      '/adeudos': 'Adeudos',
+      '/accesos': 'Accesos',
+      '/estacion': 'Estación de acceso',
+      '/clientes/12': 'Clientes',
+    };
+    for (const [ruta, titulo] of Object.entries(casos)) expect(seccionDeRuta(ruta)?.etiqueta).toBe(titulo);
+  });
+
+  it('ningún rol tiene un bloque vacío y cada sección nueva tiene ícono y ruta propia', () => {
+    for (const rol of ['administrador', 'recepcionista', 'entrenador', 'cliente']) {
+      for (const grupo of menuParaRol(rol)) expect(grupo.secciones.length).toBeGreaterThan(0);
+    }
+    const rutas = SECCIONES.map((s) => s.ruta);
+    expect(new Set(rutas).size).toBe(rutas.length);
+    for (const s of SECCIONES) expect(s.icono).toBeTruthy();
+  });
+
   it('el bloque "Membresías y pagos" va entre Operación y Administración', () => {
     const orden = menuParaRol('administrador').map((g) => g.bloque.etiqueta);
     expect(orden).toEqual(['General', 'Operación', 'Membresías y pagos', 'Administración']);
@@ -76,6 +98,15 @@ describe('Sidebar', () => {
     const activos = within(menu).getAllByRole('link', { current: 'page' });
     expect(activos).toHaveLength(1);
     expect(activos[0]).toHaveTextContent('Clientes');
+  });
+
+  it('cada sección nueva aparece resaltada cuando el usuario está en ella', () => {
+    for (const [ruta, etiqueta] of [['/dashboard', 'Dashboard'], ['/pagos', 'Pagos'], ['/adeudos', 'Adeudos'], ['/accesos', 'Accesos']]) {
+      const menu = abrir('administrador', ruta);
+      const activos = within(menu).getAllByRole('link', { current: 'page' });
+      expect(activos.map((a) => a.textContent)).toEqual([etiqueta]);
+      cleanup();
+    }
   });
 
   it('en el inicio solo "Inicio" está activa', () => {

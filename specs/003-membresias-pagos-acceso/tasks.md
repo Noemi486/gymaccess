@@ -276,9 +276,9 @@ description: "Lista de tareas de la funcionalidad 003: membresías, pagos, recon
 
 **Independent Test**: comparar el menú de los 4 roles con la tabla del Anexo.
 
-- [ ] T079 [P] [US10] Completar `frontend/tests/menu.test.jsx` con la matriz final por rol: administrador (Inicio, Dashboard, Clientes, Accesos, Estación de acceso, Tipos de membresía, Pagos, Adeudos, Usuarios y roles), recepcionista (Inicio, Clientes, Accesos, Estación de acceso, Tipos de membresía, Pagos, Adeudos), entrenador (Inicio, Clientes, Accesos), cliente (Inicio, Mi información); orden de bloques General, Operación, Membresías y pagos, Administración; ningún bloque vacío; título del encabezado y resaltado en cada sección nueva, incluida la ruta `/estacion` que no usa el `Layout`
-- [ ] T080 [P] [US10] Crear `frontend/tests/permisos-sprint2.test.jsx`: para cada ruta nueva y cada rol no permitido se muestra "Sin permiso" y no se hace ninguna petición de datos; sin sesión se redirige a `/login`
-- [ ] T081 [US10] Revisar `frontend/src/config/menu.js` y `frontend/src/App.jsx`: títulos del encabezado para subrutas, iconos y orden finales; ajustar si hace falta
+- [X] T079 [P] [US10] Completar `frontend/tests/menu.test.jsx` con la matriz final por rol: administrador (Inicio, Dashboard, Clientes, Accesos, Estación de acceso, Tipos de membresía, Pagos, Adeudos, Usuarios y roles), recepcionista (Inicio, Clientes, Accesos, Estación de acceso, Tipos de membresía, Pagos, Adeudos), entrenador (Inicio, Clientes, Accesos), cliente (Inicio, Mi información); orden de bloques General, Operación, Membresías y pagos, Administración; ningún bloque vacío; título del encabezado y resaltado en cada sección nueva, incluida la ruta `/estacion` que no usa el `Layout`
+- [X] T080 [P] [US10] Crear `frontend/tests/permisos-sprint2.test.jsx`: para cada ruta nueva y cada rol no permitido se muestra "Sin permiso" y no se hace ninguna petición de datos; sin sesión se redirige a `/login`
+- [X] T081 [US10] Revisar `frontend/src/config/menu.js` y `frontend/src/App.jsx`: títulos del encabezado para subrutas, iconos y orden finales; ajustar si hace falta
 
 ---
 
