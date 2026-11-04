@@ -268,6 +268,8 @@ Como usuario autenticado de cualquier rol, quiero cambiar mi contraseña desde e
 
 ## Anexo: Diseño reservado para Sprint 2: Inicio del cliente
 
+> **Nota (2026-11-03):** estas tarjetas ya están activas: las construyó la funcionalidad 003 (US9, `specs/003-membresias-pagos-acceso/`). Lo mismo ocurre con los indicadores "Accesos de hoy" y "Membresías por vencer" y con "Clientes que entraron hoy" del entrenador. "Mis clientes asignados" y rutinas siguen reservados para el Sprint 3.
+
 Estas tarjetas **NO se muestran en esta entrega**. Se anota su diseño para que Sprint 2 las construya sobre el espacio ya reservado en el Inicio del cliente (debajo de la tarjeta compacta de información). Cada tarjeta muestra únicamente datos del propio cliente (RN-14) y sigue las reglas visuales del sistema: el estado se indica con color **y** texto (FR-011), y los colores salen de los tokens de diseño.
 
 **Distribución**: cuadrícula de 2 columnas en pantallas anchas y 1 columna por debajo de 1024 px. Orden: Mi membresía, Acceso facial, Mis últimas visitas, Mis pagos. Cada tarjeta tiene título, contenido y, si hay más información, un enlace "Ver todo".

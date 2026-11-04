@@ -1,6 +1,6 @@
 # Estado del proyecto — GymAccess
 
-Última actualización: 17 de octubre de 2026 (Sprint 2 en curso: fases 1 a 8 de 14 hechas)
+Última actualización: 3 de noviembre de 2026 (Sprint 2: fases 1 a 14 hechas; MVP completo)
 
 ## Resumen
 
@@ -8,7 +8,7 @@
 |---|---|---|---|
 | 001 | Sprint 1: autenticación, usuarios, roles y clientes | `001-base-usuarios-clientes` | ✅ Terminado |
 | 002 | Rediseño de interfaz: menú lateral y sistema visual | `002-interfaz-menu-lateral` | ✅ Terminado (rama `feature/interfaz`) |
-| 003 | Sprint 2: membresías, pagos, reconocimiento facial y acceso (**completa el MVP**) | `003-membresias-pagos-acceso` | 🚧 En curso: fases 1 a 8 hechas, 65 de 89 tareas (rama `feature/sprint-2`) |
+| 003 | Sprint 2: membresías, pagos, reconocimiento facial y acceso (**completa el MVP**) | `003-membresias-pagos-acceso` | ✅ Fases 1 a 14 hechas (rama `feature/sprint-2`). Falta el recorrido manual con la cámara (T088). Siguen US12 (avisos) y US13 (respaldo) |
 | 004 | Sprint 3: entrenadores, rutinas y dashboard (extra) | `004-...` | ⬜ Opcional |
 
 ## MVP
@@ -30,11 +30,11 @@ El MVP queda completo al terminar la funcionalidad **003 (Sprint 2)**. Criterio 
 
 ## Siguiente paso
 
-Funcionalidad **003 — Sprint 2**, en la rama `feature/sprint-2`. Se implementa por fases con `tasks.md` y el equipo prueba cada una.
+Funcionalidad **003 — Sprint 2**, en la rama `feature/sprint-2`.
 
-- Hecho: fases 1 a 8 (tipos de membresía, asignar/renovar, pagos, registro de rostro, estación de acceso y consulta de accesos).
-- Siguiente: **Fase 9** (US7: pantallas Pagos y Adeudos). Después: Dashboard, Inicio por rol, menú, auditoría y cierre.
-- Al cerrar la 003: actualizar este archivo y agregar la nota en la spec 002 (tarea T089).
+- Hecho: fases 1 a 14 (tipos de membresía, asignar/renovar, pagos, registro de rostro, estación de acceso, consulta de accesos, pagos y adeudos, dashboard, Inicio por rol, menú y permisos, auditoría y cierre).
+- Pendiente del equipo: recorrer `specs/003-membresias-pagos-acceso/quickstart.md` con la cámara real y los 4 roles (T088).
+- Siguiente: **US12** (avisos de membresías por vencer y vencidas, Jira SOL12345-14) y **US13** (respaldo automático, Jira SOL12345-5), que salieron del aseguramiento de calidad del 2026-11-03. Después, el Sprint 3 (`docs/sprint-3.md`), que requiere una migración nueva.
 
 ## Pendientes del equipo
 
@@ -73,3 +73,12 @@ Funcionalidad **003 — Sprint 2**, en la rama `feature/sprint-2`. Se implementa
   - Interfaz: login rediseñado en pantalla dividida y acento global cambiado de verde lima a naranja `#f05a24` (solo en `tokens.css`).
   - Criterios de aceptación de las historias de inicio de sesión (spec 001) y de la Estación de acceso (spec 003) reescritos en notación EARS.
   - Pruebas al cierre de la fase 8: backend sobre `gymaccess_test` y frontend en verde; `npm run build` compila. Falta probar la cámara real en navegador (la estación y el registro de rostro).
+
+- **2026-11-03** — Funcionalidad 003 (Sprint 2), fases 9 a 14 en `feature/sprint-2`:
+  - Aseguramiento de calidad de lo pendiente con Jira conectado por MCP (Claude y Claude Code): historias SOL12345-4, -5 y -6 corregidas y SOL12345-11 a -14 creadas en la épica SOL12345-8. Decisiones: avisos dentro del sistema (US12), base local, solo entrada en este sprint (la salida pasa al Sprint 3) y respaldo automático diario (US13).
+  - Fase 9: `GET /api/pagos` (historial con filtros y total) y `GET /api/adeudos`; pantallas Pagos y Adeudos.
+  - Fase 10: `GET /api/dashboard` (solo administrador) con periodo hoy, semana, mes o rango; pantalla Dashboard con botón Actualizar.
+  - Fase 11: Inicio de cada rol: accesos de hoy y membresías por vencer (A, R), clientes que entraron hoy (E) y las 4 tarjetas del cliente con `GET /api/clientes/me/resumen`. Tarjetas del cliente en 2 columnas (corrección tras la revisión en navegador).
+  - Fase 12: matriz de permisos de las pantallas nuevas. Fase 13: pruebas de auditoría; los rechazos al registrar o cambiar un rostro ahora dejan evento de error.
+  - Fase 14: revisión de seguridad (sin `.env` en Git, `FACE_KEY` sin valor en los ejemplos, sin `DELETE`, todas las rutas con `autenticar` y `autorizar`) y prueba de que ninguna respuesta ni la consola contienen datos biométricos.
+  - Pruebas: las del backend corren un archivo a la vez (`--test-concurrency=1`) porque varias comparten `gymaccess_test`; antes fallaban de forma intermitente. Backend 469 pasan y 1 omitida (0 fallos); frontend 341 pasan.

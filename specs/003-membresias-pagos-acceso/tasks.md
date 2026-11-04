@@ -295,12 +295,12 @@ description: "Lista de tareas de la funcionalidad 003: membresías, pagos, recon
 
 ## Phase 14: Polish & Cross-Cutting
 
-- [ ] T084 [P] Crear `backend/tests/integration/sin-biometria.test.js`: recorrer los endpoints del Sprint 2 con datos reales de prueba (rostros registrados) y comprobar con `sinBiometria` que NINGUNA respuesta, de éxito o de error, contiene `descriptor` ni `descriptor_facial`, y que `console.error`/`console.log` no recibieron el descriptor durante las pruebas
-- [ ] T085 [P] Revisión de seguridad: confirmar que `.env` y `.env.test` siguen ignorados por Git, que `.env.example` y `.env.test.example` llevan `FACE_KEY=` sin valor, que `git grep -n "FACE_KEY"` no muestra valores reales, que ninguna ruta del Sprint 2 omite `autenticar` y `autorizar`, y que no existe `DELETE` en SQL ni en rutas
-- [ ] T086 [P] Revisar accesibilidad y diseño de las pantallas nuevas con los tokens: contraste, foco visible, textos con color e insignia, adaptación de 360 a 1920 px y menú en pantallas pequeñas; corregir lo que falte en `frontend/src/styles/estilos.css`
-- [ ] T087 Ejecutar todo: `npm test` en `backend/` (contra `gymaccess_test`) y `npm test` y `npm run build` en `frontend/`; todo debe pasar (SC-014), incluidas las pruebas de los sprints anteriores
+- [X] T084 [P] Crear `backend/tests/integration/sin-biometria.test.js`: recorrer los endpoints del Sprint 2 con datos reales de prueba (rostros registrados) y comprobar con `sinBiometria` que NINGUNA respuesta, de éxito o de error, contiene `descriptor` ni `descriptor_facial`, y que `console.error`/`console.log` no recibieron el descriptor durante las pruebas
+- [X] T085 [P] Revisión de seguridad: confirmar que `.env` y `.env.test` siguen ignorados por Git, que `.env.example` y `.env.test.example` llevan `FACE_KEY=` sin valor, que `git grep -n "FACE_KEY"` no muestra valores reales, que ninguna ruta del Sprint 2 omite `autenticar` y `autorizar`, y que no existe `DELETE` en SQL ni en rutas
+- [X] T086 [P] Revisar accesibilidad y diseño de las pantallas nuevas con los tokens: contraste, foco visible, textos con color e insignia, adaptación de 360 a 1920 px y menú en pantallas pequeñas; corregir lo que falte en `frontend/src/styles/estilos.css`
+- [X] T087 Ejecutar todo: `npm test` en `backend/` (contra `gymaccess_test`) y `npm test` y `npm run build` en `frontend/`; todo debe pasar (SC-014), incluidas las pruebas de los sprints anteriores
 - [ ] T088 Recorrer `specs/003-membresias-pagos-acceso/quickstart.md` con la cámara real de la laptop y los 4 roles (registro de rostro, entrada autorizada y rechazos, 3 intentos fallidos, Dashboard, Inicios, permisos) y anotar los resultados; es una comprobación manual del equipo
-- [ ] T089 Actualizar `docs/estado.md` (funcionalidad 003 terminada, decisiones: pendiente de pago derivado, `@vladmandic/face-api`, `FACE_KEY`, 3 intentos, limitación de detección de vida, pendientes) y actualizar la nota de `specs/002-interfaz-menu-lateral/spec.md` indicando que los espacios reservados quedaron activados por la funcionalidad 003
+- [X] T089 Actualizar `docs/estado.md` (funcionalidad 003 terminada, decisiones: pendiente de pago derivado, `@vladmandic/face-api`, `FACE_KEY`, 3 intentos, limitación de detección de vida, pendientes) y actualizar la nota de `specs/002-interfaz-menu-lateral/spec.md` indicando que los espacios reservados quedaron activados por la funcionalidad 003
 
 ---
 
