@@ -47,6 +47,13 @@ const RESUMENES = {
   },
   entrenador: {
     clientes: { activos: 40, nuevos_7_dias: 6 },
+    mis_clientes: {
+      total: 12,
+      lista: [
+        { id_cliente: 8, nombre: 'Mario', apellido: 'Luna', estado: 'activo' },
+        { id_cliente: 9, nombre: 'Sara', apellido: 'Gil', estado: 'activo' },
+      ],
+    },
     accesos: {
       clientes_hoy: 2,
       ultimos: [
@@ -235,7 +242,7 @@ describe('Inicio: panel de resumen', () => {
   });
 
   describe('entrenador', () => {
-    it('ve el saludo con fecha, el buscador, tres indicadores y la lista de clientes nuevos', async () => {
+    it('ve el saludo con fecha, el buscador, cuatro indicadores y la lista de clientes nuevos', async () => {
       const urls = abrir('entrenador');
       const contenido = within(principal());
 
@@ -245,7 +252,8 @@ describe('Inicio: panel de resumen', () => {
       expect(contenido.getByText('Clientes activos').closest('.stat-card')).toHaveTextContent('40');
       expect(contenido.getByText('Clientes nuevos (7 días)').closest('.stat-card')).toHaveTextContent('6');
       expect(contenido.getByText('Clientes que entraron hoy', { selector: '.stat-etiqueta' }).closest('.stat-card')).toHaveTextContent('2');
-      expect(principal().querySelectorAll('.stat-card')).toHaveLength(3);
+      expect(contenido.getByText('Mis clientes asignados', { selector: '.stat-etiqueta' }).closest('.stat-card')).toHaveTextContent('12');
+      expect(principal().querySelectorAll('.stat-card')).toHaveLength(4);
       expect(contenido.getByText(fechaDeHoy())).toBeInTheDocument();
 
       expect(contenido.queryByRole('link', { name: /registrar cliente/i })).not.toBeInTheDocument();
@@ -287,6 +295,15 @@ describe('Inicio: panel de resumen', () => {
       fireEvent.change(await screen.findByRole('searchbox', { name: /buscar clientes/i }), { target: { value: 'Pérez' } });
       fireEvent.click(screen.getByRole('button', { name: 'Buscar' }));
       expect(await screen.findByTestId('ubicacion')).toHaveTextContent('/clientes?q=P%C3%A9rez');
+    });
+
+    it('lista "Mis clientes asignados" (Sprint 3) con enlace y "Ver los N clientes" si hay más', async () => {
+      abrir('entrenador');
+      const lista = await screen.findByRole('list', { name: 'Mis clientes asignados' });
+      const filas = within(lista).getAllByRole('listitem');
+      expect(filas).toHaveLength(2);
+      expect(within(filas[0]).getByRole('link', { name: 'Mario Luna' })).toHaveAttribute('href', '/clientes/8');
+      expect(screen.getByRole('link', { name: 'Ver los 12 clientes' })).toHaveAttribute('href', '/mis-clientes');
     });
 
     it('lista "Clientes que entraron hoy": avatar, nombre completo y hora, sin datos de contacto', async () => {
@@ -432,7 +449,7 @@ describe('Configuración de indicadores', () => {
       'accesos-hoy',
       'membresias-por-vencer',
     ]);
-    expect(indicadoresParaRol('entrenador').map((i) => i.id)).toEqual(['clientes-activos', 'clientes-7-dias', 'clientes-entraron-hoy']);
+    expect(indicadoresParaRol('entrenador').map((i) => i.id)).toEqual(['clientes-activos', 'clientes-7-dias', 'clientes-entraron-hoy', 'mis-clientes-asignados']);
     expect(indicadoresParaRol('cliente')).toEqual([]);
   });
 

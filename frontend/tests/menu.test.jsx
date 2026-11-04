@@ -19,7 +19,7 @@ const ESPERADO = {
     Operación: ['Clientes', 'Entrenadores', 'Accesos', 'Estación de acceso'],
     'Membresías y pagos': ['Tipos de membresía', 'Pagos', 'Adeudos'],
   },
-  entrenador: { General: ['Inicio'], Operación: ['Clientes', 'Accesos'] },
+  entrenador: { General: ['Inicio'], Operación: ['Clientes', 'Mis clientes', 'Accesos'] },
   cliente: { General: ['Inicio', 'Mi información'] },
 };
 
@@ -42,7 +42,7 @@ describe('menuParaRol', () => {
     const nueva = { id: 'pagos', etiqueta: 'Pagos', ruta: '/pagos', icono: Users, bloque: 'operacion', roles: ['recepcionista'] };
     const secciones = [...SECCIONES, nueva];
     expect(comoObjeto(menuParaRol('recepcionista', secciones)).Operación).toEqual(['Clientes', 'Entrenadores', 'Accesos', 'Estación de acceso', 'Pagos']);
-    expect(comoObjeto(menuParaRol('entrenador', secciones)).Operación).toEqual(['Clientes', 'Accesos']);
+    expect(comoObjeto(menuParaRol('entrenador', secciones)).Operación).toEqual(['Clientes', 'Mis clientes', 'Accesos']);
   });
 
   it('el título del encabezado sale de la sección también en las subrutas', () => {

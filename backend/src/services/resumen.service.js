@@ -5,6 +5,7 @@ import { vistaCliente } from '../utils/vistaCliente.js';
 const ROLES_PERSONAL = ['administrador', 'recepcionista', 'entrenador'];
 const ROLES_USUARIO = ['administrador', 'recepcionista', 'entrenador', 'cliente'];
 const CANTIDAD_ULTIMOS = 5;
+const CANTIDAD_MIS_CLIENTES = 8;
 
 // Cada entrada del resumen se declara aquí: `roles` dice quién la recibe y `obtener` la calcula.
 // El servicio solo calcula y devuelve lo que el rol puede ver (negar por defecto).
@@ -67,6 +68,15 @@ export function crearResumenService({ modelo }) {
         return { hoy: await modelo.contarAccesosAutorizadosHoy() };
       },
     },
+    // ---- Sprint 3 (spec 004, FR-024) ----
+    {
+      clave: 'mis_clientes',
+      roles: ['entrenador'],
+      async obtener(_rol, actor) {
+        const { filas, total } = await modelo.misClientesAsignados(actor.id_usuario, CANTIDAD_MIS_CLIENTES);
+        return { total, lista: filas };
+      },
+    },
     {
       clave: 'membresias',
       roles: ['administrador', 'recepcionista'],
@@ -81,7 +91,7 @@ export function crearResumenService({ modelo }) {
     if (!actor || !ROLES_PERSONAL.includes(actor.rol)) throw errorSinPermiso();
     const resumen = {};
     for (const entrada of ENTRADAS) {
-      if (entrada.roles.includes(actor.rol)) resumen[entrada.clave] = await entrada.obtener(actor.rol);
+      if (entrada.roles.includes(actor.rol)) resumen[entrada.clave] = await entrada.obtener(actor.rol, actor);
     }
     return resumen;
   }

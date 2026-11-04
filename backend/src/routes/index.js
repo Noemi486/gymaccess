@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import accesosRoutes from './accesos.routes.js';
 import adeudosRoutes from './adeudos.routes.js';
+import asignacionesRoutes from './asignaciones.routes.js';
 import avisosRoutes from './avisos.routes.js';
 import authRoutes from './auth.routes.js';
 import clientesRoutes from './clientes.routes.js';
@@ -33,6 +34,7 @@ router.use('/dashboard', dashboardRoutes);
 router.use('/accesos', accesosRoutes);
 router.use('/entrenadores', entrenadoresRoutes);
 router.use('/', rostrosRoutes);
-router.use('/', membresiasRoutes); // /clientes/:id/membresias y /membresias/:id/... (después de /clientes)
+router.use('/', membresiasRoutes);
+router.use('/', asignacionesRoutes); // /clientes/:id/entrenador y /entrenamiento/mis-clientes // /clientes/:id/membresias y /membresias/:id/... (después de /clientes)
 
 export default router;

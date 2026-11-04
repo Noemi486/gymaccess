@@ -20,9 +20,9 @@
 
 ## Phase 3: US2 y US7 Asignaciones (P1)
 
-- [ ] T009 [P] [US2] `tests/integration/asignaciones.test.js`: asignar, cambiar (cierra la anterior), quitar, historial, rechazos (cliente inactivo o inexistente, entrenador inactivo o con otro rol), simultáneas → una sola activa, permisos, auditoría; lista del entrenador = asignaciones activas (US7)
-- [ ] T010 [US2] `models/asignacion.model.js`, `services/asignaciones.service.js`, rutas `GET/PUT /clientes/:id/entrenador` y `GET /entrenamiento/mis-clientes`
-- [ ] T011 [P] [US2] Frontend: `PanelEntrenador` en el detalle del cliente, clientes en el detalle del entrenador, página "Mis clientes" y "Mis clientes asignados" en el Inicio del entrenador; pruebas
+- [X] T009 [P] [US2] `tests/integration/asignaciones.test.js`: asignar, cambiar (cierra la anterior), quitar, historial, rechazos (cliente inactivo o inexistente, entrenador inactivo o con otro rol), simultáneas → una sola activa, permisos, auditoría; lista del entrenador = asignaciones activas (US7)
+- [X] T010 [US2] `models/asignacion.model.js`, `services/asignaciones.service.js`, rutas `GET/PUT /clientes/:id/entrenador` y `GET /entrenamiento/mis-clientes`
+- [X] T011 [P] [US2] Frontend: `PanelEntrenador` en el detalle del cliente, clientes en el detalle del entrenador, página "Mis clientes" y "Mis clientes asignados" en el Inicio del entrenador; pruebas
 
 ## Phase 4: US3 Rutinas (P1)
 

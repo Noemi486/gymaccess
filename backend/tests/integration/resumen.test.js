@@ -190,7 +190,7 @@ describe('API de resumen del inicio', () => {
       const { status, cuerpo } = await api('GET', '/resumen', tokenEntrenador);
 
       assert.equal(status, 200);
-      assert.deepEqual(Object.keys(cuerpo).sort(), ['accesos', 'clientes', 'ultimos_clientes']);
+      assert.deepEqual(Object.keys(cuerpo).sort(), ['accesos', 'clientes', 'mis_clientes', 'ultimos_clientes']);
       assert.deepEqual(Object.keys(cuerpo.clientes).sort(), ['activos', 'nuevos_7_dias']);
       assert.ok(Number.isInteger(cuerpo.clientes.activos) && cuerpo.clientes.activos >= 1);
       assert.ok(Number.isInteger(cuerpo.clientes.nuevos_7_dias) && cuerpo.clientes.nuevos_7_dias >= 1);

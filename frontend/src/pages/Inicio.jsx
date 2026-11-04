@@ -8,6 +8,7 @@ import { tarjetasClienteVisibles } from '../config/tarjetasCliente.js';
 import BuscadorClientes from '../components/BuscadorClientes.jsx';
 import ClientesNuevos from '../components/ClientesNuevos.jsx';
 import ClientesQueEntraronHoy from '../components/ClientesQueEntraronHoy.jsx';
+import MisClientesAsignados from '../components/MisClientesAsignados.jsx';
 import Badge from '../components/ui/Badge.jsx';
 import Button from '../components/ui/Button.jsx';
 import Card from '../components/ui/Card.jsx';
@@ -165,6 +166,8 @@ function ResumenPersonal({ rol, resumen }) {
 
       <div className="inicio-paneles">
         {/* Entrenador: lista de clientes nuevos con la proyección básica (sin datos de contacto) */}
+        {/* Sprint 3: "Mis clientes asignados" va antes de "Clientes nuevos" (reservado en la spec 002) */}
+        {rol === 'entrenador' && resumen.mis_clientes && <MisClientesAsignados datos={resumen.mis_clientes} />}
         {rol === 'entrenador' && resumen.accesos?.ultimos && (
           <ClientesQueEntraronHoy clientes={resumen.accesos.ultimos} />
         )}

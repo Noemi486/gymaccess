@@ -2323,3 +2323,19 @@ a.campana-aviso:hover {
   margin: var(--espacio-6) 0 var(--espacio-3);
   font-size: var(--texto-lg);
 }
+
+.lista-historial {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  margin: var(--espacio-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-historial li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espacio-2) var(--espacio-3);
+}

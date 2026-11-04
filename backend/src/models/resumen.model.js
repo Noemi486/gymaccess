@@ -90,3 +90,15 @@ export async function ultimosClientesQueEntraronHoy(limite) {
   );
   return filas.map((fila) => ({ id_cliente: fila.id_cliente, nombre: fila.nombre, apellido: fila.apellido, hora: fila.hora }));
 }
+
+// Sprint 3 (FR-024): clientes activos asignados hoy al entrenador (básico: id, nombre, apellido, estado).
+export async function misClientesAsignados(idEntrenador, limite) {
+  const base = `FROM asignaciones_entrenador a JOIN clientes c ON c.id_cliente = a.id_cliente
+                WHERE a.id_entrenador = ? AND a.estado = 'activa' AND c.estado = 'activo'`;
+  const [conteo] = await pool.execute(`SELECT COUNT(*) AS total ${base}`, [idEntrenador]);
+  const [filas] = await pool.execute(
+    `SELECT c.id_cliente, c.nombre, c.apellido, c.estado ${base} ORDER BY c.apellido, c.nombre, c.id_cliente LIMIT ?`,
+    [idEntrenador, String(limite)],
+  );
+  return { filas, total: Number(conteo[0].total) };
+}

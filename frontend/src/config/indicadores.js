@@ -1,4 +1,4 @@
-import { CalendarClock, DoorOpen, ShieldCheck, UserCheck, UserPlus, UserX, Users } from 'lucide-react';
+import { CalendarClock, ClipboardList, DoorOpen, ShieldCheck, UserCheck, UserPlus, UserX, Users } from 'lucide-react';
 
 // Indicadores (StatCard) del inicio. Cada uno dice qué rol lo ve y de dónde sale su valor en la
 // respuesta de GET /api/resumen. El servidor solo envía a cada rol lo que le corresponde.
@@ -71,6 +71,15 @@ export const INDICADORES = [
     icono: DoorOpen,
     roles: ['entrenador'],
     valor: (resumen) => resumen.accesos?.clientes_hoy,
+    disponible: true,
+  },
+  // --- Sprint 3 (spec 004, FR-024) ---
+  {
+    id: 'mis-clientes-asignados',
+    etiqueta: 'Mis clientes asignados',
+    icono: ClipboardList,
+    roles: ['entrenador'],
+    valor: (resumen) => resumen.mis_clientes?.total,
     disponible: true,
   },
 ];

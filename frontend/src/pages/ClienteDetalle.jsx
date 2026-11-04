@@ -5,6 +5,7 @@ import { ErrorApi, solicitar } from '../api/cliente.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import PanelRostro from '../components/PanelRostro.jsx';
 import PanelMembresia from '../components/PanelMembresia.jsx';
+import PanelEntrenador from '../components/PanelEntrenador.jsx';
 import PerfilCliente from '../components/PerfilCliente.jsx';
 import Button from '../components/ui/Button.jsx';
 import Spinner from '../components/ui/Spinner.jsx';
@@ -49,6 +50,7 @@ export default function ClienteDetalle() {
 
       {puedeEditar && <PanelMembresia idCliente={cliente.id_cliente} clienteActivo={cliente.estado === 'activo'} rol={rol} />}
       {puedeEditar && <PanelRostro cliente={cliente} rol={rol} />}
+      {puedeEditar && <PanelEntrenador cliente={cliente} />}
 
       <div className="acciones perfil-acciones">
         <Button to="/clientes" variante="secundario">
