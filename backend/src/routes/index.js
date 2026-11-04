@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import accesosRoutes from './accesos.routes.js';
+import adeudosRoutes from './adeudos.routes.js';
 import authRoutes from './auth.routes.js';
 import clientesRoutes from './clientes.routes.js';
 import membresiasRoutes from './membresias.routes.js';
@@ -23,6 +24,7 @@ router.use('/clientes', clientesRoutes);
 router.use('/resumen', resumenRoutes);
 router.use('/tipos-membresia', tiposMembresiaRoutes);
 router.use('/pagos', pagosRoutes);
+router.use('/adeudos', adeudosRoutes);
 router.use('/accesos', accesosRoutes);
 router.use('/', rostrosRoutes);
 router.use('/', membresiasRoutes); // /clientes/:id/membresias y /membresias/:id/... (después de /clientes)

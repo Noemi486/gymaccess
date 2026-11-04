@@ -2044,3 +2044,50 @@ tbody tr:last-child td {
     padding: var(--espacio-4);
   }
 }
+
+/* ---- Pagos y Adeudos (Sprint 2, US7) ---- */
+.resumen-lista {
+  margin: 0 0 var(--espacio-3, 0.75rem);
+  color: var(--color-texto-suave);
+  font-size: var(--texto-sm);
+}
+.resumen-lista strong {
+  color: var(--color-texto);
+}
+.texto-tenue {
+  color: var(--color-texto-tenue);
+}
+.lista-seleccion {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.opcion-seleccion {
+  width: 100%;
+  display: grid;
+  gap: 0.25rem;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  background: var(--color-superficie-elevada);
+  color: var(--color-texto);
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+}
+.opcion-seleccion span {
+  color: var(--color-texto-suave);
+  font-size: var(--texto-sm);
+}
+.opcion-seleccion:hover {
+  background: var(--color-superficie-hover);
+  border-color: var(--color-borde-fuerte);
+}
+.opcion-seleccion:focus-visible {
+  outline: 2px solid var(--color-acento);
+  outline-offset: 2px;
+}

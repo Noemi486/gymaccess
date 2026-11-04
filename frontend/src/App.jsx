@@ -6,6 +6,8 @@ import RutaProtegida from './components/RutaProtegida.jsx';
 import ClienteDetalle from './pages/ClienteDetalle.jsx';
 import ClienteForm from './pages/ClienteForm.jsx';
 import Accesos from './pages/Accesos.jsx';
+import Adeudos from './pages/Adeudos.jsx';
+import Pagos from './pages/Pagos.jsx';
 import Clientes from './pages/Clientes.jsx';
 import EstacionAcceso from './pages/EstacionAcceso.jsx';
 import Inicio from './pages/Inicio.jsx';
@@ -128,6 +130,23 @@ function Rutas() {
           element={
             <Con roles={['administrador', 'recepcionista']}>
               <TiposMembresia />
+            </Con>
+          }
+        />
+
+        <Route
+          path="/pagos"
+          element={
+            <Con roles={['administrador', 'recepcionista']}>
+              <Pagos />
+            </Con>
+          }
+        />
+        <Route
+          path="/adeudos"
+          element={
+            <Con roles={['administrador', 'recepcionista']}>
+              <Adeudos />
             </Con>
           }
         />

@@ -85,6 +85,18 @@ export function pagoPublico(fila) {
   };
 }
 
+// Adeudo: membresía pendiente de pago (fila de membresías + clientes + tipos). El adeudo es el precio vigente del plan.
+export function adeudoPublico(fila) {
+  return {
+    id_membresia: fila.id_membresia,
+    cliente: { id_cliente: fila.id_cliente, nombre: fila.cliente_nombre, apellido: fila.cliente_apellido },
+    plan: fila.tipo_nombre,
+    adeudo: numeroMonto(fila.tipo_precio),
+    fecha_inicio: fila.fecha_inicio,
+    fecha_fin: fila.fecha_fin,
+  };
+}
+
 // Intento de acceso. Con { basico: true } (entrenador) solo nombre, fecha, hora y resultado.
 export function accesoPublico(fila, { basico = false } = {}) {
   const cliente = fila.id_cliente

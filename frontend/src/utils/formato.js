@@ -42,3 +42,21 @@ export function formatearFechaCorta(valor) {
   if (Number.isNaN(fecha.getTime())) return '';
   return `${fecha.getDate()} ${MESES_CORTOS[fecha.getMonth()]} ${fecha.getFullYear()}`;
 }
+
+// Fecha y hora de un DATETIME -> "14 oct 2026 · 10:02".
+// El servidor envía los DATETIME como instante ISO con zona ("2026-10-14T16:02:11.000Z"): se muestran en la hora
+// local del navegador. Un texto sin zona ("2026-10-14 10:02:11") se muestra tal cual, sin convertir.
+const MESES_FECHA_HORA = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+const dos = (n) => String(n).padStart(2, '0');
+export function formatearFechaHora(valor) {
+  const texto = String(valor ?? '');
+  if (/(Z|[+-]\d{2}:\d{2})$/.test(texto)) {
+    const fecha = new Date(texto);
+    if (Number.isNaN(fecha.getTime())) return texto;
+    return `${fecha.getDate()} ${MESES_FECHA_HORA[fecha.getMonth()]} ${fecha.getFullYear()} · ${dos(fecha.getHours())}:${dos(fecha.getMinutes())}`;
+  }
+  const coincide = texto.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+  if (!coincide) return texto;
+  const [, anio, mes, dia, hora, minuto] = coincide;
+  return `${Number(dia)} ${MESES_FECHA_HORA[Number(mes) - 1]} ${anio} · ${hora}:${minuto}`;
+}

@@ -1,4 +1,4 @@
-import { DoorOpen, House, ScanFace, Tags, UserCog, UserRound, Users } from 'lucide-react';
+import { DoorOpen, House, ReceiptText, ScanFace, Tags, UserCog, UserRound, Users, Wallet } from 'lucide-react';
 
 // ÚNICA fuente de las secciones del menú lateral.
 // Para agregar una sección (por ejemplo, las de Sprint 2) basta con añadir una entrada a SECCIONES.
@@ -57,6 +57,22 @@ export const SECCIONES = [
     etiqueta: 'Tipos de membresía',
     ruta: '/tipos-membresia',
     icono: Tags,
+    bloque: 'membresias-pagos',
+    roles: ['administrador', 'recepcionista'],
+  },
+  {
+    id: 'pagos',
+    etiqueta: 'Pagos',
+    ruta: '/pagos',
+    icono: Wallet,
+    bloque: 'membresias-pagos',
+    roles: ['administrador', 'recepcionista'],
+  },
+  {
+    id: 'adeudos',
+    etiqueta: 'Adeudos',
+    ruta: '/adeudos',
+    icono: ReceiptText,
     bloque: 'membresias-pagos',
     roles: ['administrador', 'recepcionista'],
   },

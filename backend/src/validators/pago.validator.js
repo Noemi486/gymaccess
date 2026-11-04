@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import './mensajes.js'; // mensajes de zod en español
 import { aCentavos, deCentavos } from '../utils/dinero.js';
+import { busquedaEsquema, fechaEsquema } from './comunes.js';
 
 // Pagos (data-model.md, tabla pagos): un solo pago por membresía, por el monto completo.
 
@@ -39,4 +40,27 @@ export const pagoCrearEsquema = z.strictObject({
 export const pagoEnLineaEsquema = z.strictObject({
   metodo_pago: metodoEsquema,
   monto: montoEsquema,
+});
+
+// GET /api/pagos?desde=&hasta=&metodo_pago=&q=&page=&limit=
+export const pagoListarQueryEsquema = z
+  .object({
+    desde: fechaEsquema.optional(),
+    hasta: fechaEsquema.optional(),
+    metodo_pago: metodoEsquema.optional(),
+    q: busquedaEsquema,
+    page: z.string().optional(),
+    limit: z.string().optional(),
+  })
+  .superRefine((datos, contexto) => {
+    if (datos.desde && datos.hasta && datos.desde > datos.hasta) {
+      contexto.addIssue({ code: 'custom', path: ['hasta'], message: 'La fecha final no puede ser anterior a la inicial.' });
+    }
+  });
+
+// GET /api/adeudos?q=&page=&limit=
+export const adeudoListarQueryEsquema = z.object({
+  q: busquedaEsquema,
+  page: z.string().optional(),
+  limit: z.string().optional(),
 });

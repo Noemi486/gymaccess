@@ -5,10 +5,10 @@ import * as membresiaModeloReal from '../models/membresia.model.js';
 import * as pagoModeloReal from '../models/pago.model.js';
 import * as auditoriaServicio from './auditoria.service.js';
 import { MODULOS } from './auditoria.service.js';
-import { aCentavos, formatearMonto } from '../utils/dinero.js';
+import { aCentavos, deCentavos, formatearMonto } from '../utils/dinero.js';
 import { errorConflicto, errorNoEncontrado, errorValidacion } from '../utils/errores.js';
 import { estadoEfectivo } from '../utils/membresia.js';
-import { membresiaPublica } from '../utils/serializadores.js';
+import { adeudoPublico, membresiaPublica, pagoPublico } from '../utils/serializadores.js';
 
 // Las dependencias se inyectan para poder probar el servicio sin base de datos.
 export function crearPagosService({
@@ -78,7 +78,19 @@ export function crearPagosService({
     }
   }
 
-  return { registrar, registrarEnTransaccion };
+  // GET /pagos: historial con el total de lo filtrado (en centavos para no acumular errores de decimales).
+  async function listar({ desde, hasta, metodo_pago, q, page, limit, offset }) {
+    const { filas, total, total_monto } = await pagoModelo.listar({ desde, hasta, metodo_pago, q, limit, offset });
+    return { data: filas.map(pagoPublico), page, limit, total, total_monto: deCentavos(aCentavos(total_monto)) };
+  }
+
+  // GET /adeudos: membresías pendientes de pago, la fecha de inicio más antigua primero.
+  async function listarAdeudos({ q, page, limit, offset }) {
+    const { filas, total, total_adeudo } = await pagoModelo.listarAdeudos({ q, limit, offset });
+    return { data: filas.map(adeudoPublico), page, limit, total, total_adeudo: deCentavos(aCentavos(total_adeudo)) };
+  }
+
+  return { registrar, registrarEnTransaccion, listar, listarAdeudos };
 }
 
-export const { registrar, registrarEnTransaccion } = crearPagosService();
+export const { registrar, registrarEnTransaccion, listar, listarAdeudos } = crearPagosService();

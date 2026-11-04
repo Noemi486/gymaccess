@@ -11,13 +11,13 @@ const ESPERADO = {
   administrador: {
     General: ['Inicio'],
     Operación: ['Clientes', 'Accesos', 'Estación de acceso'],
-    'Membresías y pagos': ['Tipos de membresía'],
+    'Membresías y pagos': ['Tipos de membresía', 'Pagos', 'Adeudos'],
     Administración: ['Usuarios y roles'],
   },
   recepcionista: {
     General: ['Inicio'],
     Operación: ['Clientes', 'Accesos', 'Estación de acceso'],
-    'Membresías y pagos': ['Tipos de membresía'],
+    'Membresías y pagos': ['Tipos de membresía', 'Pagos', 'Adeudos'],
   },
   entrenador: { General: ['Inicio'], Operación: ['Clientes', 'Accesos'] },
   cliente: { General: ['Inicio', 'Mi información'] },
@@ -68,7 +68,7 @@ describe('Sidebar', () => {
     expect(screen.getByText('Operación')).toBeInTheDocument();
     expect(screen.getByText('Membresías y pagos')).toBeInTheDocument();
     expect(screen.queryByText('Administración')).not.toBeInTheDocument();
-    expect(within(menu).getAllByRole('link').map((a) => a.textContent)).toEqual(['Inicio', 'Clientes', 'Accesos', 'Estación de acceso', 'Tipos de membresía']);
+    expect(within(menu).getAllByRole('link').map((a) => a.textContent)).toEqual(['Inicio', 'Clientes', 'Accesos', 'Estación de acceso', 'Tipos de membresía', 'Pagos', 'Adeudos']);
   });
 
   it('marca como activa solo la sección actual', () => {
