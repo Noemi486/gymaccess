@@ -134,7 +134,7 @@ export default function EditorRutina({ idCliente, base, onGuardada, onCancelar }
             return (
               <div key={j} className="editor-ejercicio" role="group" aria-label={`Día ${d.dia}, ejercicio ${n}`}>
                 <FormField id={`${id}-nombre`} etiqueta={`Ejercicio ${n}`} error={errores[`${ruta}.nombre`]}>
-                  <Input value={e.nombre} onChange={cambiarEjercicio(i, j, 'nombre')} maxLength={100} placeholder="Nombre" />
+                  <Input value={e.nombre} onChange={cambiarEjercicio(i, j, 'nombre')} maxLength={100} placeholder="Por ejemplo: Sentadilla" />
                 </FormField>
                 <FormField id={`${id}-series`} etiqueta="Series" error={errores[`${ruta}.series`]}>
                   <Input type="number" min={1} max={20} value={e.series} onChange={cambiarEjercicio(i, j, 'series')} />

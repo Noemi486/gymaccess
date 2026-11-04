@@ -2398,17 +2398,43 @@ a.campana-aviso:hover {
   font-weight: 700;
 }
 
+/* Fila 1: nombre (ancho), series, repeticiones y "Quitar". Fila 2: peso, descanso e instrucciones (ancho). */
 .editor-ejercicio {
   display: grid;
-  grid-template-columns: 2fr repeat(4, minmax(90px, 1fr)) 2fr auto;
-  gap: var(--espacio-2);
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  gap: var(--espacio-2) var(--espacio-3);
   align-items: end;
   padding-bottom: var(--espacio-3);
   border-bottom: 1px dashed var(--color-borde);
 }
 
-@media (max-width: 1023px) {
+.editor-ejercicio > .campo {
+  min-width: 0;
+}
+
+.editor-ejercicio .entrada {
+  width: 100%;
+  min-width: 0;
+}
+
+.editor-ejercicio > .campo:nth-child(1),
+.editor-ejercicio > .campo:nth-child(6) {
+  grid-column: span 2;
+}
+
+.editor-ejercicio > .btn {
+  grid-column: 5;
+  grid-row: 1;
+}
+
+@media (max-width: 640px) {
   .editor-ejercicio {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .editor-ejercicio > .btn {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    justify-self: start;
   }
 }
