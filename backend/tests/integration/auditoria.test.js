@@ -178,7 +178,8 @@ describe('Auditoría del Sprint 2', () => {
 
   it('no existe ninguna ruta para consultar, modificar o borrar la auditoría', async () => {
     for (const metodo of ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']) {
-      const r = await api(metodo, '/auditoria', admin.token, {});
+      // GET no lleva cuerpo (fetch no lo permite); los demás métodos, uno vacío.
+      const r = await api(metodo, '/auditoria', admin.token, metodo === 'GET' ? undefined : {});
       assert.equal(r.status, 404, `${metodo} /auditoria`);
     }
   });
